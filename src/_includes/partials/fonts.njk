@@ -1,11 +1,20 @@
-{# Loads the web fonts listed in _data/fonts.json from the font base URL, and preloads the ones used at the top of the page. #}
+{#-
+  Loads the web fonts.
+  The licensed fonts (_data/fonts.json) come from the font base URL. The ones used at the top of the
+  page are preloaded, and text stays hidden for a moment instead of flashing in a different font.
+  The free fallback fonts (_data/fallbackFonts.json) are only fetched if a licensed font fails or
+  lacks a character. Each is scaled to take up the same space as the font it stands in for.
+-#}
 {%- for font in fonts %}
   {%- if font.preload %}
-  <link rel="preload" href="{{ fontBase }}{{ font.file }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ fontBase }}{{ font.file }}{% if fontVersions[font.file] %}?v={{ fontVersions[font.file] }}{% endif %}" as="font" type="font/woff2" crossorigin>
   {%- endif %}
 {%- endfor %}
   <style>
   {%- for font in fonts %}
-    @font-face { font-family: "{{ font.family }}"; font-weight: {{ font.weight }}; font-style: {{ font.style }}; font-display: swap; src: url("{{ fontBase }}{{ font.file }}") format("woff2"); }
+    @font-face { font-family: "{{ font.family }}"; font-weight: {{ font.weight }}; font-style: {{ font.style }}; font-display: block; src: url("{{ fontBase }}{{ font.file }}{% if fontVersions[font.file] %}?v={{ fontVersions[font.file] }}{% endif %}") format("woff2"); }
+  {%- endfor %}
+  {%- for font in fallbackFonts %}
+    @font-face { font-family: "{{ font.family }}"; font-weight: {{ font.weight }}; font-style: {{ font.style }}; font-display: swap; src: url("/assets/fonts/{{ font.file }}") format("woff2"); size-adjust: {{ font.sizeAdjust }}; ascent-override: {{ font.ascentOverride }}; descent-override: {{ font.descentOverride }}; line-gap-override: {{ font.lineGapOverride }}; }
   {%- endfor %}
   </style>

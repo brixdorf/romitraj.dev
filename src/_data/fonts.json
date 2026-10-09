@@ -5,6 +5,7 @@
     "style": "normal",
     "source": "Manuka Collection/Manuka/manuka-black.woff2",
     "file": "manuka-black.woff2",
+    "fallback": "anton-regular.woff2",
     "preload": true
   },
   {
@@ -13,6 +14,7 @@
     "style": "normal",
     "source": "Louize Display/LouizeDisplay-Regular.otf",
     "file": "louize-display-regular.woff2",
+    "fallback": "cormorant-regular.woff2",
     "preload": true
   },
   {
@@ -21,7 +23,8 @@
     "style": "italic",
     "source": "Louize Display/LouizeDisplay-Italic.otf",
     "file": "louize-display-italic.woff2",
-    "preload": false
+    "fallback": "cormorant-italic.woff2",
+    "preload": true
   },
   {
     "family": "Louize",
@@ -29,6 +32,7 @@
     "style": "normal",
     "source": "Louize/Louize-Regular.otf",
     "file": "louize-regular.woff2",
+    "fallback": "cormorant-regular.woff2",
     "preload": false
   },
   {
@@ -37,6 +41,7 @@
     "style": "italic",
     "source": "Louize/Louize-Italic.otf",
     "file": "louize-italic.woff2",
+    "fallback": "cormorant-italic.woff2",
     "preload": false
   },
   {
@@ -45,6 +50,7 @@
     "style": "normal",
     "source": "PPNeueMontreal/PPNeueMontreal-Regular.otf",
     "file": "neue-montreal-regular.woff2",
+    "fallback": "inter-tight-regular.woff2",
     "preload": true
   },
   {
@@ -53,6 +59,7 @@
     "style": "normal",
     "source": "PPNeueMontreal/PPNeueMontreal-Semibold.otf",
     "file": "neue-montreal-semibold.woff2",
+    "fallback": "inter-tight-semibold.woff2",
     "preload": false
   }
 ]

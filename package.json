@@ -15,6 +15,7 @@
     "build": "eleventy",
     "start": "node server/index.js",
     "fonts": "python scripts/fonts.py",
+    "fonts:fallback": "python scripts/fallback_fonts.py",
     "check": "node scripts/check.mjs"
   },
   "dependencies": {

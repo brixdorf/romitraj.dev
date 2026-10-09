@@ -40,6 +40,9 @@ export default function (eleventyConfig) {
   eleventyConfig.addWatchTarget('./src/assets/css/');
   eleventyConfig.addWatchTarget('./src/assets/js/');
 
+  // The free fallback fonts and their license files ship with the site.
+  eleventyConfig.addPassthroughCopy({ 'src/assets/fonts': 'assets/fonts' });
+
   // Copy the licensed fonts into the local built site. _site/ is ignored by git, so they never reach this repo.
   if (hasLocalFonts && fontBase === '/fonts/') {
     eleventyConfig.addPassthroughCopy({ [localFonts]: 'fonts' });

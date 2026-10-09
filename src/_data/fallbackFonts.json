@@ -1,0 +1,79 @@
+[
+  {
+    "family": "Manuka Fallback",
+    "weight": 400,
+    "style": "normal",
+    "file": "anton-regular.woff2",
+    "madeFrom": "Anton",
+    "sizeAdjust": "69.7%",
+    "ascentOverride": "127.8%",
+    "descentOverride": "17.9%",
+    "lineGapOverride": "0.0%"
+  },
+  {
+    "family": "Louize Display Fallback",
+    "weight": 400,
+    "style": "normal",
+    "file": "cormorant-regular.woff2",
+    "madeFrom": "Cormorant",
+    "sizeAdjust": "91.4%",
+    "ascentOverride": "100.1%",
+    "descentOverride": "30.2%",
+    "lineGapOverride": "2.6%"
+  },
+  {
+    "family": "Louize Display Fallback",
+    "weight": 400,
+    "style": "italic",
+    "file": "cormorant-italic.woff2",
+    "madeFrom": "Cormorant",
+    "sizeAdjust": "91.9%",
+    "ascentOverride": "99.6%",
+    "descentOverride": "30.0%",
+    "lineGapOverride": "2.6%"
+  },
+  {
+    "family": "Louize Fallback",
+    "weight": 400,
+    "style": "normal",
+    "file": "cormorant-regular.woff2",
+    "madeFrom": "Cormorant",
+    "sizeAdjust": "101.8%",
+    "ascentOverride": "89.9%",
+    "descentOverride": "27.1%",
+    "lineGapOverride": "2.4%"
+  },
+  {
+    "family": "Louize Fallback",
+    "weight": 400,
+    "style": "italic",
+    "file": "cormorant-italic.woff2",
+    "madeFrom": "Cormorant",
+    "sizeAdjust": "101.2%",
+    "ascentOverride": "90.4%",
+    "descentOverride": "27.3%",
+    "lineGapOverride": "2.4%"
+  },
+  {
+    "family": "Neue Montreal Fallback",
+    "weight": 400,
+    "style": "normal",
+    "file": "inter-tight-regular.woff2",
+    "madeFrom": "Inter Tight",
+    "sizeAdjust": "98.7%",
+    "ascentOverride": "97.1%",
+    "descentOverride": "24.5%",
+    "lineGapOverride": "0.0%"
+  },
+  {
+    "family": "Neue Montreal Fallback",
+    "weight": 700,
+    "style": "normal",
+    "file": "inter-tight-semibold.woff2",
+    "madeFrom": "Inter Tight",
+    "sizeAdjust": "99.5%",
+    "ascentOverride": "96.2%",
+    "descentOverride": "24.3%",
+    "lineGapOverride": "0.0%"
+  }
+]

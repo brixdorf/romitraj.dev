@@ -16,11 +16,11 @@
   --color-bar-3: #f6a65e;
   --color-bar-4: #fbe3c4;
 
-  /* Fonts: the licensed face first, then its free stand-in, then a system font. */
-  --font-display: "Manuka", "Anton", Impact, sans-serif;
-  --font-serif-display: "Louize Display", "Cormorant", Georgia, serif;
-  --font-serif: "Louize", "Cormorant", Georgia, serif;
-  --font-text: "Neue Montreal", "Inter Tight", Arial, sans-serif;
+  /* Fonts: the licensed face first, then its free stand-in (set up in _data/fallbackFonts.json), then a system font. */
+  --font-display: "Manuka", "Manuka Fallback", Impact, sans-serif;
+  --font-serif-display: "Louize Display", "Louize Display Fallback", Georgia, serif;
+  --font-serif: "Louize", "Louize Fallback", Georgia, serif;
+  --font-text: "Neue Montreal", "Neue Montreal Fallback", Arial, sans-serif;
 
   /* Layout */
   --gutter: 16px;

@@ -3,10 +3,14 @@
 Reads the list of fonts from src/_data/fonts.json, takes each source file from
 ../romitraj-private/fonts/source/, keeps only the Latin characters the site needs,
 and writes the result to ../romitraj-private/fonts/web/. The source files are only
-read, never changed. Run it with: npm run fonts
+read, never changed. It also writes a short fingerprint of every converted file to
+src/_data/fontVersions.json, so browsers fetch a font again when it changes.
+Run it with: npm run fonts
 """
 
+import hashlib
 import json
+import string
 import sys
 from pathlib import Path
 
@@ -18,6 +22,7 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parent.parent
 FONT_LIST = ROOT / "src" / "_data" / "fonts.json"
+VERSIONS = ROOT / "src" / "_data" / "fontVersions.json"
 SOURCE_DIR = ROOT.parent / "romitraj-private" / "fonts" / "source"
 WEB_DIR = ROOT.parent / "romitraj-private" / "fonts" / "web"
 
@@ -36,20 +41,32 @@ KEEP = [
     (0x2212, 0x2212),  # Minus sign
 ]
 
+# Everyday characters. If a font has no drawing for one of these, the report says so,
+# because the browser will then borrow that character from the fallback font.
+EVERYDAY = string.ascii_letters + string.digits + ".,;:!?'\"-()&/@" + "’“”–…"
 
-def convert(source: Path, target: Path) -> tuple[int, int]:
-    """Writes a Latin-only WOFF2 copy of one font. Returns the glyph counts before and after."""
+
+def save_as_woff2(font: TTFont, target: Path) -> None:
+    """Cuts an opened font down to the KEEP ranges and saves it as WOFF2."""
     options = subset.Options()
     options.flavor = "woff2"
     options.layout_features = ["*"]  # keep kerning, ligatures and every other OpenType feature
     options.notdef_outline = True
-    font = TTFont(source)
-    before = len(font.getGlyphOrder())
     subsetter = subset.Subsetter(options)
     subsetter.populate(unicodes=[code for first, last in KEEP for code in range(first, last + 1)])
     subsetter.subset(font)
     subset.save_font(font, str(target), options)
-    return before, len(font.getGlyphOrder())
+
+
+def missing_everyday(font_file: Path) -> str:
+    """Lists the everyday characters a font file cannot draw."""
+    covered = TTFont(font_file).getBestCmap()
+    return " ".join(char for char in EVERYDAY if ord(char) not in covered)
+
+
+def fingerprint(font_file: Path) -> str:
+    """A short code that changes whenever the file's contents change."""
+    return hashlib.sha256(font_file.read_bytes()).hexdigest()[:8]
 
 
 def main() -> None:
@@ -62,20 +79,31 @@ def main() -> None:
     if missing:
         sys.exit("Missing source files:\n  " + "\n  ".join(missing))
 
+    versions = {}
     for font in fonts:
         source = SOURCE_DIR / font["source"]
         target = WEB_DIR / font["file"]
-        before, after = convert(source, target)
+        # recalcTimestamp=False keeps the file's own date, so converting twice gives identical files.
+        opened = TTFont(source, recalcTimestamp=False)
+        before = len(opened.getGlyphOrder())
+        save_as_woff2(opened, target)
+        versions[font["file"]] = fingerprint(target)
         print(
             f"{font['file']:<32} {source.stat().st_size / 1024:6.1f} KB -> {target.stat().st_size / 1024:5.1f} KB"
-            f"   glyphs {before} -> {after}"
+            f"   glyphs {before} -> {len(opened.getGlyphOrder())}"
         )
+        gaps = missing_everyday(target)
+        if gaps:
+            print(f"    no drawing for: {gaps}")
+
+    VERSIONS.write_text(json.dumps(dict(sorted(versions.items())), indent=2) + "\n", encoding="utf-8")
 
     wanted = {font["file"] for font in fonts}
     extra = sorted(path.name for path in WEB_DIR.glob("*.woff2") if path.name not in wanted)
     if extra:
         print("\nNot in fonts.json, left untouched: " + ", ".join(extra))
     print(f"\nDone. {len(fonts)} fonts written to {WEB_DIR}")
+    print(f"Fingerprints written to {VERSIONS.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

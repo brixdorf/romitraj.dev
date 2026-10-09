@@ -100,6 +100,13 @@ try {
       const page = await context.newPage();
       const problems = [];
       page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));
+      // The free fallback fonts should never be needed. If one is fetched, a licensed font failed or lacks a character.
+      page.on('request', (request) => {
+        const url = new URL(request.url());
+        if (url.pathname.startsWith('/assets/fonts/') && url.pathname.endsWith('.woff2')) {
+          problems.push(`fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (npm run fonts lists the characters each licensed font lacks)`);
+        }
+      });
       page.on('response', (response) => { if (response.status() >= 400) problems.push(`${response.url()} answered ${response.status()}`); });
       for (const pagePath of pages) {
         await page.goto(`http://localhost:${port}${pagePath}`, { waitUntil: 'load' });
