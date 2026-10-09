@@ -1,0 +1,27 @@
+{
+  "name": "romitraj.dev",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal website and portfolio of Romit Raj Sahu.",
+  "homepage": "https://romitraj.dev",
+  "license": "MIT",
+  "author": "Romit Raj Sahu",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "eleventy --serve",
+    "build": "eleventy",
+    "start": "node server/index.js",
+    "fonts": "python scripts/fonts.py",
+    "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "3.1.6",
+    "esbuild": "0.28.2"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}

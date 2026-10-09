@@ -1,0 +1,11 @@
+{# Loads the web fonts listed in _data/fonts.json from the font base URL, and preloads the ones used at the top of the page. #}
+{%- for font in fonts %}
+  {%- if font.preload %}
+  <link rel="preload" href="{{ fontBase }}{{ font.file }}" as="font" type="font/woff2" crossorigin>
+  {%- endif %}
+{%- endfor %}
+  <style>
+  {%- for font in fonts %}
+    @font-face { font-family: "{{ font.family }}"; font-weight: {{ font.weight }}; font-style: {{ font.style }}; font-display: swap; src: url("{{ fontBase }}{{ font.file }}") format("woff2"); }
+  {%- endfor %}
+  </style>

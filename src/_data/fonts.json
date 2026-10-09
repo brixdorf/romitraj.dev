@@ -1,0 +1,58 @@
+[
+  {
+    "family": "Manuka",
+    "weight": 400,
+    "style": "normal",
+    "source": "Manuka Collection/Manuka/manuka-black.woff2",
+    "file": "manuka-black.woff2",
+    "preload": true
+  },
+  {
+    "family": "Louize Display",
+    "weight": 400,
+    "style": "normal",
+    "source": "Louize Display/LouizeDisplay-Regular.otf",
+    "file": "louize-display-regular.woff2",
+    "preload": true
+  },
+  {
+    "family": "Louize Display",
+    "weight": 400,
+    "style": "italic",
+    "source": "Louize Display/LouizeDisplay-Italic.otf",
+    "file": "louize-display-italic.woff2",
+    "preload": false
+  },
+  {
+    "family": "Louize",
+    "weight": 400,
+    "style": "normal",
+    "source": "Louize/Louize-Regular.otf",
+    "file": "louize-regular.woff2",
+    "preload": false
+  },
+  {
+    "family": "Louize",
+    "weight": 400,
+    "style": "italic",
+    "source": "Louize/Louize-Italic.otf",
+    "file": "louize-italic.woff2",
+    "preload": false
+  },
+  {
+    "family": "Neue Montreal",
+    "weight": 400,
+    "style": "normal",
+    "source": "PPNeueMontreal/PPNeueMontreal-Regular.otf",
+    "file": "neue-montreal-regular.woff2",
+    "preload": true
+  },
+  {
+    "family": "Neue Montreal",
+    "weight": 700,
+    "style": "normal",
+    "source": "PPNeueMontreal/PPNeueMontreal-Semibold.otf",
+    "file": "neue-montreal-semibold.woff2",
+    "preload": false
+  }
+]

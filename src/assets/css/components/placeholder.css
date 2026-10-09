@@ -1,0 +1,47 @@
+/* Temporary home page. Delete this file, and its line in main.css, when the real hero is built. */
+.placeholder {
+  min-block-size: 100vh;
+  min-block-size: 100svh;
+  padding: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+
+  & p {
+    margin: 0;
+  }
+}
+
+.placeholder__label {
+  font-size: 12px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+  padding-block-end: 12px;
+  border-block-end: var(--rule) solid var(--color-ink);
+}
+
+.placeholder__name {
+  margin: 0;
+  padding-block: 0.12em 0.08em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(88px, 21vw, 400px);
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+
+.placeholder__bio {
+  font-family: var(--font-serif-display);
+  font-style: italic;
+  font-size: clamp(22.4px, 4vw, 77px);
+  line-height: 0.9;
+  padding-block: 0.3em 0.5em;
+  border-block-end: var(--rule) solid var(--color-ink);
+}
+
+.placeholder__note {
+  max-inline-size: 34em;
+  padding-block-start: 16px;
+}

@@ -1,0 +1,14 @@
+# Installed packages
+node_modules/
+
+# Built site
+_site/
+
+# Secrets
+.env
+
+# Check screenshots, when they are saved inside this folder
+screenshots/
+
+# Python cache
+__pycache__/

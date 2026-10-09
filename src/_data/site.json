@@ -1,0 +1,18 @@
+{
+  "name": "Romit Raj Sahu",
+  "url": "https://romitraj.dev",
+  "language": "en",
+  "description": "Personal website and portfolio of Romit Raj Sahu.",
+  "bio": "A lifelong explorer who procrastinates a lot.",
+  "city": "Bangalore",
+  "timeZone": "Asia/Kolkata",
+  "email": "hi@romitraj.dev",
+  "blogUrl": "https://blog.romitraj.dev",
+  "fontsUrl": "https://fonts.romitraj.dev/",
+  "themeColor": "#2a2722",
+  "links": {
+    "github": "https://github.com/brixdorf",
+    "x": "https://x.com/brixdorf",
+    "linkedin": "https://www.linkedin.com/in/romitrajsahu"
+  }
+}

@@ -1,0 +1,10 @@
+---
+note: "I'm still building this place. It's taking a while, which will surprise nobody who knows me."
+---
+{#- Temporary home page, shown until the real sections are built. -#}
+<section class="placeholder">
+  <p class="placeholder__label">{{ site.url | replace("https://", "") }} / under construction</p>
+  <h1 class="placeholder__name">{{ site.name }}</h1>
+  <p class="placeholder__bio">{{ site.bio }}</p>
+  <p class="placeholder__note">{{ note }} Until then, say hi at <a href="mailto:{{ site.email }}">{{ site.email }}</a> or read <a href="{{ site.blogUrl }}">the blog</a>.</p>
+</section>

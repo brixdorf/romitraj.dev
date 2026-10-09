@@ -1,0 +1,31 @@
+/* Base styles: the page background, default text and small resets shared by every page. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: 20px;
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: var(--rule) solid currentColor;
+  outline-offset: 3px;
+}

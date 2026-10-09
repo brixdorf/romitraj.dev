@@ -1,0 +1,38 @@
+/* Design tokens: the one place for colors, fonts, spacing and CSS timings.
+   Every other stylesheet uses these names instead of raw values. */
+:root {
+  /* Color: light paper and warm dark ink. Dark sections swap the two. */
+  --color-paper: #fafafa;
+  --color-ink: #2a2722;
+  --color-muted-on-paper: #666666;
+  --color-muted-on-ink: #9f9f9f;
+  --color-ghost-on-ink: #3e3b36;
+  --color-line-on-paper: #eeeeee;
+  --color-line-on-ink: #3a3a3a;
+
+  /* Color: the gradient bar under the top banner (Dusk). */
+  --color-bar-1: #6a7cf5;
+  --color-bar-2: #e07aa8;
+  --color-bar-3: #f6a65e;
+  --color-bar-4: #fbe3c4;
+
+  /* Fonts: the licensed face first, then its free stand-in, then a system font. */
+  --font-display: "Manuka", "Anton", Impact, sans-serif;
+  --font-serif-display: "Louize Display", "Cormorant", Georgia, serif;
+  --font-serif: "Louize", "Cormorant", Georgia, serif;
+  --font-text: "Neue Montreal", "Inter Tight", Arial, sans-serif;
+
+  /* Layout */
+  --gutter: 16px;
+  --grid-columns: 12;
+  --grid-gap: 16px;
+  --section-space: 64px;
+  --rule: 2px;
+  --radius: 12px;
+
+  /* Timings used by CSS. Timings used by scripts are in assets/js/motion.js. */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-bar-loop: 20s;
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+}

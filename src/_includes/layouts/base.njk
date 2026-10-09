@@ -1,0 +1,19 @@
+{# The page shell every page uses: head tags, fonts, styles, script, and the slot for the page's own content. -#}
+<!doctype html>
+<html lang="{{ site.language }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <meta name="theme-color" content="{{ site.themeColor }}">
+  {%- include "partials/fonts.njk" %}
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js" defer></script>
+</head>
+<body>
+  <main>
+    {{ content | safe }}
+  </main>
+</body>
+</html>
