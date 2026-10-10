@@ -8,6 +8,7 @@ tags:
 year: 2026
 link: https://github.com/brixdorf/hardened
 order: 2
+image: padlock
 ---
 > **Sample project**
 >

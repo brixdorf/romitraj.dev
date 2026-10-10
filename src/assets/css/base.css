@@ -56,11 +56,38 @@ a {
   block-size: 1em;
 }
 
-/* An empty picture frame: an ink outline with rounded corners. */
+/* A picture frame: an ink outline with rounded corners. Its picture fills it and is cut to its
+   shape. The picture is laid over the frame instead of sitting inside it, so the frame's size
+   never depends on the picture and nothing moves when the file arrives. */
 .frame {
+  position: relative;
   border: var(--rule) solid var(--color-ink);
   border-radius: var(--radius);
   background: var(--color-paper);
+  overflow: hidden;
+}
+
+.frame > .picture {
+  position: absolute;
+  inset: 0;
+}
+
+/* A dark frame, for a picture drawn in the paper colour. */
+.frame--ink {
+  background: var(--color-ink);
+}
+
+/* A picture made by the build (scripts/images.mjs). It fills the box it is put in. Each pixel of
+   the file is one block of the picture, so it is enlarged without smoothing to keep hard edges. */
+.picture {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.picture--pixels {
+  image-rendering: pixelated;
 }
 
 /* The small diamond before the version tag. */

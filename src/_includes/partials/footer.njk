@@ -1,4 +1,4 @@
-{#- The footer on every page: the "you are here" line (not on the home page), a site map with descriptions, links elsewhere, the contact email, the copyright line and the sign-off. -#}
+{#- The footer on every page: the "you are here" line (not on the home page), a site map with descriptions, links elsewhere, the contact email, the copyright line, the sign-off, and a compass that is half off the edge. -#}
 {%- from "partials/icon.njk" import icon with context -%}
   <footer class="footer">
     <nav class="footer__nav" aria-label="Site map">
@@ -33,6 +33,8 @@
         <p class="footer__row"><a class="footer__link" href="mailto:{{ site.email }}">{{ site.email }}</a></p>
       </div>
     </nav>
+
+    <div class="footer__ornament" data-ornament>{% picture "compass" %}</div>
 
     <div class="footer__end">
       <p class="footer__copyright"><span class="footer__symbol">&copy;</span> <span data-current-year>{{ build.year }}</span> {{ site.name }}</p>

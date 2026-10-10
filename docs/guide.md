@@ -30,7 +30,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
 | `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. |
-| `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and confirms the hero's big lines fit. Run it before every commit. |
+| `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit. |
 
 ## Where things live
 
@@ -41,6 +41,8 @@ src/
                 about.json (the About page), pages.json (small labels on the inner pages, and the
                 resume note), navigation.json (the page links),
                 icons.json (icon drawings), fonts.json,
+                images.json (every picture: its source file, alt text and look),
+                image-credits.json (who took each photo),
                 blog.js (fetches the latest blog posts during the build),
                 and three files written by scripts: fontVersions.json, fallbackFonts.json, textWidths.json
   _includes/    layouts/ (base.njk is the page shell, page.njk adds the giant page name for an
@@ -57,6 +59,7 @@ src/
                 during each kind of page change), split.js (cuts text into letters or lines)
   assets/fonts/ The free fallback fonts and their license files
   assets/icons/ The license of the icon set
+  assets/img/source/  The photos and drawings the pictures are made from
   content/      The pages. index.njk is the home page, about.njk the About page, resume.njk the
                 resume note, projects.njk the list of projects. projects/ holds one Markdown
                 file per project (its facts on top, its write-up below), plus
@@ -64,6 +67,9 @@ src/
 server/         index.js: the small server behind npm start
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
                 fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers),
+                images.mjs (turns the photos and drawings into the site's pictures, during
+                every build), lib/paint.mjs (paints the texture behind the hero picture),
+                lib/pictures.mjs (the check's tests of the pictures),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
                 letters, the page changes and the headline's entrance), speed.mjs (npm run speed)
 docs/           This guide and the decisions log
@@ -79,7 +85,10 @@ Every file starts with a comment saying what it does.
 | My name, email, city, social links, blog address | `src/_data/site.json` |
 | The bio line in the top banner | `src/_data/site.json` (`banner`) |
 | The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
-| The introduction sentence, the scroll note, the note inside the picture frame | `src/_data/home.json` |
+| The introduction sentence, the scroll note | `src/_data/home.json` |
+| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below) |
+| Which picture a project shows | `image` at the top of the project's file |
+| Which picture sits beside a page's giant name | `picture` at the top of the page's file |
 | The page links and their descriptions (hero and footer) | `src/_data/navigation.json` |
 | The intro letter, the about text, section headings, button labels, the footer sign-off | `src/_data/home.json` |
 | A project's name, one-line description, tags, year, link or write-up | Its file in `src/content/projects/` (the six there now are samples) |
@@ -143,12 +152,13 @@ The home page is a stack of sections, listed in order in `src/content/index.njk`
 
 | Section | What it is | Its words |
 |---|---|---|
-| Hero | Headline, ticker, page links, picture frame | `headline.json`, `home.json`, `navigation.json` |
+| Hero | Headline, ticker, page links, the framed picture | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`) |
 | Letter | A short signed note on a dark block | `home.json` (`letter`) |
-| About | Sliding heading, quote ticker, bio, card of links | `home.json` (`about`), `site.json` (`elsewhere`) |
+| About | Sliding heading, quote ticker, bio, card of links, a large drawing behind them | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`diver`) |
 | Projects | One row per project on a dark block | The files in `src/content/projects/`, `home.json` (`projects`) |
 | Writing | The latest blog posts as cards | The blog's own feed, `home.json` (`writing`) |
-| Footer | Site map, links, email, copyright, sign-off (on every page) | `navigation.json`, `site.json`, `home.json` (`footer`) |
+| Shore | A band of stippled sea that sinks into the footer's dark (`shore.css`) | `images.json` (`swells`) |
+| Footer | Site map, links, email, copyright, sign-off, and a compass half off the edge (on every page) | `navigation.json`, `site.json`, `home.json` (`footer`), `images.json` (`compass`) |
 
 Things to know:
 
@@ -164,7 +174,7 @@ Things to know:
 Every page except the home page shares three pieces:
 
 - **The small row under the banner** (`partials/page-row.njk`): the version tag, which links home and shows "Go home" beside it on hover; the tagline; and a link back ("Go home", or "All projects" on a project's page).
-- **The giant page name** (`partials/page-header.njk`, used through `layouts/page.njk`), with a small empty picture frame until the images are built. A project's page has its own top instead: the project's name in very large serif letters.
+- **The giant page name** (`partials/page-header.njk`, used through `layouts/page.njk`), with a small framed picture beside it. A project's page has its own top instead: the project's name in very large serif letters.
 - **"You are here"** at the top of the footer (`partials/crumb.njk`): the path from the home page down to the current page.
 
 | Page | Its file | Its words |
@@ -184,6 +194,8 @@ The top of a page's file (between the two `---` lines) sets:
 | `heading` | The giant name on the page, if it should differ from the title |
 | `headingSize: long` | Smaller giant letters, for a heading of several words |
 | `frame: square` | A small square picture frame instead of a wide one |
+| `picture` | Which picture from `images.json` goes in that frame. Without it the frame is empty |
+| `frameTone: ink` | A dark frame, for a picture drawn in the paper colour (the compass) |
 | `ruled: true` | A line under the header, with more room below it |
 | `description` | The sentence search engines show |
 
@@ -191,7 +203,7 @@ On phones the giant name shrinks until its longest word fits the screen. This is
 
 ### The About page
 
-All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering`, `contact`, `toolbox`) and the labels for the latest blog post. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is left out if the feed could not be read. The picture frames are empty until the images are built.
+Its three framed pictures are named in `src/content/about.njk` (`bust`, `jellyfish`, `swells`) and described in `images.json`. All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering`, `contact`, `toolbox`) and the labels for the latest blog post. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is left out if the feed could not be read. The picture frames are empty until the images are built.
 
 The text there now is placeholder text. `<a href="...">` and `{email}` work as in `home.json`.
 
@@ -211,6 +223,7 @@ tags:
 year: 2025
 link: https://github.com/brixdorf/snip
 order: 5
+image: padlock
 ---
 The write-up starts here.
 ```
@@ -223,11 +236,13 @@ The write-up starts here.
 | `year` | A year | The Projects page and the project's page |
 | `link` | The address of the code | "GitHub" on the project's page |
 | `order` | A number: 1 comes first | Decides the project's place in both lists |
+| `image` | The name of a picture in `images.json`. Optional | The frame beside the project on the Projects page |
 
 - **To add a project:** copy an existing file, rename it, change the facts and the write-up. Give it the `order` number of the place it should take, and renumber the ones after it.
 - **To remove a project:** delete its file.
 - **To reorder:** change the `order` numbers. Two projects with the same number are sorted by name.
-- All six facts are required. If one is missing, the build stops and names the file and the fact.
+- The first six facts are required. If one is missing, the build stops and names the file and the fact.
+- `image` is optional. On wide windows the Projects page has a frame beside every second project (the 2nd, 4th, 6th and so on), and it shows that project's picture. A project in an odd place has no frame, so a picture given to it is not shown anywhere. A project in an even place without a picture gets an empty frame.
 - If a title or description contains a colon followed by a space, or starts with a quote mark, wrap it in double quotes: `title: "Snip: the sequel"`.
 - A line starting with `#` between the `---` lines is a note to yourself and is never shown. The samples use one to say they are samples.
 
@@ -339,6 +354,86 @@ Every link to another website opens in a new tab. The build does this by itself 
 - Links within the site, links to a section of the same page and email links are left alone.
 - The hidden words are in `src/_data/site.json` (`newTabNote`).
 
+## Pictures
+
+Every picture on the site is made by the build from a file in `src/assets/img/source/`: either a photo (`.jpg`) or a drawing (`.svg`). The build turns each one into a tiny two-tone picture made of square pixel blocks, in the ink colour on the paper colour, and writes it into `_site/assets/img/`. The finished pictures are never committed; only the sources are.
+
+The list of pictures is `src/_data/images.json`. One entry looks like this:
+
+```json
+"padlock": {
+  "source": "padlock.jpg",
+  "alt": "An old padlock hanging from a chain, with its key.",
+  "across": 110,
+  "shape": "17:10",
+  "crop": { "x": 0.42, "y": 0.55, "zoom": 1.25 },
+  "black": 0.32,
+  "white": 0.78,
+  "sharpen": 1
+}
+```
+
+| Setting | What it does |
+|---|---|
+| `source` | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops |
+| `alt` | The short description screen readers read aloud. Every picture needs either this or `decorative` |
+| `decorative` | `true` for a picture that is only decoration (the compass, the sea band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both |
+| `across` | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size |
+| `shape` | Cuts the source to this shape, written width:height. Without it the source's own shape is kept |
+| `crop` | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it |
+| `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker |
+| `sharpen` | Crisper edges before the picture is reduced to two tones. 0 to 2 |
+| `pattern` | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band) |
+| `tones` | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass) |
+| `ground` | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below) |
+
+Where each picture is shown:
+
+| Picture | Source | Where |
+|---|---|---|
+| `hero` | whale-tail.jpg | The frame in the hero |
+| `diver` | diver.svg | Behind the home page's about section |
+| `swells` | swells.svg | The band above the footer on the home page, and the wide frame on the About page |
+| `compass` | compass.svg | The footer on every page, and beside the About page's name |
+| `servers` | server-rack.jpg | Beside the Projects page's name |
+| `padlock`, `ship`, `crane` | padlock.jpg, container-ship.jpg, harbour-cranes.jpg | The frames on the Projects page (Hardened, Ship It, Dokploy Templates) |
+| `bust`, `jellyfish` | marble-bust.jpg, diver.svg | The About page |
+| `fluke` | whale-tail.jpg | Beside the Resume page's name |
+
+### Changing a picture
+
+- **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `npm run dev` is running: the picture is redone each time you save.
+- **A photo that works** has one clear subject with a strong outline against a plain background. Busy photos turn into noise.
+- **To add a picture:** add an entry with a new name (with an `alt`, or `"decorative": true` if it is only ornament), then show it with `{% picture "name" %}` in a template, or name it as a project's `image` or a page's `picture`.
+- **The photos there now are placeholders** from Unsplash. Replace them with your own when you have them.
+
+### Credits
+
+`src/_data/image-credits.json` lists the photographer and the Unsplash page of every photo. The Unsplash License does not require credit, but the record is kept anyway, and the build stops if a photo is used without an entry. Before adding a photo from Unsplash, check that its page says "Free to use under the Unsplash License": photos marked Unsplash+ are paid and are not covered.
+
+The drawings (`diver.svg`, `compass.svg`, `swells.svg`) were made for this site and need no credit. They are ordinary SVG files in shades of grey and can be edited in any drawing program. Do not put text in them: the build would draw it with whatever fonts the computer has, and the live server has different ones.
+
+### The texture behind the hero picture
+
+The hero picture alone sits on a faint surface like thick white paint. It is not a photo: `scripts/lib/paint.mjs` paints it during the build from a seed number, so it is the site's own. In `images.json`:
+
+```json
+"ground": "texture",
+"texture": { "seed": 7, "strokes": 9 }
+```
+
+- Another `seed` gives a different surface; `strokes` is how many brush strokes cross it.
+- The texture shows only behind the subject. Light spots enclosed by the subject (the foam in the sea) stay flat paper.
+- Its tones were set to the measured ones (the average grey, how dark the deepest shadow goes). They are at the top of `paintTexture` in `paint.mjs`. It is too faint to judge by eye: `reference/scripts/texturecheck.mjs` in the private folder measures a screenshot.
+
+### How they are shown
+
+- **One pixel of the file is one block on the page.** The browser enlarges the file without smoothing (`image-rendering: pixelated` in `base.css`), which keeps the edges hard and the files tiny: all the pictures together weigh about 27 KB.
+- **Nothing moves when a picture arrives.** Every picture is laid over a box whose size is already fixed by the styles, and its width and height are written into the page. `npm run check` tests this on every page in three browsers.
+- **Pictures below the top of a page are fetched only when they come near the window.** The hero picture and the one beside a page's name are fetched at once.
+- **At some window sizes a block is not a whole number of screen pixels**, so now and then one column of blocks is a pixel wider than its neighbours. This is how hard-edged pixel pictures behave at a fluid size.
+- **The compass in the footer rises by 14 pixels** as the footer scrolls into view (`ornamentDistance` in `motion.js`), on tablets and laptops.
+
 ## Fonts
 
 The site uses four licensed font families. Their files are not in this repository.
@@ -398,7 +493,7 @@ Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `s
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, and a headline entrance that flashes, ends out of place or leaves the headline hidden.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -434,5 +529,4 @@ These parts of the guide are written when the matching part of the site is built
 
 - Spotify setup for the now-playing widget, and the weather. Both will appear in the status ticker.
 - Deployment with Dokploy, step by step.
-- Images: where the photos go and how the build converts them. Until then every picture frame is empty, and the about section on the home page has no illustration.
 - The resume itself. Until `resume.pdf` exists, the Resume page is a short note.

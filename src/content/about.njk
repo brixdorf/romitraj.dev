@@ -3,6 +3,8 @@ title: About
 heading: About the human
 headingSize: long
 frame: square
+picture: compass
+frameTone: ink
 ruled: true
 layout: layouts/page.njk
 description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach him.
@@ -29,12 +31,12 @@ description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach 
   </section>
 
   <figure class="about-page__portrait" data-part="card">
-    <div class="frame about-page__portrait-frame"></div>
+    <div class="frame about-page__portrait-frame">{% picture "bust" %}</div>
     <figcaption class="about-page__caption">{{ about.portraitNote }}</figcaption>
   </figure>
 
-  <div class="frame about-page__square" aria-hidden="true" data-part="card"></div>
-  <div class="frame about-page__strip" aria-hidden="true" data-part="card"></div>
+  <div class="frame about-page__square" data-part="card">{% picture "jellyfish" %}</div>
+  <div class="frame about-page__strip" data-part="card">{% picture "swells" %}</div>
 
   <aside class="about__card about-page__elsewhere" aria-labelledby="elsewhere-label" data-part="card">
     <h2 class="about__label" id="elsewhere-label">{{ home.about.elsewhereLabel }}</h2>

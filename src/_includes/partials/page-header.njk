@@ -2,12 +2,14 @@
   The top of an inner page: its name in giant letters, with a small picture frame beside it.
   A page chooses the look at the top of its own file: "heading" (the words, if they differ from the
   title), "headingSize: long" (smaller letters for a long heading), "frame: square" (a small square
-  frame instead of a wide one) and "ruled: true" (a line under the whole header).
+  frame instead of a wide one), "picture" (which picture from _data/images.json goes in the frame),
+  "frameTone: ink" (a dark frame, for a picture drawn in the paper colour) and "ruled: true" (a
+  line under the whole header).
 -#}
 {%- set words = heading or title -%}
 <header class="page-header{% if ruled %} page-header--ruled{% endif %}">
   <div class="page-header__inner">
     <h1 class="page-header__title{% if headingSize == 'long' %} page-header__title--long{% endif %}" data-part="title" style="--longest-word: {{ words | longestWord }}">{{ words | raisedApostrophe | safe }}</h1>
-    <div class="frame page-header__frame{% if frame == 'square' %} page-header__frame--square{% endif %}" aria-hidden="true" data-part="header-frame"></div>
+    <div class="frame page-header__frame{% if frame == 'square' %} page-header__frame--square{% endif %}{% if frameTone == 'ink' %} frame--ink{% endif %}" data-part="header-frame">{% if picture %}{% picture picture, { eager: true } %}{% endif %}</div>
   </div>
 </header>

@@ -1,4 +1,4 @@
-{#- The about section: a sliding serif heading, a thin ticker, the short bio with its small blocks, and the card of links. -#}
+{#- The about section: a sliding serif heading, a thin ticker, the short bio with its small blocks, the card of links, and a large drawing behind them that runs off the edge of the page. -#}
 {%- from "partials/icon.njk" import icon with context -%}
 <section class="about" data-part="section">
   <div class="about__inner">
@@ -13,6 +13,7 @@
     </div>
 
     <div class="about__body">
+      <div class="about__art">{% picture "diver" %}</div>
       <div class="about__text">
         {%- for paragraph in home.about.paragraphs %}
         <p>{{ paragraph | safe }}</p>

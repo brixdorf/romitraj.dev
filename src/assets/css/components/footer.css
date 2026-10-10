@@ -1,9 +1,39 @@
 /* The footer: a dark block with the "you are here" line (not on the home page), the site map,
-   links elsewhere, the contact email, and a last line with the copyright and the sign-off. */
+   links elsewhere, the contact email, a last line with the copyright and the sign-off, and a
+   compass that is half out of sight: its top half at the bottom on phones and tablets, its left
+   half at the right edge on laptops. */
 .footer {
+  position: relative;
   padding: 32px var(--gutter) 0;
   background: var(--color-ink);
   color: var(--color-paper);
+}
+
+/* The compass. Its box shows half of it and hides the rest. Every size here is written out in
+   full (none is worked out from another), because browsers disagree about boxes whose width
+   follows from their height.
+   "--compass" is how wide the round picture is: 400px, or the window less its gutters. */
+.footer__ornament {
+  --compass: min(400px, 100vw - 2 * var(--gutter));
+
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: calc(50% - var(--compass) / 2);
+  /* Twice as wide as it is tall: the top half of the picture shows. */
+  inline-size: var(--compass);
+  block-size: calc(var(--compass) / 2);
+  overflow: hidden;
+}
+
+.footer__ornament .picture {
+  inline-size: var(--compass);
+  block-size: var(--compass);
+}
+
+.footer__nav,
+.footer__end {
+  position: relative;
+  z-index: 1;
 }
 
 .footer__group {
@@ -146,9 +176,10 @@
   color: var(--color-hint-on-ink);
 }
 
+/* On phones and tablets the last line leaves room under it for the compass. */
 .footer__end {
   margin: 0;
-  padding-block-end: 48px;
+  padding-block-end: calc(min(200px, 50vw - var(--gutter)) + 48px);
   font-family: var(--font-serif);
   font-size: var(--type-small);
   line-height: 1.3;
@@ -241,5 +272,19 @@
   .footer__end {
     display: flex;
     justify-content: space-between;
+    padding-block-end: 48px;
+  }
+
+  /* The left half of the compass at the right edge, a little above the middle of the footer so
+     that it clears the last line. 300px across: three pixels to each of its 100 blocks. (The
+     reference's ornament is 400px in a taller footer; this footer has fewer links.) */
+  .footer__ornament {
+    --compass: 300px;
+
+    inset-block: calc(50% - var(--compass) / 2 - 16px) auto;
+    inset-inline: auto 0;
+    /* Half as wide as it is tall: the left half of the picture shows. */
+    inline-size: calc(var(--compass) / 2);
+    block-size: var(--compass);
   }
 }

@@ -1,15 +1,33 @@
 /* The about section: a large serif heading between two rules, with pale copies of itself on both
    sides (a script slides it in from the right as it scrolls into view), a thin ticker, the bio
-   text, and a bordered card of links. */
+   text, a bordered card of links, and a large drawing behind them that runs off the page's edge. */
 .about {
-  max-inline-size: 1440px;
-  margin-inline: auto;
-  padding-block: 32px;
+  padding: 32px var(--gutter);
   overflow: hidden;
+  /* Keeps the drawing, which is layered behind the text, in front of the page's own background. */
+  isolation: isolate;
 }
 
 .about__inner {
-  margin-inline: var(--gutter);
+  max-inline-size: calc(1440px - 2 * var(--gutter));
+  margin-inline: auto;
+}
+
+.about__body {
+  position: relative;
+}
+
+/* The drawing. Its size follows the window's width and it hangs past the window's right edge, as
+   measured on the reference; the section cuts off whatever does not fit. On phones it sits low,
+   behind the card of links.
+   "(100% - 100vw) / 2" is the distance from the text's right edge to the window's right edge. */
+.about__art {
+  position: absolute;
+  z-index: -1;
+  inset-block-end: -32px;
+  inset-inline-end: calc((100% - 100vw) / 2 - 96px);
+  inline-size: min(100vw, 364px + 6.7vw);
+  aspect-ratio: 936 / 900;
 }
 
 .about__heading {
@@ -124,6 +142,13 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--grid-gap);
+  }
+
+  /* From tablets up the drawing starts level with the text and takes 65% of the window's width. */
+  .about__art {
+    inset-block: 0 auto;
+    inset-inline-end: calc((100% - 100vw) / 2 - 64px);
+    inline-size: 65vw;
   }
 
   .about__text {

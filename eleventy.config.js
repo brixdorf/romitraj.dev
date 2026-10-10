@@ -1,8 +1,9 @@
-// Eleventy configuration: where the content lives, how the CSS and JavaScript are bundled,
-// and where the web fonts load from.
+// Eleventy configuration: where the content lives, how the CSS and JavaScript are bundled, how the
+// pictures are made, and where the web fonts load from.
 import fs from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
+import { convertImages } from './scripts/images.mjs';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
 
@@ -118,6 +119,28 @@ export default function (eleventyConfig) {
     const result = await esbuild.build({ entryPoints: ['src/assets/js/intro.js'], bundle: true, minify: true, format: 'iife', target: browsers, write: false, logLevel: 'warning' });
     introScript = result.outputFiles[0].text.trim();
   });
+
+  // The pictures. Before every build, scripts/images.mjs turns the photos and drawings listed in
+  // _data/images.json into small two-tone pixel pictures inside the built site. A template shows
+  // one with {% picture "name" %}. The tag writes the picture's size into the page, so the browser
+  // keeps its place before the file arrives, and its alt text from images.json (empty for a
+  // picture marked as decoration there, so that screen readers pass over it).
+  // Options: "eager: true" for a picture at the top of a page (fetched at once instead of when it
+  // comes near the window), and "class" for an extra class name.
+  let pictures = {};
+  eleventyConfig.on('eleventy.before', async ({ directories }) => {
+    pictures = await convertImages(path.join(directories.output, 'assets', 'img'));
+  });
+  eleventyConfig.addShortcode('picture', (name, options = {}) => {
+    const picture = pictures[name];
+    if (!picture) throw new Error(`There is no picture called "${name}" in src/_data/images.json.`);
+    const attribute = (text) => escapeHtml(text).replace(/"/g, '&quot;');
+    const tag = (file, alt, kind) => `<img class="picture picture--${kind}${options.class ? ` ${options.class}` : ''}" src="${file.src}" width="${file.width}" height="${file.height}" alt="${attribute(alt)}" ${options.eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+    // A picture with a painted backdrop is two files: the paint underneath, the pixels on top.
+    return (picture.texture ? tag(picture.texture, '', 'paint') : '') + tag(picture, picture.alt, 'pixels');
+  });
+  eleventyConfig.addWatchTarget('./src/assets/img/source/');
+  eleventyConfig.addWatchTarget('./scripts/images.mjs');
 
   // Bundle and minify the CSS and JavaScript before every build.
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {

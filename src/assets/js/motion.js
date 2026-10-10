@@ -154,4 +154,8 @@ export const scroll = {
   // A row fades away as it leaves through the top of the window.
   rowFadeStart: 'top 11%',
   rowFadeEnd: 'bottom top',
+  // The compass in the footer rises by this many pixels while the footer scrolls into view.
+  ornamentDistance: 14,
+  ornamentStart: 'top bottom',
+  ornamentEnd: 'bottom bottom',
 };

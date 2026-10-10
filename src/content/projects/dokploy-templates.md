@@ -8,6 +8,7 @@ tags:
 year: 2025
 link: https://github.com/brixdorf/dokploy-templates
 order: 6
+image: crane
 ---
 > **Sample project**
 >

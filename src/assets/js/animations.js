@@ -125,6 +125,17 @@ function startScrollMovement(root) {
         scrollTrigger: { trigger: row, start: scroll.rowFadeStart, end: scroll.rowFadeEnd, scrub: true },
       });
     });
+
+    // The compass in the footer rises a little as the footer scrolls into view. The footer is not
+    // part of "root" (it stays in place through page changes), so it is looked up in the whole page.
+    const ornament = document.querySelector('[data-ornament] .picture');
+    if (ornament) {
+      gsap.fromTo(ornament, { y: scroll.ornamentDistance }, {
+        y: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: ornament.closest('footer'), start: scroll.ornamentStart, end: scroll.ornamentEnd, scrub },
+      });
+    }
   });
 
   // Positions are measured from the page's layout, which shifts once the fonts arrive.

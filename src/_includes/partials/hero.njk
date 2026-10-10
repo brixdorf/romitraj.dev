@@ -1,6 +1,6 @@
 {#-
   The hero: the opening serif line, the giant headline, the outlined italic words over it, the large
-  serif word, the picture frame, the status ticker, the navigation lists and the short introduction.
+  serif word, the picture in its frame, the status ticker, the navigation lists and the short introduction.
   The four headline pieces are for the eye only. Screen readers get the whole sentence from the hidden h1.
 -#}
 <section class="hero" style="--opening-em: {{ textWidths.opening }}; --giant-em: {{ textWidths.giant }}; --giant-line-em: {{ textWidths.giantLongestLine }}; --giant-first-line-em: {{ textWidths.giantFirstLine }}; --serif-em: {{ textWidths.serif }};">
@@ -18,7 +18,7 @@
   <p class="hero__note" data-part="note">{{ home.scrollNote }}</p>
 
   <div class="hero__image" data-part="frame">
-    <p class="hero__image-note">{{ home.imageNote }}</p>
+    {% picture "hero", { eager: true } %}
   </div>
 
   {%- include "partials/ticker.njk" %}

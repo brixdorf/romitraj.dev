@@ -3,8 +3,9 @@
 // confirms the hero's big lines still fit their space, clicks from page to page in each browser
 // to confirm the page changes work, that nothing moves once a page change has finished, and that
 // back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
-// cutting headings into letters for those changes moves nothing (lib/letters.mjs), and confirms
-// that the headline's entrance on the home page is safe (lib/entrance.mjs).
+// cutting headings into letters for those changes moves nothing (lib/letters.mjs), confirms
+// that the headline's entrance on the home page is safe (lib/entrance.mjs), and confirms that
+// every picture has alt text, stays small and moves nothing as it loads (lib/pictures.mjs).
 // Run it with: npm run check
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,6 +14,7 @@ import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidth
 import { lettersStayInPlace, testWidths } from './lib/letters.mjs';
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
+import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
 
 const privateDir = path.join(root, '..', 'romitraj-private');
 // Screenshots go next to the reference screenshots when that folder exists, otherwise into this repo (ignored by git).
@@ -82,7 +84,17 @@ if (broken.length) {
   console.log(`Links: ${linkCount} internal links on ${pages.length} page(s), none broken.`);
 }
 
-// ---- 3. Screenshots ----
+// ---- 3. Picture files: how heavy are they? ----
+const weights = pictureFiles(siteDir);
+if (weights.problems.length) {
+  console.log('\nPICTURES THAT ARE TOO HEAVY:\n  ' + weights.problems.join('\n  '));
+  process.exitCode = 1;
+}
+console.log(`Pictures: ${weights.summary}.`);
+
+// ---- 4. Screenshots ----
+// Where every picture ended up in each browser, to compare them at the end.
+const pictureWhere = {};
 const server = await startServer(4173);
 try {
   fs.rmSync(shotsDir, { recursive: true, force: true });
@@ -123,6 +135,10 @@ try {
         await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
         await page.addStyleTag({ content: noFades });
         await page.evaluate(() => document.fonts.ready);
+        // Pictures further down the page are normally fetched only when they come near the window.
+        // For the photograph they are all fetched now.
+        await page.evaluate(() => { for (const image of document.images) image.loading = 'eager'; });
+        await page.waitForFunction(() => [...document.images].every((image) => image.complete), null, { timeout: 8000 }).catch(() => problems.push(`${pagePath}: some pictures did not finish loading`));
         // A page should never be wider than its window.
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         if (overflow > 0) problems.push(`${pagePath} is ${overflow}px wider than the window`);
@@ -136,7 +152,7 @@ try {
       await context.close();
     }
 
-    // ---- 4. Do the hero's big lines still fit? (measured once, in Chromium) ----
+    // ---- 5. Do the hero's big lines still fit? (measured once, in Chromium) ----
     if (engineName === 'chromium') {
       const saved = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
       const measured = await measureTextWidths(await browser.newPage(), server.address);
@@ -148,26 +164,41 @@ try {
         console.log('Hero lines: all fit their space.');
       }
     }
-    // ---- 5. Page changes: click from page to page the way a visitor would ----
+    // ---- 6. Page changes: click from page to page the way a visitor would ----
     const walkProblems = await walkThePages(browser, server.address);
     if (walkProblems.length) {
       console.log(`\nPAGE CHANGE PROBLEMS in ${engineName}:\n  ` + walkProblems.join('\n  '));
       process.exitCode = 1;
     }
-    // ---- 6. Headings cut into letters: does any letter move? ----
+    // ---- 7. Headings cut into letters: does any letter move? ----
     const letterProblems = await lettersOnEveryPage(browser, server.address, pages);
     if (letterProblems.length) {
       console.log(`\nLETTERS THAT MOVE in ${engineName} (they would jump during a page change):\n  ` + letterProblems.slice(0, 20).join('\n  ') + (letterProblems.length > 20 ? `\n  ... and ${letterProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
-    // ---- 7. The headline's entrance on the home page ----
+    // ---- 8. The headline's entrance on the home page ----
     const entranceProblems = await headlineEntrance(browser, server.address);
     if (entranceProblems.length) {
       console.log(`\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '));
       process.exitCode = 1;
     }
+    // ---- 9. Pictures: sized, described, sharp, and moving nothing as they load ----
+    const { problems: pictureProblems, where } = await picturesHoldStill(browser, server.address, pages);
+    pictureWhere[engineName] = where;
+    if (pictureProblems.length) {
+      console.log(`\nPICTURE PROBLEMS in ${engineName}:\n  ` + pictureProblems.slice(0, 20).join('\n  ') + (pictureProblems.length > 20 ? `\n  ... and ${pictureProblems.length - 20} more` : ''));
+      process.exitCode = 1;
+    }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths) and headline entrance: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance and pictures: ${engineName} done.`);
+  }
+  // ---- 10. Does every browser show the same part of each picture in the same place? ----
+  const differences = picturesDiffer(pictureWhere);
+  if (differences.length) {
+    console.log('\nPICTURES THAT DIFFER BETWEEN BROWSERS:\n  ' + differences.slice(0, 20).join('\n  ') + (differences.length > 20 ? `\n  ... and ${differences.length - 20} more` : ''));
+    process.exitCode = 1;
+  } else {
+    console.log('Pictures: the same place and size in every browser.');
   }
   console.log(`\nSaved to ${shotsDir}`);
 } finally {

@@ -83,23 +83,19 @@
   color: var(--color-muted-on-paper);
 }
 
+/* The picture frame. Two files fill it, one over the other: the painted backdrop, then the pixels.
+   Both are laid over the frame, so its size never depends on them. */
 .hero__image {
-  display: grid;
-  place-items: center;
+  position: relative;
   margin-block-end: 12px;
   border: var(--rule) solid var(--color-ink);
   border-radius: var(--radius);
   overflow: hidden;
 }
 
-.hero__image-note {
-  margin: 0;
-  padding: var(--gutter);
-  font-size: var(--type-micro);
-  line-height: 1.17;
-  text-align: center;
-  text-transform: uppercase;
-  color: var(--color-muted-on-paper);
+.hero__image .picture {
+  position: absolute;
+  inset: 0;
 }
 
 /* ---- Phone: the headline runs down the left edge, everything else stacks beside it. ---- */

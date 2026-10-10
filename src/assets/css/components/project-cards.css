@@ -66,8 +66,11 @@
 }
 
 /* "Read more": the card's one link. Its clickable area covers the whole card. */
+/* It is a block of its own (only as wide as its words), not a box sitting in a line of text:
+   browsers disagree by half a pixel about the height of such a line. */
 .project-card__more {
-  display: inline-block;
+  display: block;
+  inline-size: fit-content;
   margin-block-end: -16px;
   padding-block: 16px;
   font-size: var(--type-micro);

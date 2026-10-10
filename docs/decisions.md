@@ -2,6 +2,70 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-10: Pictures
+
+### Versions verified
+
+| What | Version | Source | Used for |
+|---|---|---|---|
+| sharp | 0.35.5 | `npm view sharp version`, 2026-10-10. Apache-2.0. Needs Node.js 20.9 or newer | Reading the photos and drawings, shrinking them, and writing the finished PNG and WebP files |
+
+sharp is a new package for this project; nothing was upgraded. It is a normal dependency, not a dev-only one, because the live server runs the build too.
+
+### Why sharp
+
+- It reads JPEG and SVG, resizes well, hands over the raw pixels (so the two-tone conversion is this project's own code), and writes PNG files with a palette of two or three colours.
+- It ships ready-built for Windows and Linux, so `npm install` needs no compiler on Romit's computer or on the server.
+- The dithering itself is about forty lines in `scripts/images.mjs`. No dithering package is used: none gave the exact look measured on the reference (solid ink, solid paper, a fine checkerboard only where the tone changes).
+
+### How the pictures are made
+
+- **One list, `src/_data/images.json`**, names every picture: its source file, alt text, size in blocks, crop and contrast. The build converts them all before every build (`npm run build` and `npm run dev` alike) and writes the results into `_site/assets/img/`. Only the sources are committed.
+- **One pixel of the file is one block on the page.** The hero picture is 152 by 190 pixels and is enlarged by the browser without smoothing (`image-rendering: pixelated`, which Chrome, Edge, Firefox and Safari all support). This keeps the edges hard, as measured, and the files tiny: 12 files, 27 KB in all, the pixel pictures between 0.3 and 5.2 KB each.
+- **PNG with a palette for the pixel pictures:** lossless, shown the same way by every browser. **WebP for the hero's texture:** it is a smooth, faint surface, where a lossless file would weigh several hundred KB for no visible gain; as WebP it is 11 KB.
+- **The cost of a fluid size:** where a block is not a whole number of screen pixels, the browser makes an occasional column or row one pixel wider. The reference behaves the same way. The footer compass is set at exactly 300px on laptops, 3px a block.
+- **Addresses carry a fingerprint** (`hero.png?v=...`), so a changed picture is fetched again at once.
+
+### What is shown where
+
+- **Hero:** a whale's tail rising from the sea (photo by Zac Bowling). Chosen for a strong dark outline against a plain sky, and because it suits the headline. About half ink, as measured on the reference.
+- **The hero's paint texture is painted by the build, not taken from a photo.** The brief allowed "original or licensed"; Romit asked for an original. `scripts/lib/paint.mjs` lays brush strokes with raised edges onto a height map and lights it from the top left, from a seed number, so every build gives the same file. It shows only behind the subject; light spots enclosed by the subject stay flat paper, as on the reference.
+  - Measured with `texturecheck.mjs` on the light areas of the framed picture, reference against this site: darkest 1% 212 against 213, darkest 5% 233 against 237, middle 244 against 245, lightest 5% 250 against 250, average 243.2 against 243.2.
+- **Three drawings made for this site**, as SVG files in greys that the build turns into pixels: a deep-sea diver with a jellyfish (behind the home page's about section, where the reference has its large illustration), a compass rose (the footer's corner, where the reference has its ornament), and sea swells sinking into the dark (the band above the footer). They follow the reference only in role, size and place. Their subjects come from this site's own headline ("what we don't know is an ocean") and bio line ("a lifelong explorer"). None of the reference's pictures was copied, traced or used as a source.
+  - The drawings contain no text: the build would draw it with the fonts of whichever computer runs it.
+  - The band is stippled (`pattern: grain`), like the reference's; everything else uses the checkerboard.
+- **The inner pages reuse these**, as the reference reuses its own few pictures: the compass on a dark frame beside "About the human", the jellyfish and the swells in two of the About page's frames, the tips of the whale's tail beside "Resume".
+- **Other photos (all placeholders):** a marble bust for the About page's portrait frame, with a caption saying it is a stand-in; a server rack beside "Projects"; a padlock, a container ship and harbour cranes in the three frames on the Projects page.
+- **A project's picture is optional.** The Projects page has a frame beside every second project only, so three of the six sample projects have a picture. The reference's project pages show a logo above the name; these projects have none, and no picture was added there.
+- **Positions are the measured ones:** the about drawing is 65% of the window wide and hangs 64px past the right edge from tablets up, and sits low behind the card on phones; the compass shows its left half at the right edge on laptops and its top half at the bottom on phones and tablets; it rises 14px as the footer scrolls in. On laptops it is 300px across, not the reference's 400px: this footer has fewer links and is about 100px shorter, and a 400px compass would run into the last line.
+- **The about section now spans the whole window**, with its text held to 1440px, so that the drawing can hang past the edge on very wide windows as on the reference. Nothing changes below 1440px.
+
+### Alt text, credits, and nothing moving
+
+- **Every picture is either described or marked as decoration**, in `images.json`: `alt` for a description, or `"decorative": true`. The build stops on a picture with neither or with both, so a silent picture is always a decision and never an oversight. Romit's choice (2026-10-10): the compass, the sea band and the hero's paint texture are decoration and are passed over by screen readers, wherever they appear; the hero, the diver, the project pictures, the portrait and the other framed pictures are described.
+- **`src/_data/image-credits.json`** records the photographer and Unsplash page of each of the six photos. Each page was opened on 2026-10-10 and read "Free to use under the Unsplash License". The build stops if a photo has no entry.
+- **No picture can move the page.** Each one is laid over a box whose size the styles already fix, and carries its width and height in the page. A new test in `npm run check` (`scripts/lib/pictures.mjs`) holds the picture files back, notes where everything is, lets them arrive and compares, on every page at three widths in three browsers. It also checks that each picture says exactly what `images.json` has for it (or nothing, for decoration), written sizes, hard-edged enlarging, that every file loads, and that no file is heavier than 24 KB. A last step compares where each picture sits, and how much of it shows, from one browser to the next.
+  - That last step exists because the first version of the compass differed: its box took its width from its height, which Chrome's engine, Firefox and Safari's engine each worked out differently (half a compass, most of one, a whole one). Every size is now written out in full. **Rule: never let a box take its width from its height.** A height worked out from a width (the hero frame, the about drawing) is fine and the same everywhere.
+- **Loading speed, measured with `npm run speed`** (Chromium, middle of nine loads). The largest piece of the home page is now the hero picture, which is drawn with the first paint:
+
+  | | Before the pictures | With the pictures |
+  |---|---|---|
+  | Slow phone, Largest Contentful Paint, with the entrance | about 1310ms | 1252ms |
+  | Slow phone, Largest Contentful Paint, without the entrance | about 1235ms | 1236ms |
+  | Fast laptop, Largest Contentful Paint, with the entrance | about 180ms | 148ms |
+
+  The headline's entrance used to cost about 70ms on the slow phone because the giant line was the largest piece. It now costs about 16ms.
+
+### An older difference the new test found
+
+- **On the Projects page, at phone and tablet widths, each card was 0.6px taller in Firefox and Safari's engine than in Chrome's**, which put the footer 2 to 4px lower there. The "Read more" link was a box sitting in a line of text, and browsers disagree by a fraction of a pixel about the height of such a line. It is now a block of its own (`project-cards.css`). The cards are 1.8px shorter than before in Chrome's engine and the same height everywhere. Laptop widths were never affected.
+
+### Known issues
+
+- **Safari's engine does not report the fonts as ready until the pictures have loaded** (`document.fonts.ready`). Nothing on the site waits on that for anything visible; the picture test waits for the fonts another way.
+- **The ship photo shows a shipping line's name on the hull.** At 170 blocks across it cannot be read. It is a placeholder.
+- **At 125% display scaling on Windows**, blocks that are 3px wide become 3.75 screen pixels, so some columns are 3 and some 4 pixels wide. The reference has the same.
+
 ## 2026-10-10: Page changes, headline reveals and hovers
 
 ### Versions verified

@@ -8,6 +8,7 @@ tags:
 year: 2026
 link: https://github.com/brixdorf/ship-it
 order: 4
+image: ship
 ---
 > **Sample project**
 >

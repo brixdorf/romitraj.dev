@@ -1,5 +1,6 @@
 ---
 title: Projects
+picture: servers
 layout: layouts/page.njk
 pageKind: list
 description: Things Romit Raj Sahu built, broke and rebuilt.
@@ -22,9 +23,9 @@ description: Things Romit Raj Sahu built, broke and rebuilt.
       </div>
     </article>
   </li>
-  {#- An empty picture frame beside every second card, shown on wide windows only. #}
+  {#- A picture frame beside every second card, shown on wide windows only. It shows that project's picture ("image" at the top of its file), or stays empty. #}
   {%- if loop.index % 2 == 0 %}
-  <li class="frame project-cards__frame" aria-hidden="true" data-part="card"></li>
+  <li class="frame project-cards__frame" data-part="card">{% if project.image %}{% picture project.image %}{% endif %}</li>
   {%- endif %}
   {%- endfor %}
 </ol>

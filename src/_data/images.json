@@ -1,0 +1,134 @@
+{
+  "note": "Every picture on the site. 'source' is a file in src/assets/img/source/ (a photo, or an SVG drawing). Every picture needs one of two things: 'alt', a short description that screen readers read aloud, or 'decorative': true, for a picture that is only decoration and should be passed over in silence. 'across' is how many pixel blocks wide the finished picture is: fewer means chunkier. 'shape' cuts the source to a shape (width:height) and 'crop' chooses which part: x and y from 0 to 1, and zoom. Greys darker than 'black' become solid ink and lighter than 'white' solid paper (both from 0 to 1): move them closer together for harder contrast. The rest is explained in docs/guide.md under Pictures. The photos here are placeholders to replace.",
+  "pictures": {
+    "hero": {
+      "source": "whale-tail.jpg",
+      "alt": "A whale’s tail rising out of a dark sea, drawn in chunky black pixels.",
+      "across": 152,
+      "shape": "4:5",
+      "crop": {
+        "x": 0.5,
+        "y": 0.4,
+        "zoom": 1.45
+      },
+      "black": 0.38,
+      "white": 0.64,
+      "sharpen": 1,
+      "ground": "texture",
+      "texture": {
+        "seed": 7,
+        "strokes": 9
+      }
+    },
+    "diver": {
+      "source": "diver.svg",
+      "alt": "A deep-sea diver in a round copper helmet, with a jellyfish drifting past and bubbles rising.",
+      "across": 234,
+      "black": 0.3,
+      "white": 0.7
+    },
+    "compass": {
+      "source": "compass.svg",
+      "decorative": true,
+      "across": 100,
+      "black": 0.12,
+      "white": 0.88,
+      "tones": "paper"
+    },
+    "swells": {
+      "source": "swells.svg",
+      "decorative": true,
+      "across": 640,
+      "black": 0.04,
+      "white": 0.96,
+      "pattern": "grain"
+    },
+    "jellyfish": {
+      "source": "diver.svg",
+      "alt": "A jellyfish with long trailing tentacles.",
+      "across": 74,
+      "shape": "3:4",
+      "crop": {
+        "x": 0.135,
+        "y": 0.33,
+        "zoom": 3.3
+      },
+      "black": 0.3,
+      "white": 0.7
+    },
+    "fluke": {
+      "source": "whale-tail.jpg",
+      "alt": "The two tips of a whale’s tail, spread wide.",
+      "across": 192,
+      "shape": "22:5",
+      "crop": {
+        "x": 0.5,
+        "y": 0.2,
+        "zoom": 1.2
+      },
+      "black": 0.38,
+      "white": 0.64,
+      "sharpen": 1
+    },
+    "bust": {
+      "source": "marble-bust.jpg",
+      "alt": "A marble bust of a curly-haired Roman, lit from one side.",
+      "across": 110,
+      "shape": "11:21",
+      "crop": {
+        "x": 0.42,
+        "y": 0.45,
+        "zoom": 1
+      },
+      "black": 0.22,
+      "white": 0.6,
+      "sharpen": 0.8
+    },
+    "servers": {
+      "source": "server-rack.jpg",
+      "alt": "A long row of drive bays in a server rack.",
+      "across": 192,
+      "shape": "22:5",
+      "black": 0.06,
+      "white": 0.36,
+      "sharpen": 1
+    },
+    "padlock": {
+      "source": "padlock.jpg",
+      "alt": "An old padlock hanging from a chain, with its key.",
+      "across": 110,
+      "shape": "17:10",
+      "black": 0.32,
+      "white": 0.78,
+      "sharpen": 1,
+      "crop": {
+        "x": 0.42,
+        "y": 0.55,
+        "zoom": 1.25
+      }
+    },
+    "ship": {
+      "source": "container-ship.jpg",
+      "alt": "A container ship under way, seen from above.",
+      "across": 170,
+      "shape": "13:5",
+      "black": 0.27,
+      "white": 0.62,
+      "sharpen": 1
+    },
+    "crane": {
+      "source": "harbour-cranes.jpg",
+      "alt": "Harbour cranes in silhouette against a low sun.",
+      "across": 110,
+      "shape": "17:10",
+      "black": 0.3,
+      "white": 0.6,
+      "sharpen": 1,
+      "crop": {
+        "x": 0.5,
+        "y": 0.62,
+        "zoom": 1
+      }
+    }
+  }
+}

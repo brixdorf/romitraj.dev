@@ -1,0 +1,29 @@
+{
+  "note": "Where each photo in src/assets/img/source/ came from. All are placeholder photos from Unsplash, free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; the credit is kept here anyway. The build stops if a photo is used without an entry here. The drawings (the .svg files) are the site's own and need none.",
+  "photos": {
+    "whale-tail.jpg": {
+      "photographer": "Zac Bowling",
+      "url": "https://unsplash.com/photos/a-whale-tail-flups-out-of-the-water-1QF3rWzi7CM"
+    },
+    "marble-bust.jpg": {
+      "photographer": "Ian Noble",
+      "url": "https://unsplash.com/photos/ancient-man-statue-jpBx2YFfVAU"
+    },
+    "server-rack.jpg": {
+      "photographer": "Domaintechnik",
+      "url": "https://unsplash.com/photos/server-rack-with-blinking-green-lights-VHmBX7FnXw0"
+    },
+    "padlock.jpg": {
+      "photographer": "Hush Naidoo Jade Photography",
+      "url": "https://unsplash.com/photos/brass-padlock-with-key-on-white-background-gxAUvs7fjvc"
+    },
+    "container-ship.jpg": {
+      "photographer": "Haydn",
+      "url": "https://unsplash.com/photos/a-large-cargo-ship-with-lots-of-containers-on-its-back-ZT3i-6XW8J8"
+    },
+    "harbour-cranes.jpg": {
+      "photographer": "Werner Hilversum",
+      "url": "https://unsplash.com/photos/a-group-of-cranes-sitting-on-top-of-a-body-of-water-vFLJEhS_y5w"
+    }
+  }
+}
