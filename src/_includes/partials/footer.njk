@@ -1,0 +1,40 @@
+{#- The footer on every page: a site map with descriptions, links elsewhere, the contact email, the copyright line and the sign-off. -#}
+{%- from "partials/icon.njk" import icon with context -%}
+  <footer class="footer">
+    <nav class="footer__nav" aria-label="Site map">
+      <div class="footer__group footer__group--home">
+        <p class="footer__label"><span class="footer__mark" aria-hidden="true"></span>{{ site.version }}</p>
+        <p class="footer__row"><a class="footer__link" href="/">{{ home.footer.homeLabel }}</a></p>
+      </div>
+
+      <div class="footer__group footer__group--pages">
+        {%- for group in navigation %}
+        <p class="footer__label">{{ group.label }}</p>
+        <ul class="footer__list">
+          {%- for item in group.items %}
+          <li class="footer__row"><a class="footer__link" href="{{ item.url }}">{{ item.title }}</a> <span class="footer__hint">{{ item.hint }}</span></li>
+          {%- endfor %}
+        </ul>
+        {%- endfor %}
+      </div>
+
+      <div class="footer__group footer__group--elsewhere">
+        <p class="footer__label">{{ home.footer.elsewhereLabel }}</p>
+        <ul class="icon-list icon-list--small">
+          {%- for item in site.elsewhere %}
+          <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url }}">{{ item.title }}</a></li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+      <div class="footer__group footer__group--contact">
+        <p class="footer__label">{{ home.footer.contactLabel }}</p>
+        <p class="footer__row"><a class="footer__link" href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+      </div>
+    </nav>
+
+    <div class="footer__end">
+      <p class="footer__copyright"><span class="footer__symbol">&copy;</span> <span data-current-year>{{ build.year }}</span> {{ site.name }}</p>
+      <p class="footer__sign-off">{{ home.footer.signOff[0] }} <span class="footer__heart">{{ icon("heart") }}<span class="visually-hidden">love</span></span> {{ home.footer.signOff[1] }}</p>
+    </div>
+  </footer>

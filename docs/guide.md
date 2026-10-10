@@ -36,16 +36,21 @@ These are the only commands you need. All of them work in Windows PowerShell.
 ```
 src/
   _data/        Facts and words: site.json (name, banner line, links, email, city), headline.json (the headline),
-                home.json (other home page text), navigation.json (the page links), fonts.json,
+                home.json (all other home page text), navigation.json (the page links),
+                projects.json (the projects), icons.json (icon drawings), fonts.json,
+                blog.js (fetches the latest blog posts during the build),
                 and three files written by scripts: fontVersions.json, fallbackFonts.json, textWidths.json
   _includes/    layouts/ (base.njk is the page shell, notice.njk is a short "coming soon" page)
-                partials/ (banner, hero, ticker, fonts)
+                partials/ (one per section: banner, hero, ticker, letter, about, projects, writing,
+                footer; plus fonts and icon)
   assets/css/   main.css (the list), tokens.css (every value), base.css, components/ (one file per piece)
   assets/js/    main.js (the entry point), motion.js (animation timings),
-                animations.js (the tickers), widgets.js (the local time)
+                animations.js (tickers and movement tied to scroll), widgets.js (local time, year)
   assets/fonts/ The free fallback fonts and their license files
-  content/      The pages. index.njk is the home page; about.md, projects.md and resume.njk
-                are short notices until the real pages are written.
+  assets/icons/ The license of the icon set
+  content/      The pages. index.njk is the home page. about.md and resume.njk are short notices until
+                the real pages are written. projects.njk lists the projects, and project.njk makes one
+                short page per project.
 server/         index.js: the small server behind npm start
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
                 fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers)
@@ -63,7 +68,14 @@ Every file starts with a comment saying what it does.
 | The bio line in the top banner | `src/_data/site.json` (`banner`) |
 | The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
 | The introduction sentence, the scroll note, the note inside the picture frame | `src/_data/home.json` |
-| The page links and their descriptions | `src/_data/navigation.json` |
+| The page links and their descriptions (hero and footer) | `src/_data/navigation.json` |
+| The intro letter, the about text, section headings, button labels, the footer sign-off | `src/_data/home.json` |
+| The projects | `src/_data/projects.json` (the six there now are samples) |
+| How many blog posts the home page shows | `src/_data/home.json` (`writing.count`) |
+| The links under "Elsewhere" (about card and footer) | `src/_data/site.json` (`elsewhere`) |
+| The version tag in the footer | `src/_data/site.json` (`version`) |
+| An icon's drawing, or a new icon | `src/_data/icons.json` |
+| Where and how far things move as you scroll | `src/assets/js/motion.js` (`scroll`) |
 | The city, country or coordinates in the status ticker | `src/_data/site.json` |
 | The text on a page that is not written yet | That page's file in `src/content/` |
 | How fast the ticker moves, and how much it slows under the pointer | `src/assets/js/motion.js` |
@@ -104,6 +116,28 @@ Three things to know when changing it:
 - **Manuka has few characters.** Letters, digits, comma, hyphen and full stop only. An apostrophe in the giant line works anyway: the site draws it with Manuka's comma, raised into place. Other punctuation would be borrowed from the fallback font, and `npm run check` would report it.
 
 The layout has three arrangements, chosen by window width: phone (under 600px), tablet (600 to 899px) and laptop (900px and wider).
+
+## The home page sections
+
+The home page is a stack of sections, listed in order in `src/content/index.njk`. Each has its own file in `src/_includes/partials/` and its own stylesheet in `src/assets/css/components/`.
+
+| Section | What it is | Its words |
+|---|---|---|
+| Hero | Headline, ticker, page links, picture frame | `headline.json`, `home.json`, `navigation.json` |
+| Letter | A short signed note on a dark block | `home.json` (`letter`) |
+| About | Sliding heading, quote ticker, bio, card of links | `home.json` (`about`), `site.json` (`elsewhere`) |
+| Projects | One row per project on a dark block | `projects.json`, `home.json` (`projects`) |
+| Writing | The latest blog posts as cards | The blog's own feed, `home.json` (`writing`) |
+| Footer | Site map, links, email, copyright, sign-off (on every page) | `navigation.json`, `site.json`, `home.json` (`footer`) |
+
+Things to know:
+
+- **Formatting inside the words.** Some texts in `home.json` use small tags: `<i>` for the italic serif asides, `<del>` for a struck-out word, `<ins>` for the word that replaces it, `<br>` for a line break and `<a href="...">` for a link. `{email}` is replaced by the email address in `site.json`.
+- **Apostrophes in serif text.** The letter, the about heading, project names and post titles are set in Louize, which has only the curly apostrophe (`’`). Blog titles are converted for you. In `home.json` and `projects.json`, type the curly one.
+- **Projects.** Each entry in `projects.json` becomes a row on the home page and a short page at `/projects/<slug>/`. The row's name opens near its middle on hover; where it opens is worked out from the name.
+- **Blog posts are fetched when the site is built**, not when someone visits. A new post appears on the home page after the next build (on the live site: after the next deploy). If the blog cannot be reached during a build, the section shows one sentence and a link instead, and the build still succeeds. While `npm run dev` is running, the feed is kept for an hour in `.cache/`.
+- **Movement tied to scroll** (the sliding about heading, the bars beside the giant headings, the project rows) runs on tablets and laptops. It is off on phones and for visitors who asked their system for less motion; there, everything sits in its resting place.
+- **Project rows start somewhere new on every page load**, so the section never looks quite the same twice. `npm run check` uses fixed starting places instead, so its screenshots match from one run to the next.
 
 ## Fonts
 
@@ -198,6 +232,7 @@ These parts of the guide are written when the matching part of the site is built
 
 - Spotify setup for the now-playing widget, and the weather. Both will appear in the status ticker.
 - Deployment with Dokploy, step by step.
-- Images: where the photos go and how the build converts them. Until then the hero's picture frame is empty.
-- The rest of the home page (letter, about, projects, writing, footer) and the real About, Projects and Resume pages.
+- Images: where the photos go and how the build converts them. Until then the hero's picture frame is empty, and the about section has no illustration.
+- The real About and Resume pages, the designed list of projects, and a full write-up page for each project.
+- Page changes that fade instead of reloading.
 - The small row with the site label, home link and tagline that sits under the banner on every page except the home page.

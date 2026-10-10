@@ -1,0 +1,12 @@
+---
+title: Projects
+layout: layouts/notice.njk
+label: all projects
+---
+{#- The list of every project. A plain list for now; each name leads to that project's page. -#}
+<p>The projects are built. Their write-ups are not. I'm working on it.</p>
+<ul class="notice__list">
+  {%- for project in projects.items %}
+  <li><a class="link link--underlined" href="/projects/{{ project.slug }}/">{{ project.title }}</a>: {{ project.description }}</li>
+  {%- endfor %}
+</ul>

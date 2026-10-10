@@ -1,0 +1,36 @@
+{#- The about section: a sliding serif heading, a thin ticker, the short bio with its small blocks, and the card of links. -#}
+{%- from "partials/icon.njk" import icon with context -%}
+<section class="about">
+  <div class="about__inner">
+    <h2 class="about__heading">
+      <span class="about__heading-text" data-drift data-text="{{ home.about.heading }}">{{ home.about.heading }}</span>
+    </h2>
+
+    <div class="ticker ticker--quote" data-ticker="quoteTicker">
+      <div class="ticker__group">
+        <span class="ticker__item">{{ home.about.quote }}</span>
+      </div>
+    </div>
+
+    <div class="about__body">
+      <div class="about__text">
+        {%- for paragraph in home.about.paragraphs %}
+        <p>{{ paragraph | safe }}</p>
+        {%- endfor %}
+        {%- for block in home.about.blocks %}
+        <h3 class="about__label">{{ block.label }}</h3>
+        <p>{{ block.text | fill | safe }}</p>
+        {%- endfor %}
+      </div>
+
+      <aside class="about__card" aria-labelledby="about-elsewhere">
+        <h3 class="about__label" id="about-elsewhere">{{ home.about.elsewhereLabel }}</h3>
+        <ul class="icon-list">
+          {%- for item in site.elsewhere %}
+          <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url }}">{{ item.title }}</a></li>
+          {%- endfor %}
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>

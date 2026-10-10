@@ -34,6 +34,15 @@
   margin: 0 0 16px;
 }
 
+.notice__list {
+  margin: 0 0 16px;
+  padding-inline-start: 1.1em;
+}
+
+.notice__list li {
+  margin-block-end: 8px;
+}
+
 .notice__home {
   margin: 16px 0 0;
   font-size: var(--type-small);

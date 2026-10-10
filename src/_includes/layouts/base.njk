@@ -1,4 +1,4 @@
-{# The page shell every page uses: head tags, fonts, styles, script, the top banner, and the slot for the page's own content. -#}
+{# The page shell every page uses: head tags, fonts, styles, script, the top banner, the slot for the page's own content, and the footer. -#}
 <!doctype html>
 <html lang="{{ site.language }}">
 <head>
@@ -16,5 +16,6 @@
   <main>
     {{ content | safe }}
   </main>
+  {%- include "partials/footer.njk" %}
 </body>
 </html>

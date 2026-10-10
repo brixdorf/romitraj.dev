@@ -12,3 +12,6 @@ screenshots/
 
 # Python cache
 __pycache__/
+
+# Saved copy of the blog feed, used while developing
+.cache/

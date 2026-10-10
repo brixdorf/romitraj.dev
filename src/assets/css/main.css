@@ -2,8 +2,15 @@
 @import "./tokens.css";
 @import "./base.css";
 @import "./components/link.css";
+@import "./components/icon-list.css";
 @import "./components/banner.css";
 @import "./components/hero.css";
 @import "./components/ticker.css";
 @import "./components/nav-list.css";
+@import "./components/section-heading.css";
+@import "./components/letter.css";
+@import "./components/about.css";
+@import "./components/project-list.css";
+@import "./components/card.css";
+@import "./components/footer.css";
 @import "./components/notice.css";

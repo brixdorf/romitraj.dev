@@ -43,6 +43,23 @@ a {
   border: 0;
 }
 
+/* An icon: as tall as the text around it, and the same color. */
+.icon {
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* A section's closing link, such as "View all projects": small capitals, centered. */
+.section-link {
+  display: block;
+  font-size: var(--type-micro);
+  line-height: 1.17;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
 /* A drawn line that stands where a long dash would go between two pieces of text. */
 .dash {
   display: inline-block;

@@ -78,6 +78,9 @@ try {
       // Firefox has no phone mode; it still gets the phone-sized window.
       if (settings.mobile && engineName !== 'firefox') Object.assign(options, { isMobile: true, hasTouch: true });
       const context = await browser.newContext(options);
+      // Tells the site's scripts to use fixed starting points for anything they would otherwise place
+      // at random, so the same page gives the same picture on every run.
+      await context.addInitScript(() => { window.steadyMotion = true; });
       const page = await context.newPage();
       const problems = [];
       page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));

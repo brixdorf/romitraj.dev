@@ -1,0 +1,110 @@
+/* The project rows on the dark "Selected projects" section. Each row holds one strip: the project's
+   name in full strength, with faint blurred copies running off to both sides. On hover the name
+   opens in the middle, a line draws in the gap, and the copies sharpen. A script slides each
+   strip in from the side as its row scrolls into view. */
+.works {
+  padding: var(--section-space) var(--gutter);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.project-list {
+  /* The rows run to the left edge of the page, and are cut off there and at the right edge of the content. */
+  margin: 16px 0 32px calc(var(--gutter) * -1);
+  padding: 0 0 0 var(--gutter);
+  list-style: none;
+  overflow: hidden;
+}
+
+.project-list__row {
+  display: flex;
+  padding-block-start: 4px;
+  font-family: var(--font-serif-display);
+  font-size: var(--type-project);
+  line-height: 1.37;
+  white-space: nowrap;
+}
+
+.project-list__row + .project-list__row {
+  margin-block-start: 4.976px;
+}
+
+.project-list__strip {
+  position: relative;
+  display: flex;
+}
+
+.project-list__link {
+  display: flex;
+  align-items: center;
+  gap: 0.245em;
+  text-decoration: none;
+}
+
+.project-list__number {
+  font-family: var(--font-text);
+  font-size: 12px;
+  line-height: 1.17;
+  /* The number sits at the top of the letters, like a small note beside the name. */
+  align-self: flex-start;
+  margin-block-start: 0.3em;
+}
+
+.project-list__title {
+  display: flex;
+  align-items: center;
+}
+
+/* The gap that opens in the middle of the name, with a line drawn across it. */
+.project-list__gap {
+  inline-size: 0;
+  block-size: 3px;
+  background: currentColor;
+  transition: inline-size var(--duration-fast) ease-in;
+}
+
+.project-list__link:hover .project-list__gap,
+.project-list__link:focus-visible .project-list__gap {
+  inline-size: 1.47em;
+}
+
+/* The faint copies, pinned to the left and right ends of the real name. */
+.project-list__ghosts {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  gap: 0.21em;
+  color: var(--color-ghost-on-ink);
+  filter: blur(1.5px);
+  transition: filter var(--duration-fast) ease;
+  pointer-events: none;
+}
+
+.project-list__ghosts--before {
+  inset-inline-end: calc(100% + 0.245em);
+}
+
+.project-list__ghosts--after {
+  inset-inline-start: calc(100% + 0.245em);
+}
+
+.project-list__ghost {
+  display: flex;
+}
+
+.project-list__ghost .project-list__number {
+  margin-inline-end: 3.732px;
+}
+
+.project-list__strip:hover .project-list__ghosts,
+.project-list__strip:focus-within .project-list__ghosts {
+  filter: blur(0);
+}
+
+/* Tablet and laptop: each name rests a little left of the middle of its row. */
+@media (width >= 600px) {
+  .project-list__row {
+    justify-content: center;
+    padding-inline-end: 6.8%;
+  }
+}

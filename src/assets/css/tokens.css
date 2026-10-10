@@ -11,7 +11,10 @@
   --color-muted-on-ink: #9f9f9f;
   --color-ghost-on-ink: #3e3b36;
   --color-line-on-paper: #eeeeee;
+  --color-line-on-paper-strong: #bdbdbd;
   --color-line-on-ink: #3a3a3a;
+  --color-label-on-ink: #b3b3b3;
+  --color-hint-on-ink: #a9a9a9;
 
   /* Color: the gradient bar under the top banner (Dusk). */
   --color-bar-1: #6a7cf5;
@@ -27,6 +30,11 @@
 
   /* Type sizes. The giant hero lines are not here: they are sized to fill their space, in components/hero.css. */
   --type-banner: max(22.4px, 2.4vw);
+  --type-section-heading: 120px;
+  --type-serif-heading: max(64px, 10.3vw);
+  --type-project: min(8vw, 40px);
+  --type-card-title: 32px;
+  --type-letter: 20px;
   --type-lead: 16px;
   --type-body: 20px;
   --type-nav: 16px;
@@ -67,6 +75,11 @@
 
 @media (min-width: 900px) {
   :root {
+    /* These three grow with the window between 900px and 1512px wide, then stop. */
+    --type-section-heading: clamp(120px, 19.608vw - 56.47px, 240px);
+    --type-serif-heading: clamp(94.4px, 5.817vw + 42.05px, 130px);
+    --type-project: clamp(40px, 6.863vw - 21.76px, 82px);
+    --type-letter: 24px;
     --type-lead: 24px;
     --type-nav: 20px;
     --type-label: 16px;

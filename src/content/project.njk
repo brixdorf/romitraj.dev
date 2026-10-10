@@ -1,0 +1,15 @@
+---
+pagination:
+  data: projects.items
+  size: 1
+  alias: project
+permalink: "/projects/{{ project.slug }}/"
+layout: layouts/notice.njk
+label: sample project
+eleventyComputed:
+  title: "{{ project.title }}"
+  description: "{{ project.description }}"
+---
+{#- One short page per project in _data/projects.json, shown until its full write-up exists. -#}
+<p>{{ project.description }}</p>
+<p>The full write-up is coming soon. Until then, the code lives on <a class="link link--underlined" href="{{ project.link }}">GitHub</a>.</p>

@@ -36,6 +36,22 @@
   color: var(--color-muted-on-paper);
 }
 
+/* The thinner quote ticker: smaller grey text, one rule below, wider gaps between repeats. */
+.ticker--quote {
+  margin-block-end: 32px;
+  padding-block: 0 6.4px;
+  border-block-start: 0;
+  font-size: var(--type-micro);
+  line-height: 1.17;
+  color: var(--color-muted-on-paper);
+}
+
+.ticker--quote .ticker__group {
+  min-block-size: 0;
+  gap: 2.488em;
+  padding-inline-end: 2.488em;
+}
+
 .ticker .dash {
   flex: none;
   vertical-align: baseline;

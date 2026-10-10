@@ -1,5 +1,57 @@
 {
   "lead": "The personal site and portfolio of Romit&nbsp;Raj&nbsp;Sahu, a CS student in Bangalore who hasn't picked a specialty yet.",
   "scrollNote": "(Keep scrolling. No rush.)",
-  "imageNote": "(A picture goes here soon.)"
+  "imageNote": "(A picture goes here soon.)",
+
+  "letter": {
+    "label": "A quick note before you scroll",
+    "paragraphs": [
+      "hey there <i>(yes, you, the one scrolling)</i>,",
+      "this is my corner of the internet. part portfolio, part proof that I do finish things. it took longer than it should have, which is very on brand.",
+      "have a look around.<br>if something is broken, I probably know.",
+      "cheers,<br>romit <i>(the procrastinator)</i>"
+    ]
+  },
+
+  "about": {
+    "heading": "About the human",
+    "quote": "Currently procrastinating on: finishing this website. Previously procrastinated on: starting this website.",
+    "paragraphs": [
+      "I’m a CS student <i>(the indecisive kind)</i> currently based in <del>my bed</del> <ins>Bangalore, India</ins>. I’m into servers, self-hosting, the open web, and breaking things that were working fine.",
+      "Full stack, DevOps or forward deployed engineering: I haven’t picked one yet, so for now I do a bit of each."
+    ],
+    "blocks": [
+      {
+        "label": "Availability",
+        "text": "I’m open to internships and small freelance projects. If you have something interesting, say hi."
+      },
+      {
+        "label": "Contact",
+        "text": "Email is the fastest way to reach me: <a href=\"mailto:{email}\">{email}</a>. There is also <a href=\"/resume/\">a resume</a>, once I finish it."
+      }
+    ],
+    "elsewhereLabel": "Elsewhere"
+  },
+
+  "projects": {
+    "heading": ["Selected", "projects"],
+    "viewAll": "View all projects",
+    "comingSoon": "Coming soon"
+  },
+
+  "writing": {
+    "heading": "Writing",
+    "label": "Blog",
+    "count": 6,
+    "readMore": "Read more",
+    "viewAll": "Read the blog",
+    "fallback": "The latest posts could not be loaded just now. They are all on the blog."
+  },
+
+  "footer": {
+    "homeLabel": "Home",
+    "elsewhereLabel": "Elsewhere",
+    "contactLabel": "Contact",
+    "signOff": ["made with", "in the Open Web"]
+  }
 }

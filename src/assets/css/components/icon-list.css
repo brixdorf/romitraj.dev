@@ -1,0 +1,48 @@
+/* A list of links, each with a small icon before it. A line draws under the link's name on hover or keyboard focus. */
+.icon-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--type-body);
+  line-height: 1.5;
+}
+
+.icon-list__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-list__item .icon {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+/* The link reaches back over its icon, so the icon is part of what you can click. */
+.icon-list__link {
+  position: relative;
+  margin-inline-start: -32px;
+  padding-inline-start: 32px;
+  text-decoration: none;
+}
+
+.icon-list__link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 32px 0;
+  inset-block-end: 4px;
+  block-size: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.icon-list__link:hover::after,
+.icon-list__link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.icon-list--small {
+  font-size: var(--type-small);
+}

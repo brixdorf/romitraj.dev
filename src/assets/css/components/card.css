@@ -1,0 +1,83 @@
+/* The "Writing" section and its cards. Each card is one link: a small label and date, the post's
+   title, and "Read more" in the bottom corner, which gets an underline when the card is hovered. */
+.writing {
+  padding: var(--section-space) var(--gutter);
+}
+
+.writing__fallback {
+  margin: 0 0 32px;
+}
+
+.card-grid {
+  display: grid;
+  gap: var(--grid-gap);
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.card-grid__item {
+  display: grid;
+}
+
+.card {
+  display: grid;
+  /* Label, then title, then whatever space is left, then "Read more" at the bottom. */
+  grid-template-rows: auto 1fr auto;
+  padding: 32px 24px;
+  border: var(--rule) solid var(--color-line-on-paper);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.card:hover,
+.card:focus-visible {
+  border-color: var(--color-line-on-paper-strong);
+}
+
+.card__meta {
+  margin-block-end: 12px;
+  font-size: var(--type-micro);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.card__title {
+  margin: 0 0 32px;
+  font-family: var(--font-serif-display);
+  font-weight: 400;
+  font-size: var(--type-card-title);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.card__more {
+  justify-self: end;
+  margin-block-end: -16px;
+  padding-block: 16px;
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  /* The underline is a 1px strip of background that grows from the left. */
+  background: linear-gradient(currentColor, currentColor) no-repeat left bottom 14px / 0% 1px;
+  transition: background-size var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.card:hover .card__more,
+.card:focus-visible .card__more {
+  background-size: 100% 1px;
+}
+
+@media (width >= 600px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 900px) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

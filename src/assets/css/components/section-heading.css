@@ -1,0 +1,50 @@
+/* Giant section headings ("Selected projects", "Writing"), with a thick bar that fills the rest of
+   the line. A script grows the bar from nothing as the heading scrolls into view; without
+   scripts it is simply full length. */
+.section-heading {
+  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-section-heading);
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+
+.section-heading--end {
+  line-height: 0.75;
+}
+
+/* Phone: no bar, and a two-word heading breaks onto two lines. */
+@media (width < 600px) {
+  .section-heading__word {
+    display: block;
+  }
+}
+
+@media (width >= 600px) {
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.1em;
+    white-space: nowrap;
+  }
+
+  .section-heading::after,
+  .section-heading--end::before {
+    content: "";
+    flex: 1;
+    block-size: 0.1em;
+    background: currentColor;
+    transform: scaleX(var(--bar, 1));
+    transform-origin: left;
+  }
+
+  /* On a heading that sits at the end of the line, the bar is on the other side and grows toward the edge. */
+  .section-heading--end::after {
+    content: none;
+  }
+
+  .section-heading--end::before {
+    transform-origin: right;
+  }
+}

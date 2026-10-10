@@ -2,6 +2,51 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-10: Letter, about, projects, writing and footer
+
+### Versions verified
+
+| What | Version | Source | Used for |
+|---|---|---|---|
+| gsap | 3.15.0 | `npm view gsap version` | Movement tied to scroll (with its ScrollTrigger plugin) |
+| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 | `npm view @phosphor-icons/core version`; drawings copied from the published package | The heart and the link icons |
+
+Licenses: GSAP is under its standard "no charge" license (https://gsap.com/standard-license). Phosphor Icons is MIT; its license text is kept in `src/assets/icons/LICENSE-phosphor.txt`. Only six drawings are used, copied into `src/_data/icons.json`, so the package itself is not installed.
+
+### Decisions
+
+- **Movement tied to scroll follows rules measured on the design reference**, and was checked against it number by number in three browsers:
+  - The about heading slides in from the right by half the window's width. It starts when the heading's top reaches the bottom of the window and ends when its bottom reaches the middle, on a quadratic ease-out curve.
+  - The bars beside the two giant headings grow from nothing to full length on the same rule.
+  - Each project row slides to rest from one side between the same two moments, at an even pace, and fades away as it leaves through the top of the window.
+  - All of it trails the scroll by about a second. It runs on tablets and laptops only, as on the reference. For visitors who asked for less motion it is switched off and everything sits in its resting place.
+- **Project rows start from new random positions on every page load**, as on the reference: each row begins somewhere between half a row to the left and a quarter of a row to the right of its resting place (`rowOffsetRange` in `motion.js`). An earlier build used fixed positions on every visit; Romit chose to match the reference. While `npm run check` photographs the pages, a fixed list is used instead (`rowOffsetsForChecks`), so two runs of the check give the same pictures and can be compared. The check switches this on by setting `window.steadyMotion` before the page's scripts run.
+- **Rows respond to scroll, not to the pointer.** An earlier reading suggested rows drifted at their own speeds as the page scrolled. Measuring directly showed one slide per row, tied to that row's position, and nothing tied to the pointer.
+- **A project name opens near its middle on hover**, always inside a word, at a point worked out from the name. The gap is 1.47 times the type size (113px at laptop width, the same as the reference), and the faint copies beside the name sharpen.
+- **The bars are drawn by the styles and driven by one number.** The script only changes a value called `--bar` from 0 to 1; the styles turn that into the bar's length. Without scripts the bar is simply full length.
+- **Blog posts are fetched during the build**, from the blog's feed, with two tries. If the feed cannot be reached the section shows a sentence and a link, and the build still succeeds. The feed has a title, link, date and description per post, so cards show a label, the date and the title. It has no categories or reading times, which the reference's cards show.
+- **The writing section shows up to six posts** (`writing.count` in `home.json`), which fills two rows of three on laptops. The blog has five posts today, so one place is empty until a sixth is published; it then fills in at the next build with no change here. Romit chose six over five for that reason.
+- **No dark "featured" card.** The reference's first card is black because that one article has its own look. It is not a rule of the design.
+- **A short page per project instead of dead links.** Each project row leads to `/projects/<slug>/`, a notice page with the description, until full write-ups exist.
+- **No Now block in the about section**, and no Now link in the footer, following the earlier decision to drop the Now page.
+- **The copyright line is plain:** the year and the name. The blog's own footer line was not reused because it repeats the design reference's wording. The sign-off "made with (heart) in the Open Web" is as on the blog. The heart is an icon in the text color, read out as "love".
+- **The year in the copyright line is set by the build and kept current by a script**, so it is right even if the site was last built in an earlier year.
+- **The serif has no copyright sign**, so that one character is set in the text font.
+- **The version tag is "ver. fw26"** with a small drawn diamond before it, echoing the diamond-shaped full stop of the serif.
+- **Placeholders in text.** `{email}` in `home.json` is filled in from `site.json`, so the address is still written in one place.
+- **Icons are a small data file and a helper**, not a package: six drawings, each drawn in the color and size of the text around it.
+
+### Not built yet
+
+- The about section's illustration and the footer's ornament. Both are pictures on the reference; they wait for the image conversion step.
+- The dark band of dither that leads into the footer on the reference. It is also a picture.
+- Full write-up pages for projects, the designed list of projects, and the real About and Resume pages.
+
+### Known issues
+
+- **The bundled script grew to about 116 KB** (about 46 KB when compressed in transit), almost all of it GSAP.
+- **Building needs the network** to show blog posts. Without it the build still succeeds and shows the link instead.
+
 ## 2026-10-10: Banner, hero and navigation
 
 Nothing was installed in this step. Bangalore's coordinates were checked on 2026-10-09 against two sources: Wikipedia (12.9789, 77.5917) and Open-Meteo's place search (12.97194, 77.59369). Both give N 12° 58′, E 77° 35′, which is what the ticker shows. `site.json` stores 12.97 and 77.59.

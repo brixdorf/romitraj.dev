@@ -3,6 +3,7 @@
   "url": "https://romitraj.dev",
   "language": "en",
   "description": "Personal website and portfolio of Romit Raj Sahu.",
+  "version": "ver. fw26",
   "banner": {
     "plain": "A lifelong explorer",
     "italic": "who procrastinates a lot."
@@ -16,9 +17,11 @@
   "blogUrl": "https://blog.romitraj.dev",
   "fontsUrl": "https://fonts.romitraj.dev/",
   "themeColor": "#2a2722",
-  "links": {
-    "github": "https://github.com/brixdorf",
-    "x": "https://x.com/brixdorf",
-    "linkedin": "https://www.linkedin.com/in/romitrajsahu"
-  }
+  "elsewhere": [
+    { "title": "GitHub", "url": "https://github.com/brixdorf", "icon": "github" },
+    { "title": "X", "url": "https://x.com/brixdorf", "icon": "x" },
+    { "title": "LinkedIn", "url": "https://www.linkedin.com/in/romitrajsahu", "icon": "linkedin" },
+    { "title": "Blog", "url": "https://blog.romitraj.dev", "icon": "blog" },
+    { "title": "Resume", "url": "/resume/", "icon": "resume" }
+  ]
 }

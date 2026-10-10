@@ -1,0 +1,33 @@
+{#-
+  Selected projects: a giant heading, then one row per project. Each row shows the project's name
+  once in full strength, with faint blurred copies of it running off both sides.
+  Hovering a row opens a gap in the middle of its name.
+-#}
+<section class="works">
+  <h2 class="section-heading" data-bar>
+    {%- for word in home.projects.heading %}<span class="section-heading__word">{{ word }}</span>{% if not loop.last %} {% endif %}{% endfor -%}
+  </h2>
+
+  <ol class="project-list">
+    {%- for project in projects.items %}
+    {%- set number = "(0" ~ loop.index ~ ")" %}
+    {%- set parts = project.title | halves %}
+    <li class="project-list__row" data-row>
+      <div class="project-list__strip">
+        <span class="project-list__ghosts project-list__ghosts--before" aria-hidden="true">
+          {%- for copy in range(0, 4) %}<span class="project-list__ghost"><span class="project-list__number">{{ number }}</span>{{ project.title }}</span>{% endfor -%}
+        </span>
+        <a class="project-list__link" href="/projects/{{ project.slug }}/" aria-label="{{ project.title }}: {{ project.description }}">
+          <span class="project-list__number">{{ number }}</span>
+          <span class="project-list__title"><span class="project-list__half">{{ parts[0] }}</span><span class="project-list__gap"></span><span class="project-list__half">{{ parts[1] }}</span></span>
+        </a>
+        <span class="project-list__ghosts project-list__ghosts--after" aria-hidden="true">
+          {%- for copy in range(0, 4) %}<span class="project-list__ghost"><span class="project-list__number">{{ number }}</span>{{ project.title }}</span>{% endfor -%}
+        </span>
+      </div>
+    </li>
+    {%- endfor %}
+  </ol>
+
+  <a class="section-link" href="/projects/">{{ home.projects.viewAll }} &rarr;</a>
+</section>

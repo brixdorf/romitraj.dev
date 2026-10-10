@@ -1,0 +1,24 @@
+{#- Latest writing: the newest posts from the blog as cards. If the blog's feed could not be read, a plain sentence and link instead. -#}
+<section class="writing">
+  <h2 class="section-heading section-heading--end" data-bar>
+    <span class="section-heading__word">{{ home.writing.heading }}</span>
+  </h2>
+
+  {%- if blog.posts.length %}
+  <ul class="card-grid">
+    {%- for post in blog.posts.slice(0, home.writing.count) %}
+    <li class="card-grid__item">
+      <a class="card" href="{{ post.url }}">
+        <span class="card__meta">{{ home.writing.label }}<br><time datetime="{{ post.isoDate }}">{{ post.date }}</time></span>
+        <h3 class="card__title">{{ post.title }}</h3>
+        <span class="card__more" aria-hidden="true">{{ home.writing.readMore }} &rarr;</span>
+      </a>
+    </li>
+    {%- endfor %}
+  </ul>
+  {%- else %}
+  <p class="writing__fallback">{{ home.writing.fallback }}</p>
+  {%- endif %}
+
+  <a class="section-link" href="{{ blog.url }}">{{ home.writing.viewAll }} &rarr;</a>
+</section>

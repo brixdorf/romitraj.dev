@@ -27,6 +27,12 @@ function startLocalTime(root) {
   }, untilNextMinute);
 }
 
+// Keeps the copyright year current, even if the site was last built in an earlier year.
+function showCurrentYear(root) {
+  for (const element of root.querySelectorAll('[data-current-year]')) element.textContent = new Date().getFullYear();
+}
+
 export function startWidgets(root = document) {
   startLocalTime(root);
+  showCurrentYear(root);
 }

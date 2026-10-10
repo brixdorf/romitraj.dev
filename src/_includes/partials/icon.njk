@@ -1,0 +1,4 @@
+{#- Draws one icon from _data/icons.json. It takes the color and size of the text around it. Use: {{ icon("heart") }} -#}
+{%- macro icon(name) -%}
+<svg class="icon" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="{{ icons[name] }}"/></svg>
+{%- endmacro -%}
