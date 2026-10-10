@@ -12,6 +12,15 @@
   overflow: hidden;
 }
 
+/* While the page is marked "intro" (by the script in its head, for a moment after it opens), the
+   four pieces of the headline wait out of sight for their entrance. See assets/js/intro.js. */
+.intro .hero__opening,
+.intro .hero__giant,
+.intro .hero__flourish,
+.intro .hero__serif {
+  visibility: hidden;
+}
+
 .hero__opening,
 .hero__giant,
 .hero__flourish,

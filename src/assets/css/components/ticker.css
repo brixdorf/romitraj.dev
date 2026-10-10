@@ -19,6 +19,8 @@
   padding-inline-end: 0.311em;
   /* Tall enough for an icon, so the line keeps its height before any icon is there. */
   min-block-size: 20px;
+  /* A page change fades the words in by raising this value from 0 to 1. Normally it is not set. */
+  opacity: var(--ticker-words, 1);
 }
 
 /* A piece made of several parts (some text and the dash after it) keeps the same spacing as the group. */

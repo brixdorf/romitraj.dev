@@ -43,6 +43,8 @@ export async function measureTextWidths(page, address) {
   }), selector);
   const round = (value) => Math.round(value * 10000) / 10000;
 
+  // The headline must be at rest to be measured, not sliding in.
+  await page.addInitScript(() => { window.steadyMotion = true; });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(address + '/', { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);

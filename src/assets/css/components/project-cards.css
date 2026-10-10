@@ -25,6 +25,12 @@
   border-radius: var(--radius);
 }
 
+/* The outline darkens at once while the pointer is over the card or its link has keyboard focus. */
+.project-card:hover,
+.project-card:focus-within {
+  border-color: var(--color-line-on-paper-strong);
+}
+
 .project-card__number {
   display: block;
   margin-block-end: 12px;

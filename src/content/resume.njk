@@ -4,8 +4,8 @@ layout: layouts/page.njk
 description: The resume of Romit Raj Sahu, once it is finished.
 ---
 {#- Shown until resume.pdf exists: a short note and the contact email. Its words are in _data/pages.json ("resume"). -#}
-<div class="page-grid">
-  <section class="panel page-grid__main">
+<div class="page-grid" data-part="cards">
+  <section class="panel page-grid__main" data-part="card">
     <h2 class="panel__title">{{ pages.resume.title }}</h2>
     <div class="panel__text">
       {%- for paragraph in pages.resume.paragraphs %}

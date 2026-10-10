@@ -1,11 +1,18 @@
 // Checks the site before a commit: builds it, looks for broken links between its own pages and
 // files, photographs every page in Chromium, Firefox and WebKit at laptop, tablet and phone widths,
-// and confirms the hero's big lines still fit their space.
+// confirms the hero's big lines still fit their space, clicks from page to page in each browser
+// to confirm the page changes work, that nothing moves once a page change has finished, and that
+// back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
+// cutting headings into letters for those changes moves nothing (lib/letters.mjs), and confirms
+// that the headline's entrance on the home page is safe (lib/entrance.mjs).
 // Run it with: npm run check
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium, firefox, webkit } from 'playwright';
 import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidths } from './lib/site.mjs';
+import { lettersStayInPlace, testWidths } from './lib/letters.mjs';
+import { walkThePages } from './lib/walk.mjs';
+import { headlineEntrance } from './lib/entrance.mjs';
 
 const privateDir = path.join(root, '..', 'romitraj-private');
 // Screenshots go next to the reference screenshots when that folder exists, otherwise into this repo (ignored by git).
@@ -22,6 +29,22 @@ const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entr
   const full = path.join(dir, entry.name);
   return entry.isDirectory() ? walk(full) : [full];
 });
+
+// Opens every page and confirms that cutting its headings into letters, and its introduction into
+// lines, moves nothing, at every width in the list in lib/letters.mjs.
+async function lettersOnEveryPage(browser, address, pagePaths) {
+  const problems = [];
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  // The headline must be at rest, not sliding in.
+  await page.addInitScript(() => { window.steadyMotion = true; });
+  for (const pagePath of pagePaths) {
+    await page.goto(address + pagePath, { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    problems.push(...await lettersStayInPlace(page, pagePath));
+  }
+  await page.close();
+  return problems;
+}
 
 // ---- 1. Build ----
 console.log('Building the site...');
@@ -125,8 +148,26 @@ try {
         console.log('Hero lines: all fit their space.');
       }
     }
+    // ---- 5. Page changes: click from page to page the way a visitor would ----
+    const walkProblems = await walkThePages(browser, server.address);
+    if (walkProblems.length) {
+      console.log(`\nPAGE CHANGE PROBLEMS in ${engineName}:\n  ` + walkProblems.join('\n  '));
+      process.exitCode = 1;
+    }
+    // ---- 6. Headings cut into letters: does any letter move? ----
+    const letterProblems = await lettersOnEveryPage(browser, server.address, pages);
+    if (letterProblems.length) {
+      console.log(`\nLETTERS THAT MOVE in ${engineName} (they would jump during a page change):\n  ` + letterProblems.slice(0, 20).join('\n  ') + (letterProblems.length > 20 ? `\n  ... and ${letterProblems.length - 20} more` : ''));
+      process.exitCode = 1;
+    }
+    // ---- 7. The headline's entrance on the home page ----
+    const entranceProblems = await headlineEntrance(browser, server.address);
+    if (entranceProblems.length) {
+      console.log(`\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     await browser.close();
-    console.log(`Screenshots: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths) and headline entrance: ${engineName} done.`);
   }
   console.log(`\nSaved to ${shotsDir}`);
 } finally {

@@ -29,6 +29,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
+| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. |
 | `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and confirms the hero's big lines fit. Run it before every commit. |
 
 ## Where things live
@@ -48,7 +49,12 @@ src/
                 footer; page-row, page-header and crumb for the inner pages; plus fonts and icon)
   assets/css/   main.css (the list), tokens.css (every value), base.css, components/ (one file per piece)
   assets/js/    main.js (the entry point), motion.js (animation timings),
-                animations.js (tickers and movement tied to scroll), widgets.js (local time, year)
+                animations.js (tickers and movement tied to scroll), widgets.js (local time, year),
+                intro.js (the headline's entrance when the home page opens; built into a small
+                script of its own), shapes.js (shapes shared by the animations),
+                transitions.js (page changes without a reload), scroll-memory.js (remembers
+                how far each page was scrolled), page-changes.js (what moves
+                during each kind of page change), split.js (cuts text into letters or lines)
   assets/fonts/ The free fallback fonts and their license files
   assets/icons/ The license of the icon set
   content/      The pages. index.njk is the home page, about.njk the About page, resume.njk the
@@ -57,7 +63,9 @@ src/
                 projects.11tydata.js, the settings those files share.
 server/         index.js: the small server behind npm start
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
-                fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers)
+                fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers),
+                lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
+                letters, the page changes and the headline's entrance), speed.mjs (npm run speed)
 docs/           This guide and the decisions log
 _site/          The built site. Made by the build, never edited by hand, never committed.
 ```
@@ -93,7 +101,10 @@ Every file starts with a comment saying what it does.
 | Which fonts are used for what | `src/assets/css/tokens.css` (the `--font` lines) |
 | Spacing, corner size, line thickness | `src/assets/css/tokens.css` |
 | How fast a hover or the gradient bar moves | `src/assets/css/tokens.css` (the `--duration` lines) |
-| How fast the tickers, scroll drift and page fade move | `src/assets/js/motion.js` |
+| How fast the tickers and scroll drift move | `src/assets/js/motion.js` |
+| How a page change moves: how long, how far, in what order | `src/assets/js/motion.js` (`pageChange`) |
+| How the headline slides in when the home page opens | `src/assets/js/motion.js` (`intro`, and the letter pace above it) |
+| The words screen readers hear on a link that opens a new tab | `src/_data/site.json` (`newTabNote`) |
 | The list of font files, or which ones load first | `src/_data/fonts.json`, then run `npm run fonts` |
 | Which free font stands in for a licensed one | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `npm run fonts:fallback` |
 | Which sections the home page has, and their order | `src/content/index.njk` |
@@ -241,6 +252,93 @@ The six projects there now are samples, each marked with a note at the top of it
 
 The inner pages follow the same three arrangements as the home page (phone, tablet, laptop), with two extra steps, as on the site this design is modeled on: the grids of cards on the About and project pages stay in two columns up to 999px, and the list of projects stays in two columns up to 1099px.
 
+## Page changes
+
+Following a link to another page of this site does not reload the browser. The banner, the small row under it and the footer stay where they are; only the content between them is swapped, with an animation. A library called Taxi.js fetches the next page and does the swap. Without scripts, links simply load pages the ordinary way.
+
+When a page is first opened nothing animates, with one exception: on the home page the headline slides in (see "The headline's entrance" below). The animations in this section only play when moving from one page to another.
+
+### Which change gets which animation
+
+Every page has a kind, written as `pageKind`. There are three that matter:
+
+| Kind | Which pages | Where it is set |
+|---|---|---|
+| `home` | The home page | The top of `src/content/index.njk` |
+| `project` | Each project's page | Once for all of them, in `src/content/projects/projects.11tydata.js` |
+| `page` (and `list`) | Pages with a giant name on top: About, Resume, and Projects (`list`) | `layouts/page.njk` gives every page that uses it `page`; `projects.njk` says `list` |
+
+Each kind leaves in its own way and arrives in its own way:
+
+| Kind | Leaving | Arriving |
+|---|---|---|
+| Home | The headline's letters slide out of their lines one after another, then the rest of the top of the page goes piece by piece while the sections below fade in turn. | The headline's letters slide into their lines, then the navigation, the ticker, the note, the picture frame and the introduction follow. Coming from the Projects page the letters arrive one after another; coming from anywhere else they arrive together and the rest follows sooner. |
+| A page with a giant name | The name's letters slide up and out while the cards fade as one. On the way to a project the letters leave faster and the cards drift aside. | The name's letters rise into place, then the picture frame appears, then the cards one by one, in the order they are written in the page. |
+| A project | The name, description, facts, list of sections and write-up drop away in turn. | The name sharpens letter by letter, the description comes in line by line, then the facts, the list of sections and the write-up. |
+
+Two exceptions:
+
+- **The home page straight to a project** (a project row on the home page) is a plain fade, 0.2 seconds out and 0.2 seconds in. That is what the site this design follows does.
+- **Visitors who have asked their system for less motion** always get the plain fade.
+
+On the site this design follows, About is a plain fade in every direction. Here About and Resume move like the Projects page: that was Romit's choice.
+
+### Where it lives
+
+| File | What it holds |
+|---|---|
+| `src/assets/js/motion.js` (`pageChange`) | Every number: how long each piece takes, when it starts, how far it moves, on what curve. Change timings here. |
+| `src/assets/js/page-changes.js` | One function per page leaving or arriving. Each one moves the pieces named in the templates. |
+| `src/assets/js/transitions.js` | Sets up Taxi.js, picks how each kind of page leaves and arrives (`howToLeave` and `howToArrive`), and keeps the small row, the "You are here" line and the page description up to date. |
+| `src/assets/js/scroll-memory.js` | Remembers how far down each page was scrolled, for the back and forward buttons and for reloads. |
+| `src/assets/js/split.js` | Cuts a heading into letters, or a paragraph into its lines, for the length of an animation, then puts the text back. |
+| The templates | Pieces that move are marked `data-part="..."` (for example `data-part="title"` or `data-part="card"`). The swapped content is the `<main data-taxi-view>` in `layouts/base.njk`. |
+
+### Things to know
+
+- **A new page that uses `layouts/page.njk` is choreographed without any setup**: its name's letters slide in and out. To make its content arrive piece by piece, put `data-part="cards"` on the box that holds the pieces and `data-part="card"` on each piece, as `about.njk` does. Pieces arrive in the order they are written. A page that uses neither that layout nor a `pageKind` gets the plain fade.
+- **Scroll position.** Following a link starts the new page at the top. The browser's back and forward buttons return to where you were on that page, and a reload stays where it was. (The site this design follows does the same on a reload but jumps to the top on back and forward; returning to the old place was Romit's choice.)
+- **A link that must load the ordinary way** (a download such as the future `resume.pdf`) needs `data-taxi-ignore` on it: `<a href="/resume.pdf" data-taxi-ignore>`. Links to other websites, email links and links to a section of the same page are left alone automatically.
+- **The small row and "You are here" are in every page's HTML**, hidden on the home page, so the script can show, hide and refill them. Edit them in `partials/page-row.njk` and `partials/crumb.njk` as before.
+- **The tickers and the scroll movement are restarted** for each new page, and the local time is filled in again.
+- **After a change, keyboard focus moves to the new page's heading** and screen readers are told the page's name.
+- **`npm run check` clicks through the page changes** in all three browsers: home to Projects, into a project, back out twice, to About, and back with the browser's back button. It reports a reload, a wrong page, animation pieces left behind, or the small row out of step. It then scrolls two pages and checks that back, forward and a reload return to the same place.
+- **Nothing may move once a page change has finished.** `npm run check` watches each arrival and fails if any letter, any heading's box or the picture frame beside a page name is somewhere else just after the animation than during it, or if the finished page is laid out differently from a fresh load of the same page.
+- **Headings are cut into single letters only while they move.** Afterwards the page's HTML is exactly as it was built. While they are cut, no letter may shift: each word stays whole, on the line where it ends up. `npm run check` tests this for every heading on every page at thirteen window widths in all three browsers, so a new project name or page name is covered automatically. If it ever reports "letters that move", the fix is in `src/assets/js/split.js`.
+
+## The headline's entrance
+
+When the home page is opened directly or reloaded, the headline slides in: the letters of the three big lines one after another, and the outlined italic words from the left. It is the same movement as arriving from the Projects page. Other pages have no entrance.
+
+How it works:
+
+1. A few lines of script in the head of the home page (`layouts/base.njk`) mark the page with the class `intro` before anything is drawn. The styles (`hero.css`) hide the headline while that mark is there, so it never flashes in place first.
+2. A small script written into the home page after its content (`src/assets/js/intro.js`, built separately from the main script) waits for the headline's fonts, cuts the lines into letters, starts them sliding and removes the mark.
+3. The letters then stay in the page. They sit exactly where the plain text would, so nothing looks different. The plain text is put back at the visitor's first click, tap, key press or turn of the wheel, when the window is resized, or when a link is followed.
+
+Step 3 is there for loading speed, as is the separate small script. Browsers and search engines judge loading speed by Largest Contentful Paint: the moment the biggest piece of content was first drawn. Swapping the letters for plain text when the entrance ends counts as a big new piece drawn late, and waiting for the main script delays the start on phones. The first build did both and made that figure 840ms worse on a slow phone; the current one costs well under a tenth of a second (the numbers are in [decisions.md](decisions.md)).
+
+It cannot leave the headline hidden:
+
+- Visitors who asked their system for less motion get no entrance. The page is never marked.
+- Without scripts the page is never marked either.
+- The mark is removed after three seconds whatever happens, and at once if anything in the small script fails or the fonts cannot be fetched.
+
+`npm run check` tests all of this in three browsers, and that the letters end exactly where a still page has them.
+
+To measure the cost again, run `npm run speed`. It loads the home page nine times with the entrance and nine times without, on a simulated slow phone and on a fast laptop, and prints both figures and the difference. Run it after changing the entrance, the fonts or the top of the home page.
+
+To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `src/assets/js/motion.js`. They are shared with the page changes, so both stay in step. To switch the entrance off, remove the script in the head of `layouts/base.njk`.
+
+## Links that leave the site
+
+Every link to another website opens in a new tab. The build does this by itself (`eleventy.config.js`, "linksThatLeave"): it goes over each finished page and gives every such link `target="_blank"`, `rel="noopener noreferrer"` (the new tab cannot reach back into this one, and the other site is not told where the visitor came from) and the words "(opens in a new tab)", hidden from the eye but read out by screen readers.
+
+- It covers links written in templates, in the data files and in Markdown. There is nothing to remember when adding a link.
+- "Another website" means any address that is not on romitraj.dev itself, so the blog (blog.romitraj.dev) counts.
+- Links within the site, links to a section of the same page and email links are left alone.
+- The hidden words are in `src/_data/site.json` (`newTabNote`).
+
 ## Fonts
 
 The site uses four licensed font families. Their files are not in this repository.
@@ -300,7 +398,7 @@ Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `s
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, and hero lines that no longer fit.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, and a headline entrance that flashes, ends out of place or leaves the headline hidden.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -338,4 +436,3 @@ These parts of the guide are written when the matching part of the site is built
 - Deployment with Dokploy, step by step.
 - Images: where the photos go and how the build converts them. Until then every picture frame is empty, and the about section on the home page has no illustration.
 - The resume itself. Until `resume.pdf` exists, the Resume page is a short note.
-- Page changes that fade instead of reloading.

@@ -2,7 +2,7 @@
 {%- from "partials/icon.njk" import icon with context -%}
   <footer class="footer">
     <nav class="footer__nav" aria-label="Site map">
-      {%- if page.url != "/" %}{% include "partials/crumb.njk" %}{% endif %}
+      {%- include "partials/crumb.njk" %}
       <div class="footer__group footer__group--home">
         <p class="footer__label"><span class="mark" aria-hidden="true"></span>{{ site.version }}</p>
         <p class="footer__row"><a class="footer__link" href="/">{{ home.footer.homeLabel }}</a></p>

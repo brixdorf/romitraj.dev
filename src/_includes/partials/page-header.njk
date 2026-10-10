@@ -7,7 +7,7 @@
 {%- set words = heading or title -%}
 <header class="page-header{% if ruled %} page-header--ruled{% endif %}">
   <div class="page-header__inner">
-    <h1 class="page-header__title{% if headingSize == 'long' %} page-header__title--long{% endif %}" style="--longest-word: {{ words | longestWord }}">{{ words | raisedApostrophe | safe }}</h1>
-    <div class="frame page-header__frame{% if frame == 'square' %} page-header__frame--square{% endif %}" aria-hidden="true"></div>
+    <h1 class="page-header__title{% if headingSize == 'long' %} page-header__title--long{% endif %}" data-part="title" style="--longest-word: {{ words | longestWord }}">{{ words | raisedApostrophe | safe }}</h1>
+    <div class="frame page-header__frame{% if frame == 'square' %} page-header__frame--square{% endif %}" aria-hidden="true" data-part="header-frame"></div>
   </div>
 </header>

@@ -2,6 +2,102 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-10: Page changes, headline reveals and hovers
+
+### Versions verified
+
+| What | Version | Source | Used for |
+|---|---|---|---|
+| Taxi.js (`@unseenco/taxi`) | 2.0.0 | `npm view @unseenco/taxi version` (the only release line marked `latest`); its bundled README and type definitions were read for the 2.0 interface | Page changes without a reload |
+| gsap | 3.15.0 (unchanged) | `npm view gsap version` | The page-change animations |
+
+Taxi.js is under the BSD 3-Clause license. It is a new package for this project; nothing was upgraded.
+
+### What was measured, and what it overturned
+
+The first motion measurements (2026-10-09) covered the home page's first load and one page change, home to about. They found no reveal animations and a plain 200ms fade, and the project was planned on that. Measuring every kind of page change frame by frame showed more:
+
+- **Nothing animates when a page is first opened** on the reference. This still holds there, on its inner pages too. (This site now has one entrance of its own: see "The headline's entrance" below.)
+- **Page changes between the reference's home page, its list of case studies and a case study are choreographed.** Headline letters slide in and out one after another through an unseen edge; cards, lines of text and blocks follow in a set order. Five changes have their own sequence; every other change is the plain fade.
+- **Nothing on the inner pages moves with scrolling.** The scroll-tied movement stays on the home page only.
+- So "headline reveals" exist, but only as part of a page change. This site now has them in the same places.
+
+### Decisions
+
+- **The same five choreographed changes, with the measured timings**: home to projects, projects to home, projects to a project, a project to projects, and a project to home. Each was recorded on this site with the same frame-by-frame recorder and compared with the reference: letters take 0.95s each and start 0.02s apart, cards arrive 0.98s after the page name starts and 0.1s apart, and so on, all within a frame or two. The numbers are in `motion.js` (`pageChange`).
+- **About and Resume are choreographed too. This is Romit's choice and goes beyond the reference**, where every change to or from the about page is a plain fade. Here About and Resume behave like the Projects page: the page name's letters slide in and out, and the cards arrive one by one in the order they are written (on About: Who, the portrait, the frames, the links, Tinkering, the latest post, Contact, Toolbox). This holds in every direction: from and to the home page, the Projects page, a project, and each other. Going back to the home page from About or Resume, the home page arrives the way it does from a project: all letters together, the rest sooner.
+- **So the rule is by kind of page, not by pair of pages.** Each kind (home, a page with a giant name, a project) has a way of leaving and a way of arriving, with three measured variations kept from the reference: the home page arrives letter after letter only from the Projects page; a page with a giant name leaves faster on the way to a project; and the home page straight to a project is a plain fade. Any page that uses `layouts/page.njk` is choreographed without further setup.
+- **Only the home page straight to a project still fades plainly**, 0.2s out and 0.2s in, as on the reference.
+- **How the home page's pieces map to the reference's.** Its giant line and this site's giant line behave the same (letters sink out of the line and rise back into it). Its large serif word and this site's "OCEAN." behave the same (letters lift out and drop back in). Its outlined italic words and this site's "is an" slide sideways and fade. This site has one line the reference does not, the opening serif line; it moves like the other serif line, since it is the same typeface. Romit can change this.
+- **A project page has no logo to animate**, so its name is the first piece.
+- **Reduced motion always gets the plain fade.** The reference drops its home-to-list sequence under that setting but keeps parts of the others. One rule for all of them is simpler and calmer.
+- **Taxi.js swaps the content.** It fetches the next page (starting when the pointer rests on a link), waits for the leaving animation, swaps the content and starts the arriving one. Its accessibility option is on: screen readers hear the new page's name and keyboard focus moves to its heading.
+- **The banner, the small row and the footer stay in place** across changes, as on the reference, so the gradient bar never restarts. For that the small row and the "You are here" line are now in every page's HTML, hidden on the home page, and a script shows, hides and refills them from the page it fetched. The row fades in over 0.2s and out over 0.12s, and when its back link changes words the old words slide out to the left and the new ones slide in, as measured.
+- **The page is usable as soon as the new content is in.** The arriving animation of the list of projects runs for over two seconds; a visitor can click during it. A new click finishes the running animation at once.
+- **Letters are cut by this site's own small script, not GSAP's SplitText.** A heading is cut into letter boxes only while it animates, then the original HTML is put back. Letter boxes lose the font's kerning (the fine spacing between certain pairs), which would make the giant fitted lines shift by a few pixels; the script measures each letter first and shifts every box back onto exactly that spot. It also treats the drawn apostrophe as a letter and handles the phone's sideways headline. SplitText does not correct kerning.
+- **A cut heading keeps its lines.** The first build let a long project name re-wrap while its letters were separate boxes: "Homelab Dashboard" showed "Da" on the first line and "shboard" on the second, then jumped when the text was put back. Romit caught it. Now a heading is told not to wrap while it is cut, a line break is placed exactly where each line ended before, and every letter box is shifted onto the spot its letter had. The shift uses the CSS `translate` property, which moves one box without touching its neighbours and adds to the animation's own movement; nudging with margins, tried first, left Safari up to a pixel off in centered headings. A paragraph cut into lines keeps its width, and its lines cannot wrap again.
+- **A test guards this.** `npm run check` cuts every heading on every page into letters at thirteen window widths in all three browsers and fails if any letter is more than 0.6px from where it was, or if the text is not put back exactly. All six project names were also watched during the real animation at four widths in three browsers: every letter stayed within 0.01px of its final place.
+- **An animation starts two frames after it is prepared.** Cutting the text and measuring makes one slow frame; starting later keeps that frame out of the animation. Before this, the first tenth of a second of each arrival was skipped.
+- **Scroll position.** Measured on the reference in all three browsers (`reference/scripts/scrollrestore.mjs`): a full reload stays at the same scroll position; the back and forward buttons arrive at the top of the page.
+  - **A reload stays where it was**, as on the reference. The browser does this itself: the site only takes over scroll handling once a page change starts, and hands it back when the document is left.
+  - **Back and forward return to where the visitor was on that page. This is Romit's choice and goes beyond the reference.** Each step in the browser's history gets a small key, and the scroll position for each key is kept in the tab's session storage, so it also works after a reload in between.
+  - Following a link always starts the new page at the top.
+- **The tickers, the scroll movement and the widgets can now be stopped and restarted**, because the content they belong to is replaced.
+- **Hover details measured on the reference's inner pages**, corrected here:
+  - A link inside a sentence turns grey at once under the pointer (about text on the home page and in the cards).
+  - The row of links at the bottom of the "Who" card and the "Read the post" link do not react at all.
+  - A project card's outline darkens at once, while "Read more" draws its underline.
+  - A link in a project's list of sections turns grey over 0.2s while its line draws.
+- **A heading that received focus after a page change shows no outline.** Safari drew one around the whole heading.
+- **`npm run check` now clicks through the page changes** in all three browsers, checks that back, forward and reload return to the same scroll position, and runs the letters test above.
+
+### Links that leave the site
+
+- **Every link to another website opens in a new tab**, with `rel="noopener noreferrer"` and the hidden words "(opens in a new tab)" for screen readers. Romit asked for this. Email links are left as they are.
+- **The build adds this to each finished page**, instead of each template doing it. One rule in `eleventy.config.js` covers links in templates, data files and Markdown, including ones added later, and cannot be forgotten. A link that has its own `aria-label` gets the words added to that label.
+- **The blog counts as another website**, because it is at a different address (blog.romitraj.dev).
+
+### Things that moved after a page change
+
+Romit noticed that after going back and forth between pages, the picture frame beside "PROJECTS" and the line "WHAT WE KNOW IS A DROP," shifted left once the animation ended, and snapped back on the next click. Recording ten trips in each of the three browsers and comparing positions during and after each arrival reproduced it everywhere, with two separate causes:
+
+- **GSAP took over the letters' position fix.** Each letter box carried a small shift (the CSS `translate` property) to hold it exactly on its spot. GSAP absorbs that property into its own handling of any element it moves, and the animations told every letter to end at "no shift", so the fix was animated away. By the end of an arrival the letters had drifted, up to 19px at the end of the opening line, and they jumped back when the plain text returned. **Fix:** every letter now has two boxes. The outer one carries the shift and is never animated; the inner one is what the animations move.
+- **A heading in letters was wider than the same word as text.** "PROJECTS" was 4.9px wider while cut, which pushed the frame beside it. **Fix:** the spacing between letter boxes is first put back with margins, so the heading keeps its natural size, and a heading whose text runs across is also held at its measured width. (The phone's sideways headline is not held: its length is tied up with the hero's grid rows, and fixing it changed the hero's height. The margins alone keep it right.)
+- **Tests added to `npm run check`**, in all three browsers:
+  - During the page-change walk, each arrival is watched until it ends. The check fails if any letter, any heading's box or the frame beside a page name is in a different place just after the animation than during it, or if the finished page differs from a fresh load of the same page by more than half a pixel.
+  - The letters test now also fails if cutting a heading moves anything else on the page.
+
+### The headline's entrance on first load
+
+- **The home page's headline now slides in when the page is opened or reloaded. This is Romit's choice and goes beyond the reference**, where nothing animates on first load. The letters of the three big lines slide in one after another at the pace of the page changes, and the outlined italic words slide in from the left. Only the home page has an entrance.
+- **Romit's conditions, and how each is met:**
+  - *Letters slide in rather than fade from invisible:* the letters are fully solid from their first frame and come in from behind an edge. (Only the small outlined words fade as they slide, as they do in the page changes.)
+  - *No flash before the script runs:* a few lines of script in the page's head mark the page before anything is drawn, and the styles hide the headline while the mark is there.
+  - *The text stays visible if the script fails:* without scripts the page is never marked. The mark is removed after three seconds whatever happens, and at once if the entrance script fails or the fonts cannot be fetched.
+  - *Reduced motion gets no animation:* the head script does not mark the page for those visitors.
+  - *Without hurting page speed:* see the measurements below.
+- **Measured with `npm run speed`** (new): Chromium, the home page, nine loads each way, taking the middle value. "Slow phone" is the connection and processor Lighthouse uses for its mobile score. Largest Contentful Paint is the moment the biggest piece of content (here the giant line) is first drawn.
+
+  | | Without the entrance | With the entrance | Difference |
+  |---|---|---|---|
+  | Slow phone, Largest Contentful Paint | about 1235ms | about 1310ms | 44 to 96ms later over four runs, typically about 70ms |
+  | Slow phone, First Contentful Paint | about 1235ms | about 1245ms | within the noise (4 to 12ms) |
+  | Fast laptop, Largest Contentful Paint | about 155ms | about 180ms | 24 to 44ms later |
+  | Fast laptop, First Contentful Paint | about 155ms | about 156ms | none |
+
+  These are measurements on Romit's computer of the locally built site. The live site will differ, but the difference between the two columns is what matters.
+- **The first build of the entrance cost 840ms on the slow phone** (2076ms against 1236ms), for two reasons, both removed:
+  - It put the plain headline back when the animation ended. The browser counts that as a very large new piece drawn late. Now the letters stay in the page (they sit exactly where the text would) and the plain text is only put back at the visitor's first click, tap, key press or wheel turn, when the browser has stopped measuring, or on a resize or a page change, when the letters' places would be wrong.
+  - It ran from the main script, which a slow phone needs about 0.9s longer to fetch and run than the fonts. Now the entrance is a script of its own, about 2 KB compressed, written into the home page. It uses the browser's built-in animation (the Web Animations API) instead of GSAP, and starts one frame after the headline's fonts arrive, which is when the headline would have appeared anyway.
+- **Taxi's saved copy of the first page is dropped**, because it may be taken while the headline is in letters. Coming back to that page fetches it again, as for every other page.
+- **`npm run check`, `npm run fit` and the comparison screenshots use a still page.** They set `steadyMotion`, which the head script also respects, so the headline is at rest when measured or photographed. The entrance has its own test (`scripts/lib/entrance.mjs`).
+
+### Known issues
+
+- **The bundled script is about 151 KB** (about 57 KB when compressed in transit), up from 116 KB: Taxi.js and the page-change code.
+- **`npm run check` takes a few minutes longer**, for the page changes and the letters test.
+- **Firefox prints a note about "scroll-linked positioning"** in its console. It comes from the scroll movement built earlier, is informational, and does not affect the page.
+
 ## 2026-10-10: About, projects and resume pages
 
 ### Versions verified
@@ -41,7 +137,7 @@ No new packages. Eleventy's own Markdown library does the write-ups.
 ### Not built yet
 
 - The pictures for all the empty frames, and the resume itself (`resume.pdf`).
-- Scroll-tied movement on the inner pages. None was measured on the reference's inner pages, so none was added.
+- Scroll-tied movement on the inner pages. A later measurement confirmed the reference has none there.
 
 ### Known issues
 

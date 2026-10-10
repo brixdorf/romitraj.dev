@@ -1,5 +1,6 @@
 // Movement that scripts start: the endless tickers, and the movement tied to scroll (the sliding
 // heading, the growing bars beside the giant headings, and the project rows).
+// Everything started here can be stopped again, because a page change throws the old content away.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { speed, rate, duration, ease, scroll } from './motion.js';
@@ -10,9 +11,10 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 // Makes one ticker drift: repeats its content until the line is full, then slides every copy
 // left by its own width, over and over, at a constant number of pixels per second.
+// Returns a function that stops it.
 function startTicker(ticker) {
   const original = ticker.querySelector('.ticker__group');
-  if (!original) return;
+  if (!original) return () => {};
   const pixelsPerSecond = speed[ticker.dataset.ticker] || speed.statusTicker;
   let animations = [];
 
@@ -64,10 +66,17 @@ function startTicker(ticker) {
   observer.observe(ticker);
   observer.observe(original);
   reduceMotion.addEventListener('change', build);
+
+  return () => {
+    observer.disconnect();
+    reduceMotion.removeEventListener('change', build);
+    for (const animation of animations) animation.cancel();
+  };
 }
 
 // Movement tied to scroll. It runs on tablets and laptops only, and not for visitors who asked
 // their system for less motion. Everywhere else, things simply sit in their resting place.
+// Returns a function that stops it.
 function startScrollMovement(root) {
   // Where each project row starts from. Picked once per page load, so resizing the window does not reshuffle the rows.
   // The check script sets window.steadyMotion, which swaps the random picks for a fixed list.
@@ -120,9 +129,14 @@ function startScrollMovement(root) {
 
   // Positions are measured from the page's layout, which shifts once the fonts arrive.
   document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+  // Undoes everything set up above and puts the moved things back in their resting places.
+  return () => media.revert();
 }
 
+// Starts the tickers and the scroll movement inside "root". Returns a function that stops them all.
 export function startAnimations(root = document) {
-  for (const ticker of root.querySelectorAll('[data-ticker]')) startTicker(ticker);
-  startScrollMovement(root);
+  const stops = [...root.querySelectorAll('[data-ticker]')].map(startTicker);
+  stops.push(startScrollMovement(root));
+  return () => stops.forEach((stop) => stop());
 }

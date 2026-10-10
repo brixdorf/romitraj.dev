@@ -75,6 +75,16 @@
   gap: 0.311em;
 }
 
+/* A link in the list of sections also turns grey while its line draws under it. */
+.study__contents-list .link {
+  transition: color var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.study__contents-list .link:hover,
+.study__contents-list .link:focus-visible {
+  color: var(--color-muted-on-paper);
+}
+
 .study__contents-number {
   flex: none;
   color: var(--color-muted-on-paper);
@@ -224,6 +234,13 @@
 
   .study__title {
     margin: 80px 0 128px;
+  }
+
+  /* Each of the three pieces is only as tall as its own content. */
+  .study__lead,
+  .study__facts,
+  .study__contents {
+    align-self: start;
   }
 
   .study__lead {

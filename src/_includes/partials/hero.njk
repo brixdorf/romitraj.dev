@@ -6,18 +6,18 @@
 <section class="hero" style="--opening-em: {{ textWidths.opening }}; --giant-em: {{ textWidths.giant }}; --giant-line-em: {{ textWidths.giantLongestLine }}; --giant-first-line-em: {{ textWidths.giantFirstLine }}; --serif-em: {{ textWidths.serif }};">
   <h1 class="visually-hidden">{{ headline.full }}</h1>
 
-  <p class="hero__opening" aria-hidden="true" data-fit="opening">{{ headline.opening.plain }} <em>{{ headline.opening.italic }}</em></p>
+  <p class="hero__opening" aria-hidden="true" data-fit="opening" data-part="opening">{{ headline.opening.plain }} <em>{{ headline.opening.italic }}</em></p>
 
-  <p class="hero__giant" aria-hidden="true" data-fit="giant">
+  <p class="hero__giant" aria-hidden="true" data-fit="giant" data-part="giant">
     {%- for line in headline.giant %}<span class="hero__giant-line">{{ line | raisedApostrophe | safe }}</span>{% if not loop.last %} {% endif %}{% endfor -%}
   </p>
-  <p class="hero__flourish" aria-hidden="true">{{ headline.flourish }}</p>
-  <p class="hero__serif" aria-hidden="true" data-fit="serif">{{ headline.serif }}</p>
+  <p class="hero__flourish" aria-hidden="true" data-part="flourish">{{ headline.flourish }}</p>
+  <p class="hero__serif" aria-hidden="true" data-fit="serif" data-part="serif">{{ headline.serif }}</p>
 
-  <p class="hero__lead">{{ home.lead | safe }}</p>
-  <p class="hero__note">{{ home.scrollNote }}</p>
+  <p class="hero__lead" data-part="lead">{{ home.lead | safe }}</p>
+  <p class="hero__note" data-part="note">{{ home.scrollNote }}</p>
 
-  <div class="hero__image">
+  <div class="hero__image" data-part="frame">
     <p class="hero__image-note">{{ home.imageNote }}</p>
   </div>
 
@@ -25,10 +25,10 @@
 
   <nav class="hero__nav" aria-label="Main">
     {%- for group in navigation %}
-    <p class="nav-list__label" id="nav-{{ group.label | slugify }}">{{ group.label }}</p>
+    <p class="nav-list__label" id="nav-{{ group.label | slugify }}" data-part="nav-piece">{{ group.label }}</p>
     <ul class="nav-list" aria-labelledby="nav-{{ group.label | slugify }}">
       {%- for item in group.items %}
-      <li><a class="nav-list__link" href="{{ item.url }}"><span class="nav-list__title">{{ item.title }}</span> <span class="nav-list__hint"><span class="dash" aria-hidden="true"></span> {{ item.hint }}</span></a></li>
+      <li data-part="nav-piece"><a class="nav-list__link" href="{{ item.url }}"><span class="nav-list__title">{{ item.title }}</span> <span class="nav-list__hint"><span class="dash" aria-hidden="true"></span> {{ item.hint }}</span></a></li>
       {%- endfor %}
     </ul>
     {%- endfor %}

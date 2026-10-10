@@ -66,6 +66,11 @@
   text-underline-offset: 0.12em;
 }
 
+/* A link inside a sentence turns grey under the pointer, at once. */
+.about__text a:hover {
+  color: var(--color-muted-on-paper);
+}
+
 .about__card {
   position: relative;
   display: inline-block;

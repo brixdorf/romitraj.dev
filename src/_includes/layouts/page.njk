@@ -1,6 +1,11 @@
 ---
 layout: layouts/base.njk
+pageKind: page
 ---
-{#- An inner page: the giant page name on top, then the page's own content. -#}
+{#-
+  An inner page: the giant page name on top, then the page's own content.
+  "pageKind: page" gives it the page changes of a page with a giant name: the name's letters slide
+  in and out, and whatever the page marks with data-part="card" arrives piece by piece.
+-#}
 {%- include "partials/page-header.njk" %}
 {{ content | safe }}

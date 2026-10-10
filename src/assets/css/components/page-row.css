@@ -1,6 +1,6 @@
-/* The small row under the banner on every page except the home page: the version tag (a link
-   home), a one-line description of the site, and a link back. It floats over the top of the
-   page's header instead of pushing it down. */
+/* The small row under the banner: the version tag (a link home), a one-line description of the
+   site, and a link back. It floats over the top of the page's header instead of pushing it down.
+   It is hidden on the home page; a script fades it in and out as the visitor changes page. */
 .page-row {
   /* No "top" is set, so the row starts where it would normally sit: right under the banner. */
   position: absolute;
@@ -9,6 +9,12 @@
   font-size: var(--type-small);
   line-height: 19px;
   text-transform: uppercase;
+}
+
+/* Hidden on the home page: out of sight, out of reach of the Tab key, and unread by screen readers. */
+.page-row[data-row-hidden] {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .page-row__version {
@@ -71,6 +77,7 @@
 
 .page-row__back-text {
   position: relative;
+  display: block;
 }
 
 .page-row__back-text::after {

@@ -89,6 +89,36 @@ export default function (eleventyConfig) {
     return `${part(place.latitude, 'N', 'S')} ${part(place.longitude, 'E', 'W')}`;
   });
 
+  // Every link that leaves this site opens in a new tab. This runs over each finished page, so it
+  // covers links written in templates, in the data files and in Markdown alike. Such a link gets
+  // target="_blank", rel="noopener noreferrer" (the new tab cannot reach back into this one and is
+  // not told where the visitor came from) and a note for screen readers, hidden from the eye.
+  // Links within the site, links to a section of a page and email links are left alone.
+  const siteHost = new URL(site.url).host;
+  const leavesTheSite = (href) => /^https?:\/\//i.test(href) && new URL(href).host !== siteHost;
+  eleventyConfig.addTransform('linksThatLeave', function (content) {
+    if (!(this.page.outputPath || '').endsWith('.html')) return content;
+    return content.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/g, (whole, attributes, inside) => {
+      const href = /\shref="([^"]*)"/.exec(attributes)?.[1];
+      if (!href || !leavesTheSite(href)) return whole;
+      let kept = attributes.replace(/\s(?:target|rel)="[^"]*"/g, '');
+      // A link with a label of its own is read by that label, so the note goes into the label.
+      const labelled = /\saria-label="[^"]*"/.test(kept);
+      if (labelled) kept = kept.replace(/(\saria-label="[^"]*)"/, `$1 ${escapeHtml(site.newTabNote)}"`);
+      const note = labelled ? '' : `<span class="visually-hidden"> ${escapeHtml(site.newTabNote)}</span>`;
+      return `<a${kept} target="_blank" rel="noopener noreferrer">${inside}${note}</a>`;
+    });
+  });
+
+  // The headline's entrance is a very small script of its own, written straight into the home page
+  // (layouts/base.njk) so that it does not wait for the main script. It is built here, before every build.
+  let introScript = '';
+  eleventyConfig.addShortcode('introScript', () => introScript);
+  eleventyConfig.on('eleventy.before', async () => {
+    const result = await esbuild.build({ entryPoints: ['src/assets/js/intro.js'], bundle: true, minify: true, format: 'iife', target: browsers, write: false, logLevel: 'warning' });
+    introScript = result.outputFiles[0].text.trim();
+  });
+
   // Bundle and minify the CSS and JavaScript before every build.
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {
     await esbuild.build({

@@ -1,13 +1,14 @@
 ---
 title: Projects
 layout: layouts/page.njk
+pageKind: list
 description: Things Romit Raj Sahu built, broke and rebuilt.
 ---
 {#- The list of every project (the files in content/projects/): one wide card each, leading to that project's page. -#}
-<ol class="project-cards">
+<ol class="project-cards" data-part="cards">
   {%- for item in collections.projectList %}
   {%- set project = item.data %}
-  <li class="project-cards__item">
+  <li class="project-cards__item" data-part="card">
     <article class="project-card">
       <span class="project-card__number" aria-hidden="true">({{ "0" if loop.index < 10 }}{{ loop.index }})</span>
       <h2 class="project-card__title">{{ project.title }}</h2>
@@ -23,7 +24,7 @@ description: Things Romit Raj Sahu built, broke and rebuilt.
   </li>
   {#- An empty picture frame beside every second card, shown on wide windows only. #}
   {%- if loop.index % 2 == 0 %}
-  <li class="frame project-cards__frame" aria-hidden="true"></li>
+  <li class="frame project-cards__frame" aria-hidden="true" data-part="card"></li>
   {%- endif %}
   {%- endfor %}
 </ol>

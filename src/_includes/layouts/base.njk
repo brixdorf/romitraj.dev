@@ -1,4 +1,12 @@
-{# The page shell every page uses: head tags, fonts, styles, script, the top banner, the small row under it (not on the home page), the slot for the page's own content, and the footer. -#}
+{#
+  The page shell every page uses: head tags, fonts, styles, script, the top banner, the small row
+  under it (hidden on the home page), the slot for the page's own content, and the footer.
+  When a visitor follows a link, only the content slot is swapped ("data-taxi-view"); the banner,
+  the small row and the footer stay in place. "data-page" names the kind of page, which decides
+  how the change is animated (see assets/js/transitions.js).
+  On the home page, two short scripts make the headline slide in when the page opens: one in the
+  head and one after the content. See assets/js/intro.js.
+-#}
 <!doctype html>
 <html lang="{{ site.language }}">
 <head>
@@ -8,15 +16,29 @@
   <meta name="description" content="{{ description or site.description }}">
   <meta name="theme-color" content="{{ site.themeColor }}">
   {%- include "partials/fonts.njk" %}
+  {%- if pageKind == "home" %}
+  <script>
+    /* The headline slides in when the page opens. Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while npm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */
+    if (!window.steadyMotion && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("intro");
+      setTimeout(function () { document.documentElement.classList.remove("intro"); }, 3000);
+    }
+  </script>
+  {%- endif %}
   <link rel="stylesheet" href="/assets/css/main.css">
   <script src="/assets/js/main.js" defer></script>
 </head>
 <body>
   {%- include "partials/banner.njk" %}
-  {%- if page.url != "/" %}{% include "partials/page-row.njk" %}{% endif %}
-  <main>
-    {{ content | safe }}
-  </main>
+  {%- include "partials/page-row.njk" %}
+  <div data-taxi>
+    <main data-taxi-view data-page="{{ pageKind or 'plain' }}">
+      {{ content | safe }}
+    </main>
+  </div>
+  {%- if pageKind == "home" %}
+  <script>{% introScript %}</script>
+  {%- endif %}
   {%- include "partials/footer.njk" %}
 </body>
 </html>

@@ -17,10 +17,12 @@
     "fonts": "python scripts/fonts.py",
     "fonts:fallback": "python scripts/fallback_fonts.py",
     "fit": "node scripts/fit.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "speed": "node scripts/speed.mjs"
   },
   "dependencies": {
     "@11ty/eleventy": "3.1.6",
+    "@unseenco/taxi": "2.0.0",
     "esbuild": "0.28.2",
     "gsap": "3.15.0"
   },

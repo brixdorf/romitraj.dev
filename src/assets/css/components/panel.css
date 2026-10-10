@@ -44,6 +44,11 @@
   text-underline-offset: 0.12em;
 }
 
+/* A link inside a sentence turns grey under the pointer, at once. */
+.panel__text a:hover {
+  color: var(--color-muted-on-paper);
+}
+
 /* A row of links at the bottom of a card, pushed to the right. */
 .panel__links {
   display: flex;
@@ -53,6 +58,11 @@
   margin: 0;
   font-size: var(--type-small);
   line-height: 1.5;
+}
+
+/* These links do not react to the pointer, as on the reference: the arrow already marks them. */
+.panel__links a {
+  text-decoration: none;
 }
 
 /* The one small bold link that ends a card. */

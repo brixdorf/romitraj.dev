@@ -10,9 +10,9 @@ layout: layouts/base.njk
 <article class="study">
   <header class="study__header">
     <div class="study__top">
-      <h1 class="study__title" style="--longest-word: {{ title | longestWord }}">{{ title }}</h1>
-      <p class="study__lead">{{ description }}</p>
-      <dl class="study__facts">
+      <h1 class="study__title" data-part="title" style="--longest-word: {{ title | longestWord }}">{{ title }}</h1>
+      <p class="study__lead" data-part="lead">{{ description }}</p>
+      <dl class="study__facts" data-part="facts">
         <div>
           <dt>{{ pages.project.kindLabel }}</dt>
           {%- for tag in tags %}
@@ -29,11 +29,11 @@ layout: layouts/base.njk
         </div>
       </dl>
       {%- if sections.length %}
-      <nav class="study__contents" aria-labelledby="contents-label">
-        <h2 class="study__contents-label" id="contents-label">{{ pages.project.contentsLabel }}</h2>
+      <nav class="study__contents" aria-labelledby="contents-label" data-part="contents">
+        <h2 class="study__contents-label" id="contents-label" data-part="contents-label">{{ pages.project.contentsLabel }}</h2>
         <ol class="study__contents-list">
           {%- for section in sections %}
-          <li><span class="study__contents-number" aria-hidden="true">({{ "0" if loop.index < 10 }}{{ loop.index }})<span class="dash"></span></span><a class="link" href="#{{ section.id }}">{{ section.text | safe }}</a></li>
+          <li data-part="contents-item"><span class="study__contents-number" aria-hidden="true">({{ "0" if loop.index < 10 }}{{ loop.index }})<span class="dash"></span></span><a class="link" href="#{{ section.id }}">{{ section.text | safe }}</a></li>
           {%- endfor %}
         </ol>
       </nav>
@@ -41,7 +41,7 @@ layout: layouts/base.njk
     </div>
   </header>
 
-  <div class="study__body">
+  <div class="study__body" data-part="body">
     {{ content | headingIds | safe }}
   </div>
 </article>
