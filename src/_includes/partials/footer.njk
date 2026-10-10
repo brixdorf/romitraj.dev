@@ -1,9 +1,10 @@
-{#- The footer on every page: a site map with descriptions, links elsewhere, the contact email, the copyright line and the sign-off. -#}
+{#- The footer on every page: the "you are here" line (not on the home page), a site map with descriptions, links elsewhere, the contact email, the copyright line and the sign-off. -#}
 {%- from "partials/icon.njk" import icon with context -%}
   <footer class="footer">
     <nav class="footer__nav" aria-label="Site map">
+      {%- if page.url != "/" %}{% include "partials/crumb.njk" %}{% endif %}
       <div class="footer__group footer__group--home">
-        <p class="footer__label"><span class="footer__mark" aria-hidden="true"></span>{{ site.version }}</p>
+        <p class="footer__label"><span class="mark" aria-hidden="true"></span>{{ site.version }}</p>
         <p class="footer__row"><a class="footer__link" href="/">{{ home.footer.homeLabel }}</a></p>
       </div>
 

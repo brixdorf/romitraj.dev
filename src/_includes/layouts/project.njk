@@ -1,0 +1,47 @@
+---
+layout: layouts/base.njk
+---
+{#-
+  One project's page: its name in very large serif letters, its one-line description, a few facts,
+  a list of the write-up's sections, then the write-up itself. The facts come from the top of the
+  project's Markdown file in content/projects/, and the write-up is the rest of that file.
+-#}
+{%- set sections = content | headings -%}
+<article class="study">
+  <header class="study__header">
+    <div class="study__top">
+      <h1 class="study__title" style="--longest-word: {{ title | longestWord }}">{{ title }}</h1>
+      <p class="study__lead">{{ description }}</p>
+      <dl class="study__facts">
+        <div>
+          <dt>{{ pages.project.kindLabel }}</dt>
+          {%- for tag in tags %}
+          <dd>{{ tag }}</dd>
+          {%- endfor %}
+        </div>
+        <div>
+          <dt>{{ pages.project.yearLabel }}</dt>
+          <dd>{{ year }}</dd>
+        </div>
+        <div>
+          <dt>{{ pages.project.codeLabel }}</dt>
+          <dd><a class="link" href="{{ link }}">{{ pages.project.codeLink }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a></dd>
+        </div>
+      </dl>
+      {%- if sections.length %}
+      <nav class="study__contents" aria-labelledby="contents-label">
+        <h2 class="study__contents-label" id="contents-label">{{ pages.project.contentsLabel }}</h2>
+        <ol class="study__contents-list">
+          {%- for section in sections %}
+          <li><span class="study__contents-number" aria-hidden="true">({{ "0" if loop.index < 10 }}{{ loop.index }})<span class="dash"></span></span><a class="link" href="#{{ section.id }}">{{ section.text | safe }}</a></li>
+          {%- endfor %}
+        </ol>
+      </nav>
+      {%- endif %}
+    </div>
+  </header>
+
+  <div class="study__body">
+    {{ content | headingIds | safe }}
+  </div>
+</article>

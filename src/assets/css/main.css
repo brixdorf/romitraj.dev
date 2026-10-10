@@ -13,4 +13,10 @@
 @import "./components/project-list.css";
 @import "./components/card.css";
 @import "./components/footer.css";
-@import "./components/notice.css";
+@import "./components/page-row.css";
+@import "./components/page-header.css";
+@import "./components/page-grid.css";
+@import "./components/panel.css";
+@import "./components/about-page.css";
+@import "./components/project-cards.css";
+@import "./components/study.css";

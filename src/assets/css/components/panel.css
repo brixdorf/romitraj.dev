@@ -1,0 +1,169 @@
+/* A numbered card on an inner page: a grey outline, a small number, a serif title and serif text.
+   Also the plain table one of them holds. */
+.panel {
+  /* A grid, so that when the card is stretched taller than its content the spare room is shared
+     out between its parts instead of collecting at the bottom. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 48px 16px 32px;
+  border: var(--rule) solid var(--color-line-on-paper-strong);
+  border-radius: var(--radius);
+}
+
+.panel__title {
+  margin: 0 0 32px;
+  font-family: var(--font-serif-display);
+  font-weight: 400;
+  font-size: var(--type-panel-title);
+  line-height: 1;
+  counter-increment: panel;
+}
+
+/* The card's number, above its title. */
+.panel__title::before {
+  content: "0" counter(panel);
+  display: block;
+  margin-block-end: 12px;
+  font-size: var(--type-panel-number);
+  line-height: 1;
+  color: var(--color-muted-on-paper);
+}
+
+.panel__text {
+  font-family: var(--font-serif);
+  font-size: var(--type-reading);
+  line-height: 1.5;
+}
+
+.panel__text p {
+  margin: 0 0 16px;
+}
+
+.panel__text a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+/* A row of links at the bottom of a card, pushed to the right. */
+.panel__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  column-gap: 16px;
+  margin: 0;
+  font-size: var(--type-small);
+  line-height: 1.5;
+}
+
+/* The one small bold link that ends a card. */
+.panel__action {
+  justify-self: start;
+  margin-block: 16px -8px;
+  padding-block: 8px;
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.panel__action::after {
+  inset-block-end: 8px;
+}
+
+/* The table: stacked rows on narrow windows, each starting with a small grey label. */
+.fact-table {
+  display: block;
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--type-small);
+  line-height: 19px;
+}
+
+.fact-table thead {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fact-table tbody,
+.fact-table tr,
+.fact-table td {
+  display: block;
+}
+
+.fact-table tr {
+  padding-block: 12px;
+  border-block-end: var(--rule) solid var(--color-line-on-paper);
+}
+
+.fact-table tr:last-child {
+  border-block-end: 0;
+}
+
+.fact-table th,
+.fact-table td {
+  padding: 1px;
+  font-weight: 400;
+  text-align: start;
+}
+
+.fact-table td:first-child {
+  font-size: var(--type-micro);
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.fact-table td:last-child {
+  color: var(--color-muted-on-paper);
+}
+
+@media (width >= 1000px) {
+  .panel {
+    padding: 48px;
+  }
+
+  /* A real table again: a grey heading row, then one line per row. */
+  .fact-table thead {
+    position: static;
+    display: block;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+    border-block-end: var(--rule) solid var(--color-line-on-paper-strong);
+    text-transform: uppercase;
+    white-space: normal;
+    color: var(--color-muted-on-paper);
+  }
+
+  .fact-table tr {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .fact-table thead tr {
+    border-block-end: 0;
+  }
+
+  .fact-table th,
+  .fact-table td {
+    display: block;
+    grid-column: span 4;
+  }
+
+  .fact-table th:last-child,
+  .fact-table td:last-child {
+    grid-column: span 8;
+  }
+
+  .fact-table td:first-child,
+  .fact-table td:last-child {
+    font-size: inherit;
+    text-transform: none;
+    color: inherit;
+  }
+}

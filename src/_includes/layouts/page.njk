@@ -1,0 +1,6 @@
+---
+layout: layouts/base.njk
+---
+{#- An inner page: the giant page name on top, then the page's own content. -#}
+{%- include "partials/page-header.njk" %}
+{{ content | safe }}

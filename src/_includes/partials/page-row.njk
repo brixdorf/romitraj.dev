@@ -1,0 +1,10 @@
+{#-
+  The small row under the banner on every page except the home page: the version tag (a link home,
+  with a "Go home" label that slides in beside it on hover), a one-line description of the site,
+  and a link back to the page above this one.
+-#}
+  <nav class="page-row" aria-label="{{ pages.row.label }}">
+    <a class="page-row__version" href="/"><span class="mark" aria-hidden="true"></span>{{ site.version }}<span class="page-row__home"><span class="dash"></span>{{ pages.row.home }}</span></a>
+    <p class="page-row__tagline">({{ site.tagline }} <span class="page-row__name">{{ site.name }}</span>)</p>
+    <a class="page-row__back" href="{{ parent.url if parent else '/' }}"><span aria-hidden="true">&larr;</span><span class="page-row__back-text">{{ pages.row.allProjects if parent else pages.row.home }}</span></a>
+  </nav>

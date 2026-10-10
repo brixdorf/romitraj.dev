@@ -2,7 +2,9 @@
    Every other stylesheet uses these names instead of raw values.
 
    The layout has three arrangements, switched by window width in the component files:
-   phone (under 600px), tablet (600px to 899px) and laptop (900px and wider). */
+   phone (under 600px), tablet (600px to 899px) and laptop (900px and wider).
+   The inner pages (about, projects, resume) have two more switch points: their grids of cards
+   stay in the tablet arrangement up to 999px, and the list of projects up to 1099px. */
 :root {
   /* Color: light paper and warm dark ink. Dark sections swap the two. */
   --color-paper: #fafafa;
@@ -11,6 +13,7 @@
   --color-muted-on-ink: #9f9f9f;
   --color-ghost-on-ink: #3e3b36;
   --color-line-on-paper: #eeeeee;
+  --color-line-on-paper-mid: #dadada;
   --color-line-on-paper-strong: #bdbdbd;
   --color-line-on-ink: #3a3a3a;
   --color-label-on-ink: #b3b3b3;
@@ -34,6 +37,13 @@
   --type-serif-heading: max(64px, 10.3vw);
   --type-project: min(8vw, 40px);
   --type-card-title: 32px;
+  --type-page-heading: 160px;
+  --type-page-heading-long: 128px;
+  --type-study-title: 96px;
+  --type-panel-title: 48px;
+  --type-panel-number: 24px;
+  --type-list-title: 48px;
+  --type-reading: 16px;
   --type-letter: 20px;
   --type-lead: 16px;
   --type-body: 20px;
@@ -59,6 +69,7 @@
   --section-space: 64px;
   --rule: 2px;
   --radius: 12px;
+  --frame-strip: 121.6px;
 
   /* Timings used by CSS. Timings used by scripts are in assets/js/motion.js. */
   --duration-fast: 150ms;
@@ -79,9 +90,21 @@
     --type-section-heading: clamp(120px, 19.608vw - 56.47px, 240px);
     --type-serif-heading: clamp(94.4px, 5.817vw + 42.05px, 130px);
     --type-project: clamp(40px, 6.863vw - 21.76px, 82px);
+    /* The same for the giant name at the top of an inner page, and the short picture frames. */
+    --type-page-heading: clamp(160px, 13.072vw + 42.35px, 240px);
+    --type-page-heading-long: clamp(145.6px, 15.424vw + 6.78px, 240px);
+    --type-study-title: var(--type-page-heading);
+    --frame-strip: clamp(121.6px, 10.196vw + 29.84px, 184px);
     --type-letter: 24px;
     --type-lead: 24px;
     --type-nav: 20px;
     --type-label: 16px;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    /* Project names in the list of projects grow with the window up to 1512px wide. */
+    --type-list-title: clamp(56px, 5.825vw - 8.08px, 80px);
   }
 }

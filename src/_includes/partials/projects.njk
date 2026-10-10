@@ -9,7 +9,8 @@
   </h2>
 
   <ol class="project-list">
-    {%- for project in projects.items %}
+    {%- for item in collections.projectList %}
+    {%- set project = item.data %}
     {%- set number = "(0" ~ loop.index ~ ")" %}
     {%- set parts = project.title | halves %}
     <li class="project-list__row" data-row>
@@ -17,7 +18,7 @@
         <span class="project-list__ghosts project-list__ghosts--before" aria-hidden="true">
           {%- for copy in range(0, 4) %}<span class="project-list__ghost"><span class="project-list__number">{{ number }}</span>{{ project.title }}</span>{% endfor -%}
         </span>
-        <a class="project-list__link" href="/projects/{{ project.slug }}/" aria-label="{{ project.title }}: {{ project.description }}">
+        <a class="project-list__link" href="{{ item.url }}" aria-label="{{ project.title }}: {{ project.description }}">
           <span class="project-list__number">{{ number }}</span>
           <span class="project-list__title"><span class="project-list__half">{{ parts[0] }}</span><span class="project-list__gap"></span><span class="project-list__half">{{ parts[1] }}</span></span>
         </a>

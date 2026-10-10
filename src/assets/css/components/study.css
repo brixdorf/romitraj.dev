@@ -1,0 +1,282 @@
+/* A project's page. On top: its name in very large serif letters, the one-line description, a few
+   facts and the list of sections. Below a thin line: the write-up, in a narrow serif column with
+   numbered section headings. */
+.study__header {
+  margin-block-end: 48px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--color-line-on-paper-mid);
+}
+
+.study__top {
+  margin-inline: var(--gutter);
+}
+
+.study__title {
+  margin: 208px 0 80px;
+  font-family: var(--font-serif-display);
+  font-weight: 400;
+  /* On a narrow window the letters shrink until the longest word fits. A letter of this font is
+     about 0.5 of the type size wide, and the template passes in the longest word's letter count. */
+  font-size: min(var(--type-study-title), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.5));
+  line-height: 0.8;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.study__lead {
+  max-inline-size: 447.84px;
+  margin: 0 auto 32px;
+  font-size: var(--type-small);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.study__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px var(--grid-gap);
+  margin: 0 0 48px;
+  font-size: var(--type-small);
+  line-height: 19px;
+  text-transform: uppercase;
+}
+
+.study__facts dt {
+  color: var(--color-muted-on-paper);
+}
+
+.study__facts dd {
+  margin: 0;
+}
+
+.study__contents {
+  margin-block-end: 48px;
+  font-size: var(--type-small);
+}
+
+.study__contents-label {
+  margin: 0;
+  font-weight: 400;
+  font-size: inherit;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.study__contents-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.3;
+}
+
+.study__contents-list li {
+  display: flex;
+  gap: 0.311em;
+}
+
+.study__contents-number {
+  flex: none;
+  color: var(--color-muted-on-paper);
+}
+
+.study__contents-number .dash {
+  margin-inline-start: 0.311em;
+}
+
+/* ---- The write-up ---- */
+.study__body {
+  margin: 0 var(--gutter) 72px;
+  counter-reset: section;
+  font-family: var(--font-serif);
+  font-size: var(--type-reading);
+  line-height: 1.5;
+}
+
+.study__body > p,
+.study__body > ul,
+.study__body > ol {
+  max-inline-size: 508.6px;
+  margin: 0 0 16px;
+}
+
+.study__body > ul,
+.study__body > ol {
+  padding-inline-start: 1.2em;
+}
+
+/* List bullets are drawn here as small dots, the same in every browser. The browser's own bullet
+   is kept (so screen readers still announce a list) but made invisible, and set in the text font:
+   Safari draws bullets as a letter, and the serif font has no bullet letter. */
+.study__body > ul > li {
+  position: relative;
+}
+
+.study__body > ul > li::marker {
+  font-family: var(--font-text);
+  color: transparent;
+}
+
+.study__body > ul > li::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.65em;
+  inset-inline-start: -0.8em;
+  inline-size: 0.25em;
+  block-size: 0.25em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.study__body a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+.study__body h2 {
+  margin: 72px 0 32px;
+  font-family: var(--font-serif-display);
+  font-weight: 400;
+  font-size: var(--type-panel-title);
+  line-height: 1;
+  counter-increment: section;
+}
+
+/* The section's number, above its heading. */
+.study__body h2::before {
+  content: "0" counter(section);
+  display: block;
+  margin-block-end: 12px;
+  font-size: var(--type-panel-number);
+  line-height: 1;
+  color: var(--color-muted-on-paper);
+}
+
+/* A note (a Markdown quote): grey text beside a thick pale bar. Its first bold words are its label. */
+.study__body blockquote {
+  margin: 32px 0 32px calc(-1 * var(--gutter));
+  padding-inline: 8px 16px;
+  border-inline-start: 16px solid var(--color-line-on-paper);
+  font-family: var(--font-text);
+  color: var(--color-muted-on-paper);
+}
+
+.study__body > :first-child {
+  margin-block-start: 0;
+}
+
+.study__body blockquote p {
+  margin: 0;
+}
+
+.study__body blockquote p:first-child strong {
+  display: block;
+  margin-block-end: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* Tablet: more room above the name, and the facts beside the list of sections. */
+@media (width >= 600px) {
+  .study__top {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .study__title {
+    grid-column: 1 / -1;
+    margin: 256px 0 16px;
+  }
+
+  .study__lead {
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-block-end: 128px;
+  }
+
+  .study__facts {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .study__body blockquote {
+    max-inline-size: 597.12px;
+    margin-inline-start: 0;
+    padding-inline: 16px;
+    border-inline-start-width: 8px;
+  }
+}
+
+/* Twelve columns: the description, facts and list of sections side by side under the name, and
+   the write-up in a column right of center with its section numbers hanging to the left. */
+@media (width >= 1000px) {
+  .study__header {
+    margin-block-start: 96px;
+    padding-block-end: 64px;
+  }
+
+  .study__top {
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  }
+
+  .study__title {
+    margin: 80px 0 128px;
+  }
+
+  .study__lead {
+    grid-column: 1 / span 5;
+    justify-self: start;
+    max-inline-size: 559.8px;
+    margin: 0;
+    font-size: var(--type-body);
+    text-align: start;
+  }
+
+  .study__facts {
+    grid-column: 7 / span 2;
+    margin: 0;
+  }
+
+  .study__contents {
+    grid-column: 9 / span 4;
+    margin: 0;
+  }
+
+  .study__body {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .study__body > * {
+    grid-column: 5 / span 5;
+  }
+
+  .study__body h2 {
+    position: relative;
+    grid-column: 5 / span 7;
+  }
+
+  /* The number moves out to the left of the heading, at the heading's size, followed by a drawn line. */
+  .study__body h2::before {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: calc(100% + 16px + 1.2em);
+    margin: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .study__body h2::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 0.56em;
+    inset-inline-end: calc(100% + 16px);
+    inline-size: 1em;
+    block-size: max(1px, 0.04em);
+    background: currentColor;
+  }
+}

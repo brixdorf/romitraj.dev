@@ -1,6 +1,17 @@
 ---
 title: Resume
-layout: layouts/notice.njk
+layout: layouts/page.njk
+description: The resume of Romit Raj Sahu, once it is finished.
 ---
-{#- Shown until resume.pdf exists. -#}
-<p>The resume is coming soon. Until then, email me at <a class="link link--underlined" href="mailto:{{ site.email }}">{{ site.email }}</a> and I'll send it over.</p>
+{#- Shown until resume.pdf exists: a short note and the contact email. Its words are in _data/pages.json ("resume"). -#}
+<div class="page-grid">
+  <section class="panel page-grid__main">
+    <h2 class="panel__title">{{ pages.resume.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in pages.resume.paragraphs %}
+      <p>{{ paragraph | fill | safe }}</p>
+      {%- endfor %}
+    </div>
+    <a class="link panel__action" href="mailto:{{ site.email }}">{{ pages.resume.link }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+  </section>
+</div>

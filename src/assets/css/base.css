@@ -50,6 +50,23 @@ a {
   block-size: 1em;
 }
 
+/* An empty picture frame: an ink outline with rounded corners. */
+.frame {
+  border: var(--rule) solid var(--color-ink);
+  border-radius: var(--radius);
+  background: var(--color-paper);
+}
+
+/* The small diamond before the version tag. */
+.mark {
+  display: inline-block;
+  inline-size: 0.45em;
+  block-size: 0.45em;
+  margin-inline-end: 0.5em;
+  background: currentColor;
+  transform: translateY(-0.12em) rotate(45deg);
+}
+
 /* A section's closing link, such as "View all projects": small capitals, centered. */
 .section-link {
   display: block;

@@ -81,6 +81,9 @@ try {
       // Tells the site's scripts to use fixed starting points for anything they would otherwise place
       // at random, so the same page gives the same picture on every run.
       await context.addInitScript(() => { window.steadyMotion = true; });
+      // Hover fades are switched off for the photographs. Chromium briefly squeezes the page while it
+      // photographs it, which would otherwise catch labels that only show on phones in the middle of fading out.
+      const noFades = '*, *::before, *::after { transition: none !important; }';
       const page = await context.newPage();
       const problems = [];
       page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));
@@ -95,6 +98,7 @@ try {
       page.on('pageerror', (error) => problems.push(`script error on ${new URL(page.url()).pathname}: ${error.message}`));
       for (const pagePath of pages) {
         await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
+        await page.addStyleTag({ content: noFades });
         await page.evaluate(() => document.fonts.ready);
         // A page should never be wider than its window.
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

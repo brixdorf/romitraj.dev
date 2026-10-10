@@ -1,0 +1,52 @@
+{
+  "note": "PLACEHOLDER TEXT. Everything here is a first draft to rewrite. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes.",
+
+  "portraitNote": "A portrait of the human, coming soon.",
+
+  "who": {
+    "title": "Who",
+    "paragraphs": [
+      "I’m Romit Raj Sahu, a CS student in Bangalore, India. I like servers, self-hosting, the open web, and finding out what a button does by pressing it. Most of what I know started as something I broke.",
+      "I haven’t picked a lane yet. Full stack, DevOps and forward deployed engineering all sound good, so for now I build small things in each and see what sticks. This site is one of them. It took far longer than it should have."
+    ],
+    "links": [
+      { "title": "Projects", "url": "/projects/" },
+      { "title": "Blog", "url": "https://blog.romitraj.dev" },
+      { "title": "Resume", "url": "/resume/" }
+    ]
+  },
+
+  "tinkering": {
+    "title": "Tinkering",
+    "paragraphs": [
+      "Right now I run a small home server, deploy my own things on it, and write down the parts that went wrong. The longer versions of those stories live on the blog."
+    ]
+  },
+
+  "latest": {
+    "label": "Latest post",
+    "link": "Read the post"
+  },
+
+  "contact": {
+    "title": "Contact",
+    "paragraphs": [
+      "I’m open to internships and small freelance projects. If you have something interesting, or just want to say hi, write to me.",
+      "Email is the fastest way to reach me: <a href=\"mailto:{email}\">{email}</a>. There is also <a href=\"/resume/\">a resume</a>, once I finish it."
+    ],
+    "link": "Say hi"
+  },
+
+  "toolbox": {
+    "title": "Toolbox",
+    "columns": ["Area", "What I reach for", "How it’s going"],
+    "rows": [
+      ["Front end", "HTML, CSS, a bit of JavaScript", "Getting there"],
+      ["Back end", "Node.js, Python, SQL", "Comfortable"],
+      ["Servers", "Linux, Docker, Dokploy", "My happy place"],
+      ["Pipelines", "GitHub Actions", "Works on the second try"],
+      ["Networking", "Cloudflare, DNS", "It was DNS"],
+      ["Writing", "Markdown, late at night", "Slowly"]
+    ]
+  }
+}

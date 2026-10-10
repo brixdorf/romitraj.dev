@@ -33,3 +33,8 @@
 .link--underlined::after {
   content: none;
 }
+
+/* The small arrow after a link's words: straight for a page on this site, slanted for one elsewhere. */
+.link__arrow {
+  margin-inline-start: 0.311em;
+}

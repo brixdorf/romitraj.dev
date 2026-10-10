@@ -1,0 +1,81 @@
+/* The top of an inner page: the page's name in giant letters, with a small picture frame.
+   On phones and tablets the name sits low, below the small row, with the frame under it.
+   On laptops the frame sits beside the name. */
+.page-header {
+  margin-block-end: 24px;
+  padding-block-start: 320px;
+}
+
+/* A header with a line under it and more room below (the About page). */
+.page-header--ruled {
+  margin-block-end: 64px;
+  padding-block-end: 32px;
+  border-block-end: var(--rule) solid var(--color-line-on-paper);
+}
+
+.page-header__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-inline: var(--gutter);
+}
+
+.page-header__title {
+  margin: 0 0 32px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* On a narrow window the letters shrink until the longest word fits. A letter of this font is
+     about 0.37 of the type size wide, and the template passes in the longest word's letter count. */
+  font-size: min(var(--type-page-heading), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37));
+  line-height: 0.8;
+  letter-spacing: -0.002em;
+  text-transform: uppercase;
+}
+
+.page-header__title--long {
+  font-size: min(var(--type-page-heading-long), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37));
+}
+
+.page-header__frame {
+  align-self: stretch;
+  block-size: var(--frame-strip);
+}
+
+.page-header__frame--square {
+  align-self: flex-start;
+  inline-size: var(--frame-strip);
+  margin-block-end: 8px;
+}
+
+@media (width >= 900px) {
+  .page-header {
+    padding-block-start: 64px;
+  }
+
+  .page-header__inner {
+    flex-direction: row;
+    gap: var(--grid-gap);
+  }
+
+  .page-header__title {
+    margin: 0;
+  }
+
+  /* The wide frame fills the rest of the line and sits on the letters' baseline. */
+  .page-header__frame {
+    flex: 1;
+    align-self: flex-end;
+  }
+
+  .page-header__frame--square {
+    flex: none;
+    align-self: flex-start;
+    margin-block-end: 0;
+  }
+}
+
+@media (width >= 1099px) {
+  .page-header {
+    padding-block-start: 48px;
+  }
+}

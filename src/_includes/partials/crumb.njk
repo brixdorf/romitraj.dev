@@ -1,0 +1,12 @@
+{#- The "you are here" line at the top of the footer on every page except the home page: the path from the home page down to this one. -#}
+{%- from "partials/icon.njk" import icon with context -%}
+      <div class="footer__group footer__group--crumb">
+        <p class="footer__label" id="crumb-label">{{ pages.crumb.label }}</p>
+        <ol class="crumb" aria-labelledby="crumb-label">
+          <li class="crumb__item"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><a class="crumb__link" href="/">{{ pages.crumb.home }}</a></li>
+          {%- if parent %}
+          <li class="crumb__item crumb__item--second"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><span class="crumb__elbow">{{ icon("elbow") }}</span><a class="crumb__link" href="{{ parent.url }}">{{ parent.title }}</a></li>
+          {%- endif %}
+          <li class="crumb__item crumb__item--{{ 'third' if parent else 'second' }}"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><span class="crumb__elbow">{{ icon("elbow") }}</span><a class="crumb__link{% if parent %} crumb__link--leaf{% endif %}" href="{{ page.url }}" aria-current="page">{{ title }}</a></li>
+        </ol>
+      </div>

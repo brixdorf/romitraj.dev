@@ -1,0 +1,32 @@
+/* The grid that holds an inner page's cards: one column on phones, two on tablets and narrow
+   laptops, twelve from 1000px. It also numbers the cards inside it (01, 02 and so on). */
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gap);
+  align-items: start;
+  margin-block-end: 72px;
+  padding-inline: var(--gutter);
+  counter-reset: panel;
+}
+
+@media (width >= 600px) {
+  .page-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* A page with a single card: the card takes the full width. */
+  .page-grid__main {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width >= 1000px) {
+  .page-grid {
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  }
+
+  .page-grid__main {
+    grid-column: 3 / span 6;
+  }
+}

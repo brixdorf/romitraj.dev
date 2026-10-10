@@ -20,6 +20,11 @@ const browsers = ['chrome115', 'edge115', 'firefox115', 'safari16.4'];
 
 const escapeHtml = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// The plain words of a heading, and the address ("the-problem") that links to it.
+const plainText = (html) => html.replace(/<[^>]+>/g, '').trim();
+const headingId = (html) => plainText(html).toLowerCase().replace(/&[a-z]+;/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const sectionHeading = /<h2>(.*?)<\/h2>/g;
+
 export default function (eleventyConfig) {
   eleventyConfig.addGlobalData('fontBase', fontBase);
 
@@ -44,6 +49,34 @@ export default function (eleventyConfig) {
     }
     return [title, ''];
   });
+
+  // The list of projects, in the order set by "order" at the top of each file in content/projects/.
+  // The home page and the Projects page are built from it. A project with a fact missing stops
+  // the build with a message that names the file and the fact.
+  eleventyConfig.addCollection('projectList', (collection) => {
+    const projects = collection.getFilteredByGlob('src/content/projects/*.md');
+    for (const project of projects) {
+      const { title, description, tags, year, link, order } = project.data;
+      const missing = Object.entries({ title, description, year, link }).filter(([, value]) => value === undefined || value === '').map(([name]) => name);
+      if (!Array.isArray(tags) || !tags.length) missing.push('tags (a list)');
+      if (typeof order !== 'number') missing.push('order (a number)');
+      if (missing.length) throw new Error(`${project.inputPath} needs these at the top of the file: ${missing.join(', ')}.`);
+    }
+    return projects.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
+  });
+
+  // The number of letters in the longest word of a heading. The styles use it to shrink a giant
+  // heading on a narrow window until its longest word fits.
+  eleventyConfig.addFilter('longestWord', (text) => Math.max(...String(text).split(/\s+/).map((word) => word.length)));
+
+  // A project write-up's section headings: "headings" lists them for the table of contents, and
+  // "headingIds" gives each one the address the table of contents links to.
+  eleventyConfig.addFilter('headings', (html) => [...String(html).matchAll(sectionHeading)].map(([, inner]) => ({ text: plainText(inner), id: headingId(inner) })));
+  eleventyConfig.addFilter('headingIds', (html) => String(html).replace(sectionHeading, (whole, inner) => `<h2 id="${headingId(inner)}">${inner}</h2>`));
+
+  // In Markdown, turn straight quotes and apostrophes into curly ones: the serif fonts have no
+  // straight apostrophe. Nothing else is swapped, so two hyphens stay two hyphens.
+  eleventyConfig.amendLibrary('md', (markdown) => markdown.set({ typographer: true }).disable('replacements'));
 
   // Turns the site's latitude and longitude into text such as "N 12° 58′ E 77° 35′" (degrees and minutes only).
   eleventyConfig.addFilter('coordinates', (place) => {

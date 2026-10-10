@@ -1,0 +1,99 @@
+---
+title: About
+heading: About the human
+headingSize: long
+frame: square
+ruled: true
+layout: layouts/page.njk
+description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach him.
+---
+{#- The About page: a grid of cards and picture frames. All of its words are in _data/about.json. -#}
+{%- from "partials/icon.njk" import icon with context -%}
+{%- macro arrow(url) %}<span class="link__arrow" aria-hidden="true">{% if "http" in url or "mailto:" in url %}&nearr;{% else %}&rarr;{% endif %}</span>{% endmacro -%}
+<div class="page-grid about-page">
+  <section class="panel about-page__who">
+    <h2 class="panel__title">{{ about.who.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in about.who.paragraphs %}
+      <p>{{ paragraph | fill | safe }}</p>
+      {%- endfor %}
+    </div>
+    <p class="panel__links">
+      {%- for item in about.who.links %}
+      <a class="link" href="{{ item.url }}">{{ item.title }}{{ arrow(item.url) }}</a>
+      {%- endfor %}
+    </p>
+  </section>
+
+  <figure class="about-page__portrait">
+    <div class="frame about-page__portrait-frame"></div>
+    <figcaption class="about-page__caption">{{ about.portraitNote }}</figcaption>
+  </figure>
+
+  <div class="frame about-page__square" aria-hidden="true"></div>
+  <div class="frame about-page__strip" aria-hidden="true"></div>
+
+  <aside class="about__card about-page__elsewhere" aria-labelledby="elsewhere-label">
+    <h2 class="about__label" id="elsewhere-label">{{ home.about.elsewhereLabel }}</h2>
+    <ul class="icon-list">
+      {%- for item in site.elsewhere %}
+      <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url }}">{{ item.title }}</a></li>
+      {%- endfor %}
+    </ul>
+  </aside>
+
+  <section class="panel about-page__tinkering">
+    <h2 class="panel__title">{{ about.tinkering.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in about.tinkering.paragraphs %}
+      <p>{{ paragraph | fill | safe }}</p>
+      {%- endfor %}
+    </div>
+  </section>
+
+  {#- The newest post from the blog. Left out when the blog's feed could not be read. #}
+  {%- set post = blog.posts[0] %}
+  {%- if post %}
+  <article class="teaser about-page__latest">
+    <p class="teaser__meta">{{ about.latest.label }}, <time datetime="{{ post.isoDate }}">{{ post.date }}</time></p>
+    <h3 class="teaser__title">{{ post.title }}</h3>
+    {%- if post.description %}
+    <p class="teaser__text">{{ post.description }}</p>
+    {%- endif %}
+    <a class="link teaser__link" href="{{ post.url }}">{{ about.latest.link }}{{ arrow(post.url) }}</a>
+  </article>
+  {%- endif %}
+
+  <section class="panel about-page__contact">
+    <h2 class="panel__title">{{ about.contact.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in about.contact.paragraphs %}
+      <p>{{ paragraph | fill | safe }}</p>
+      {%- endfor %}
+    </div>
+    <a class="link panel__action" href="mailto:{{ site.email }}">{{ about.contact.link }}{{ arrow("mailto:") }}</a>
+  </section>
+
+  <section class="panel about-page__toolbox">
+    <h2 class="panel__title">{{ about.toolbox.title }}</h2>
+    {#- The roles keep this a table for screen readers on narrow windows, where the rows are stacked. #}
+    <table class="fact-table" role="table">
+      <thead role="rowgroup">
+        <tr role="row">
+          {%- for column in about.toolbox.columns %}
+          <th role="columnheader" scope="col">{{ column }}</th>
+          {%- endfor %}
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {%- for row in about.toolbox.rows %}
+        <tr role="row">
+          {%- for cell in row %}
+          <td role="cell">{{ cell }}</td>
+          {%- endfor %}
+        </tr>
+        {%- endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>

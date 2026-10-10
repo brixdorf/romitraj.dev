@@ -1,0 +1,154 @@
+/* The small row under the banner on every page except the home page: the version tag (a link
+   home), a one-line description of the site, and a link back. It floats over the top of the
+   page's header instead of pushing it down. */
+.page-row {
+  /* No "top" is set, so the row starts where it would normally sit: right under the banner. */
+  position: absolute;
+  inset-inline: var(--gutter);
+  padding-block-start: 35.5px;
+  font-size: var(--type-small);
+  line-height: 19px;
+  text-transform: uppercase;
+}
+
+.page-row__version {
+  position: relative;
+  display: inline-block;
+  padding-block-end: 18px;
+  text-decoration: none;
+}
+
+/* The line under the version tag, and under the back link's words, grows from the right. */
+.page-row__version::after,
+.page-row__back-text::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 19px;
+  block-size: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.page-row__version:hover::after,
+.page-row__version:focus-visible::after,
+.page-row__back:hover .page-row__back-text::after,
+.page-row__back:focus-visible .page-row__back-text::after {
+  transform: scaleX(1);
+}
+
+/* "Go home", beside the version tag. On phones it is always there. */
+.page-row__home {
+  margin-inline-start: 0.311em;
+  color: var(--color-muted-on-paper);
+  white-space: nowrap;
+}
+
+.page-row__home .dash {
+  margin-inline-end: 0.311em;
+}
+
+.page-row__tagline {
+  max-inline-size: 298.56px;
+  margin: 0 0 16px;
+  color: var(--color-muted-on-paper);
+}
+
+.page-row__name {
+  color: var(--color-ink);
+}
+
+/* The back link has extra room above and below, so it is easy to hit. */
+.page-row__back {
+  display: inline-flex;
+  gap: 0.15em;
+  margin-block: -16px;
+  padding-block: 16px;
+  text-decoration: none;
+}
+
+.page-row__back-text {
+  position: relative;
+}
+
+.page-row__back-text::after {
+  inset-block-start: 17px;
+}
+
+/* Tablet: the version tag and back link on the left, the description on the right. */
+@media (width >= 600px) {
+  .page-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 298.56px);
+    justify-content: space-between;
+    align-items: start;
+    padding-block-start: 24px;
+  }
+
+  .page-row__version {
+    justify-self: start;
+  }
+
+  /* "Go home" waits out of sight and slides in when the version tag is hovered or focused. */
+  .page-row__home {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 100%;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity var(--duration-base), transform var(--duration-base);
+  }
+
+  .page-row__home .dash {
+    transform: translateX(8px);
+    transition: transform var(--duration-base);
+  }
+
+  .page-row__version:hover .page-row__home,
+  .page-row__version:focus-visible .page-row__home,
+  .page-row__version:hover .dash,
+  .page-row__version:focus-visible .dash {
+    opacity: 1;
+    transform: none;
+  }
+
+  .page-row__tagline {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    text-align: end;
+  }
+
+  .page-row__back {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+}
+
+/* Laptop: back link on the left, version tag in the middle, description on the right. */
+@media (width >= 900px) {
+  .page-row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: var(--grid-gap);
+    /* Sits a little lower as the banner's letters grow. */
+    padding-block-start: calc(16px + var(--type-banner) * 0.1);
+  }
+
+  .page-row__version {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .page-row__tagline {
+    grid-column: 3;
+    grid-row: 1;
+    max-inline-size: none;
+  }
+
+  .page-row__back {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}

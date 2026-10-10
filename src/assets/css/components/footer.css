@@ -1,5 +1,5 @@
-/* The footer: a dark block with the site map, links elsewhere, the contact email, and a last line
-   with the copyright and the sign-off. */
+/* The footer: a dark block with the "you are here" line (not on the home page), the site map,
+   links elsewhere, the contact email, and a last line with the copyright and the sign-off. */
 .footer {
   padding: 32px var(--gutter) 0;
   background: var(--color-ink);
@@ -23,14 +23,78 @@
   color: var(--color-label-on-ink);
 }
 
-/* The small diamond before the version tag. */
-.footer__mark {
-  display: inline-block;
-  inline-size: 0.45em;
-  block-size: 0.45em;
-  margin-inline-end: 0.5em;
+/* "You are here": the path from the home page to this page. On phones and tablets each step is
+   on its own line, indented under the one before; on laptops the steps run along one line. */
+.footer__group--crumb {
+  margin-block-end: 64px;
+}
+
+.crumb {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--type-body);
+  line-height: 34px;
+}
+
+.crumb__item {
+  display: flex;
+  align-items: center;
+}
+
+.crumb__item--second {
+  margin-inline-start: 0.622em;
+}
+
+.crumb__item--third {
+  margin-inline-start: 1.244em;
+}
+
+/* The arrow before a step: straight before the first one, bent before the steps under it. */
+.crumb__arrow,
+.crumb__elbow {
+  flex: none;
+  inline-size: 0.933em;
+}
+
+.crumb__elbow {
+  display: flex;
+}
+
+.crumb__elbow .icon {
+  inline-size: 0.6em;
+  block-size: 0.6em;
+}
+
+.crumb__item--second .crumb__arrow,
+.crumb__item--third .crumb__arrow {
+  display: none;
+}
+
+.crumb__link {
+  position: relative;
+  text-decoration: none;
+}
+
+.crumb__link--leaf {
+  font-style: italic;
+}
+
+.crumb__link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 5px;
+  block-size: 1px;
   background: currentColor;
-  transform: translateY(-0.12em) rotate(45deg);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.crumb__link:hover::after,
+.crumb__link:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .footer__list {
@@ -115,6 +179,38 @@
 
   .footer__group {
     margin-block-end: 0;
+  }
+
+  .footer__group--crumb {
+    grid-column: 1 / -1;
+    margin-block-end: 32px;
+  }
+
+  .crumb {
+    display: flex;
+    gap: 4.976px;
+    font-size: var(--type-small);
+    line-height: 1;
+  }
+
+  .crumb__item--second,
+  .crumb__item--third {
+    margin-inline-start: 0;
+  }
+
+  /* Straight arrows between the steps, and none before the first. */
+  .crumb__item:first-child .crumb__arrow,
+  .crumb__elbow {
+    display: none;
+  }
+
+  .crumb__item--second .crumb__arrow,
+  .crumb__item--third .crumb__arrow {
+    display: block;
+  }
+
+  .crumb__link::after {
+    inset-block-end: -1px;
   }
 
   .footer__group--home {

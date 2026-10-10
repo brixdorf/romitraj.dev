@@ -1,0 +1,36 @@
+{
+  "row": {
+    "label": "Where you are",
+    "home": "Go home",
+    "allProjects": "All projects"
+  },
+
+  "crumb": {
+    "label": "You are here",
+    "home": "Home"
+  },
+
+  "projects": {
+    "readMore": "Read more",
+    "readMoreAbout": "about",
+    "tagsLabel": "Tags",
+    "yearLabel": "Year"
+  },
+
+  "project": {
+    "kindLabel": "Kind",
+    "yearLabel": "Year",
+    "codeLabel": "Code",
+    "codeLink": "GitHub",
+    "contentsLabel": "Contents"
+  },
+
+  "resume": {
+    "title": "Coming soon",
+    "paragraphs": [
+      "The resume isn’t ready yet. I keep rewriting the first line, which is a great way to never reach the second.",
+      "Until it exists, email me at <a href=\"mailto:{email}\">{email}</a> and I’ll send over whatever version I have that day."
+    ],
+    "link": "Ask for it"
+  }
+}

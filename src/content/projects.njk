@@ -1,12 +1,29 @@
 ---
 title: Projects
-layout: layouts/notice.njk
-label: all projects
+layout: layouts/page.njk
+description: Things Romit Raj Sahu built, broke and rebuilt.
 ---
-{#- The list of every project. A plain list for now; each name leads to that project's page. -#}
-<p>The projects are built. Their write-ups are not. I'm working on it.</p>
-<ul class="notice__list">
-  {%- for project in projects.items %}
-  <li><a class="link link--underlined" href="/projects/{{ project.slug }}/">{{ project.title }}</a>: {{ project.description }}</li>
+{#- The list of every project (the files in content/projects/): one wide card each, leading to that project's page. -#}
+<ol class="project-cards">
+  {%- for item in collections.projectList %}
+  {%- set project = item.data %}
+  <li class="project-cards__item">
+    <article class="project-card">
+      <span class="project-card__number" aria-hidden="true">({{ "0" if loop.index < 10 }}{{ loop.index }})</span>
+      <h2 class="project-card__title">{{ project.title }}</h2>
+      <p class="project-card__text">{{ project.description }}</p>
+      <div class="project-card__side">
+        <dl class="project-card__facts">
+          <div><dt class="visually-hidden">{{ pages.projects.tagsLabel }}</dt><dd>{{ project.tags | join(" | ") }}</dd></div>
+          <div><dt class="visually-hidden">{{ pages.projects.yearLabel }}</dt><dd>{{ project.year }}</dd></div>
+        </dl>
+        <a class="project-card__more" href="{{ item.url }}"><span class="project-card__more-text">{{ pages.projects.readMore }}<span class="visually-hidden"> {{ pages.projects.readMoreAbout }} {{ project.title }}</span></span> <span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </article>
+  </li>
+  {#- An empty picture frame beside every second card, shown on wide windows only. #}
+  {%- if loop.index % 2 == 0 %}
+  <li class="frame project-cards__frame" aria-hidden="true"></li>
+  {%- endif %}
   {%- endfor %}
-</ul>
+</ol>
