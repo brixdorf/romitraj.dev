@@ -7,6 +7,11 @@ export const speed = {
   quoteTicker: 60,
 };
 
+export const rate = {
+  // While the pointer is over a ticker (or keyboard focus is inside it), it slows to this share of its speed.
+  tickerHover: 0.2,
+};
+
 export const duration = {
   // A page change fades the old page out, then the new page in. Each fade takes this long.
   pageFade: 0.2,

@@ -1,0 +1,35 @@
+/* Text links: a thin line that draws itself under the link from the left on hover or keyboard focus. */
+.link {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.link:hover::after,
+.link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* A link inside a sentence keeps a plain underline, so it reads as a link without hovering. */
+.link--underlined {
+  display: inline;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+.link--underlined::after {
+  content: none;
+}

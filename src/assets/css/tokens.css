@@ -1,5 +1,8 @@
-/* Design tokens: the one place for colors, fonts, spacing and CSS timings.
-   Every other stylesheet uses these names instead of raw values. */
+/* Design tokens: the one place for colors, fonts, sizes, spacing and CSS timings.
+   Every other stylesheet uses these names instead of raw values.
+
+   The layout has three arrangements, switched by window width in the component files:
+   phone (under 600px), tablet (600px to 899px) and laptop (900px and wider). */
 :root {
   /* Color: light paper and warm dark ink. Dark sections swap the two. */
   --color-paper: #fafafa;
@@ -22,6 +25,25 @@
   --font-serif: "Louize", "Louize Fallback", Georgia, serif;
   --font-text: "Neue Montreal", "Neue Montreal Fallback", Arial, sans-serif;
 
+  /* Type sizes. The giant hero lines are not here: they are sized to fill their space, in components/hero.css. */
+  --type-banner: max(22.4px, 2.4vw);
+  --type-lead: 16px;
+  --type-body: 20px;
+  --type-nav: 16px;
+  --type-small: 16px;
+  --type-label: 12px;
+  --type-micro: 12px;
+
+  /* Line heights, as a share of the type size. */
+  --leading-giant: 0.75;
+  --leading-serif-display: 0.8;
+  --leading-banner: 0.9;
+  --leading-lead: 1.1;
+  --leading-text: 1.2;
+
+  /* Letter spacing used on navigation and lead text. */
+  --tracking-tight: -0.01em;
+
   /* Layout */
   --gutter: 16px;
   --grid-columns: 12;
@@ -35,4 +57,18 @@
   --duration-base: 200ms;
   --duration-bar-loop: 20s;
   --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+@media (min-width: 450px) {
+  :root {
+    --type-lead: 20px;
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --type-lead: 24px;
+    --type-nav: 20px;
+    --type-label: 16px;
+  }
 }

@@ -1,25 +1,20 @@
 // Checks the site before a commit: builds it, looks for broken links between its own pages and
-// files, then photographs every page in Chromium, Firefox and WebKit at laptop and phone widths.
+// files, photographs every page in Chromium, Firefox and WebKit at laptop, tablet and phone widths,
+// and confirms the hero's big lines still fit their space.
 // Run it with: npm run check
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import Eleventy from '@11ty/eleventy';
 import { chromium, firefox, webkit } from 'playwright';
+import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidths } from './lib/site.mjs';
 
-const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-process.chdir(root);
-
-const siteDir = path.join(root, '_site');
 const privateDir = path.join(root, '..', 'romitraj-private');
 // Screenshots go next to the reference screenshots when that folder exists, otherwise into this repo (ignored by git).
 const shotsDir = fs.existsSync(privateDir) ? path.join(privateDir, 'screenshots') : path.join(root, 'screenshots');
-const port = 4173;
 
 const engines = { chromium, firefox, webkit };
 const viewports = {
   'laptop-1440': { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
+  'tablet-768': { viewport: { width: 768, height: 1024 }, deviceScaleFactor: 1 },
   'phone-390': { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, mobile: true },
 };
 
@@ -30,8 +25,7 @@ const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entr
 
 // ---- 1. Build ----
 console.log('Building the site...');
-fs.rmSync(siteDir, { recursive: true, force: true });
-await new Eleventy().write();
+await buildSite();
 
 const htmlFiles = walk(siteDir).filter((file) => file.endsWith('.html'));
 // "/", "/about/" and so on, from the built files.
@@ -66,21 +60,8 @@ if (broken.length) {
 }
 
 // ---- 3. Screenshots ----
-const server = spawn(process.execPath, ['server/index.js'], { cwd: root, env: { ...process.env, PORT: String(port) }, stdio: 'ignore' });
-const waitForServer = async () => {
-  for (let attempt = 0; attempt < 50; attempt++) {
-    try {
-      if ((await fetch(`http://localhost:${port}/`)).ok) return;
-    } catch {
-      // Not up yet.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  throw new Error(`The site server did not start on port ${port}.`);
-};
-
+const server = await startServer(4173);
 try {
-  await waitForServer();
   fs.rmSync(shotsDir, { recursive: true, force: true });
   for (const [engineName, engine] of Object.entries(engines)) {
     let browser;
@@ -108,9 +89,13 @@ try {
         }
       });
       page.on('response', (response) => { if (response.status() >= 400) problems.push(`${response.url()} answered ${response.status()}`); });
+      page.on('pageerror', (error) => problems.push(`script error on ${new URL(page.url()).pathname}: ${error.message}`));
       for (const pagePath of pages) {
-        await page.goto(`http://localhost:${port}${pagePath}`, { waitUntil: 'load' });
+        await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
         await page.evaluate(() => document.fonts.ready);
+        // A page should never be wider than its window.
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+        if (overflow > 0) problems.push(`${pagePath} is ${overflow}px wider than the window`);
         const name = pagePath === '/' ? 'home' : pagePath.replace(/^\/|\/$/g, '').replace(/\//g, '-').replace(/\.html$/, '');
         await page.screenshot({ path: path.join(dir, `${name}.png`), fullPage: true });
       }
@@ -120,11 +105,24 @@ try {
       }
       await context.close();
     }
+
+    // ---- 4. Do the hero's big lines still fit? (measured once, in Chromium) ----
+    if (engineName === 'chromium') {
+      const saved = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
+      const measured = await measureTextWidths(await browser.newPage(), server.address);
+      const off = Object.keys(measured).filter((name) => Math.abs(measured[name] - saved[name]) / measured[name] > 0.005);
+      if (off.length) {
+        console.log(`\nHERO LINES NO LONGER FIT: ${off.join(', ')}. The headline's words or fonts changed. Run: npm run fit`);
+        process.exitCode = 1;
+      } else {
+        console.log('Hero lines: all fit their space.');
+      }
+    }
     await browser.close();
     console.log(`Screenshots: ${engineName} done.`);
   }
   console.log(`\nSaved to ${shotsDir}`);
 } finally {
-  server.kill();
+  server.stop();
 }
 console.log(process.exitCode ? '\nCheck finished with problems.' : '\nCheck passed.');

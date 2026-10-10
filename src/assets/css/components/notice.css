@@ -1,0 +1,41 @@
+/* A short notice page, used for pages that are not written yet. */
+.notice {
+  padding: var(--section-space) var(--gutter);
+  overflow: hidden;
+}
+
+.notice__label {
+  margin: 0;
+  padding-block-end: 12px;
+  border-block-end: var(--rule) solid var(--color-ink);
+  font-size: var(--type-micro);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.notice__title {
+  margin: 0;
+  padding-block: 0.12em 0.1em;
+  border-block-end: var(--rule) solid var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(120px, 19.6vw - 56.5px, 240px);
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+
+.notice__text {
+  max-inline-size: 30em;
+  padding-block-start: 16px;
+}
+
+.notice__text p {
+  margin: 0 0 16px;
+}
+
+.notice__home {
+  margin: 16px 0 0;
+  font-size: var(--type-small);
+  text-transform: uppercase;
+}

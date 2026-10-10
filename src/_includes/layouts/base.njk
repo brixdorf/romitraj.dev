@@ -1,4 +1,4 @@
-{# The page shell every page uses: head tags, fonts, styles, script, and the slot for the page's own content. -#}
+{# The page shell every page uses: head tags, fonts, styles, script, the top banner, and the slot for the page's own content. -#}
 <!doctype html>
 <html lang="{{ site.language }}">
 <head>
@@ -12,6 +12,7 @@
   <script src="/assets/js/main.js" defer></script>
 </head>
 <body>
+  {%- include "partials/banner.njk" %}
   <main>
     {{ content | safe }}
   </main>

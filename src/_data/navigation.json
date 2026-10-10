@@ -1,0 +1,16 @@
+[
+  {
+    "label": "Work",
+    "items": [
+      { "title": "Projects", "url": "/projects/", "hint": "Things I built, broke and rebuilt" },
+      { "title": "Blog", "url": "https://blog.romitraj.dev", "hint": "Longer thoughts, on a separate site" }
+    ]
+  },
+  {
+    "label": "Me",
+    "items": [
+      { "title": "About", "url": "/about/", "hint": "Who I am, minus the buzzwords" },
+      { "title": "Resume", "url": "/resume/", "hint": "The formal version of all this" }
+    ]
+  }
+]

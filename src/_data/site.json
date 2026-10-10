@@ -3,8 +3,14 @@
   "url": "https://romitraj.dev",
   "language": "en",
   "description": "Personal website and portfolio of Romit Raj Sahu.",
-  "bio": "A lifelong explorer who procrastinates a lot.",
+  "banner": {
+    "plain": "A lifelong explorer",
+    "italic": "who procrastinates a lot."
+  },
   "city": "Bangalore",
+  "country": "India",
+  "latitude": 12.97,
+  "longitude": 77.59,
   "timeZone": "Asia/Kolkata",
   "email": "hi@romitraj.dev",
   "blogUrl": "https://blog.romitraj.dev",

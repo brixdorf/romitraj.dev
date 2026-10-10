@@ -18,8 +18,25 @@ const fontBase = process.env.FONT_BASE_URL || (hasLocalFonts ? '/fonts/' : site.
 // Oldest browser versions the bundled CSS and JavaScript are written out for.
 const browsers = ['chrome115', 'edge115', 'firefox115', 'safari16.4'];
 
+const escapeHtml = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 export default function (eleventyConfig) {
   eleventyConfig.addGlobalData('fontBase', fontBase);
+
+  // The headline font has no apostrophe. This swaps each apostrophe for an empty marker,
+  // which the styles fill with that font's own comma, raised into place.
+  eleventyConfig.addFilter('raisedApostrophe', (text) => escapeHtml(text).replace(/['’]/g, '<span class="apostrophe"></span>'));
+
+  // Turns the site's latitude and longitude into text such as "N 12° 58′ E 77° 35′" (degrees and minutes only).
+  eleventyConfig.addFilter('coordinates', (place) => {
+    const part = (value, positive, negative) => {
+      const size = Math.abs(value);
+      const degrees = Math.floor(size);
+      const minutes = Math.floor((size - degrees) * 60);
+      return `${value >= 0 ? positive : negative} ${degrees}° ${minutes}′`;
+    };
+    return `${part(place.latitude, 'N', 'S')} ${part(place.longitude, 'E', 'W')}`;
+  });
 
   // Bundle and minify the CSS and JavaScript before every build.
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {

@@ -1,0 +1,63 @@
+/* Navigation lists: a small label, then page links. Each link has a faint, blurred description
+   beside it that sharpens on hover or keyboard focus, while a line draws under the page name. */
+.nav-list__label {
+  margin: 0 0 8px;
+  font-size: var(--type-label);
+  line-height: var(--leading-text);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.nav-list {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-list__link {
+  display: inline-block;
+  padding-block: 4px;
+  letter-spacing: var(--tracking-tight);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-list__title {
+  position: relative;
+  display: inline-block;
+  font-size: var(--type-nav);
+  line-height: var(--leading-text);
+}
+
+.nav-list__title::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.nav-list__hint {
+  font-size: var(--type-label);
+  line-height: var(--leading-text);
+  color: var(--color-muted-on-paper);
+  opacity: 0.2;
+  filter: blur(2px);
+  transition: opacity var(--duration-base) ease, filter var(--duration-base) ease;
+}
+
+.nav-list__link:hover .nav-list__title::after,
+.nav-list__link:focus-visible .nav-list__title::after {
+  transform: scaleX(1);
+}
+
+.nav-list__link:hover .nav-list__hint,
+.nav-list__link:focus-visible .nav-list__hint {
+  opacity: 1;
+  filter: blur(0);
+}

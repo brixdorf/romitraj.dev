@@ -1,0 +1,63 @@
+/* The top banner: one centered serif line, with the drifting gradient bar along its bottom edge. */
+.banner {
+  position: relative;
+  z-index: 1;
+  padding: var(--gutter);
+}
+
+.banner__text {
+  margin: 0;
+  font-family: var(--font-serif-display);
+  font-size: var(--type-banner);
+  line-height: var(--leading-banner);
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--color-muted-on-paper);
+}
+
+.banner__text em {
+  font-style: italic;
+}
+
+/* The bar: four colors along a slanted line, a pause on white, then the same colors mirrored.
+   The pattern repeats every 200vw along the slant, which is 282.84vw across the page, and slides
+   sideways by exactly that distance each loop, so the loop has no visible seam. */
+.banner::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  block-size: 8px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-bar-1),
+    var(--color-bar-2),
+    var(--color-bar-3),
+    var(--color-bar-4),
+    #fff 90vw,
+    #fff 110vw,
+    var(--color-bar-4),
+    var(--color-bar-3),
+    var(--color-bar-2),
+    var(--color-bar-1) 200vw
+  );
+  background-size: 282.84vw 100%;
+  animation: banner-bar var(--duration-bar-loop) linear infinite;
+}
+
+@keyframes banner-bar {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 282.84vw 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner::after {
+    animation-play-state: paused;
+  }
+}

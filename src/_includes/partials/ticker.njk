@@ -1,0 +1,15 @@
+{#-
+  The status ticker: an endless line of small facts that drifts sideways.
+  Pieces that depend on a script (the local time) start hidden and appear only once the script has filled them in.
+-#}
+  <div class="ticker" data-ticker>
+    <div class="ticker__group">
+      <span class="ticker__item ticker__item--muted">{{ site | coordinates }} ({{ site.city }}, {{ site.country }})</span>
+      <span class="dash" aria-hidden="true"></span>
+      <span class="ticker__piece" data-widget hidden>
+        <span class="visually-hidden">Local time:</span>
+        <time class="ticker__item ticker__item--muted" data-local-time data-time-zone="{{ site.timeZone }}"></time>
+        <span class="dash" aria-hidden="true"></span>
+      </span>
+    </div>
+  </div>

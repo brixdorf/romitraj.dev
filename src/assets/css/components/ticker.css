@@ -1,0 +1,42 @@
+/* The status ticker: one line of small capitals between two rules, drifting sideways without end.
+   The movement itself is started by assets/js/animations.js; without scripts the line simply sits still. */
+.ticker {
+  display: flex;
+  padding-block: 8px;
+  border-block: var(--rule) solid var(--color-ink);
+  overflow: hidden;
+  font-size: var(--type-small);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ticker__group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.311em;
+  padding-inline-end: 0.311em;
+  /* Tall enough for an icon, so the line keeps its height before any icon is there. */
+  min-block-size: 20px;
+}
+
+/* A piece made of several parts (some text and the dash after it) keeps the same spacing as the group. */
+.ticker__piece {
+  display: flex;
+  align-items: center;
+  gap: 0.311em;
+}
+
+.ticker__piece[hidden] {
+  display: none;
+}
+
+.ticker__item--muted {
+  color: var(--color-muted-on-paper);
+}
+
+.ticker .dash {
+  flex: none;
+  vertical-align: baseline;
+}

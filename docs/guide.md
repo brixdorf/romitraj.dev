@@ -28,22 +28,27 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm start` | Serves `_site/` the way the live server does, at http://localhost:3000. Run `npm run build` first. |
 | `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
-| `npm run check` | Builds, looks for broken links, and photographs every page in three browsers at two widths. Run it before every commit. |
+| `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
+| `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and confirms the hero's big lines fit. Run it before every commit. |
 
 ## Where things live
 
 ```
 src/
-  _data/        Facts and lists: site.json (name, links, email), fonts.json (the fonts),
-                and two files written by scripts: fontVersions.json and fallbackFonts.json
-  _includes/    layouts/ (the page shell) and partials/ (reusable pieces)
-  assets/css/   main.css (the list), tokens.css (every value), base.css, components/
-  assets/js/    main.js (the entry point), motion.js (animation timings)
+  _data/        Facts and words: site.json (name, banner line, links, email, city), headline.json (the headline),
+                home.json (other home page text), navigation.json (the page links), fonts.json,
+                and three files written by scripts: fontVersions.json, fallbackFonts.json, textWidths.json
+  _includes/    layouts/ (base.njk is the page shell, notice.njk is a short "coming soon" page)
+                partials/ (banner, hero, ticker, fonts)
+  assets/css/   main.css (the list), tokens.css (every value), base.css, components/ (one file per piece)
+  assets/js/    main.js (the entry point), motion.js (animation timings),
+                animations.js (the tickers), widgets.js (the local time)
   assets/fonts/ The free fallback fonts and their license files
-  content/      The pages. index.njk is the home page.
+  content/      The pages. index.njk is the home page; about.md, projects.md and resume.njk
+                are short notices until the real pages are written.
 server/         index.js: the small server behind npm start
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
-                check.mjs (npm run check)
+                fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers)
 docs/           This guide and the decisions log
 _site/          The built site. Made by the build, never edited by hand, never committed.
 ```
@@ -54,7 +59,14 @@ Every file starts with a comment saying what it does.
 
 | I want to change | Open this file |
 |---|---|
-| My name, bio line, email, city, social links, blog address | `src/_data/site.json` |
+| My name, email, city, social links, blog address | `src/_data/site.json` |
+| The bio line in the top banner | `src/_data/site.json` (`banner`) |
+| The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
+| The introduction sentence, the scroll note, the note inside the picture frame | `src/_data/home.json` |
+| The page links and their descriptions | `src/_data/navigation.json` |
+| The city, country or coordinates in the status ticker | `src/_data/site.json` |
+| The text on a page that is not written yet | That page's file in `src/content/` |
+| How fast the ticker moves, and how much it slows under the pointer | `src/assets/js/motion.js` |
 | A color | `src/assets/css/tokens.css` |
 | The colors of the gradient bar | `src/assets/css/tokens.css` (the four `--color-bar` lines) |
 | Which fonts are used for what | `src/assets/css/tokens.css` (the `--font` lines) |
@@ -63,11 +75,35 @@ Every file starts with a comment saying what it does.
 | How fast the tickers, scroll drift and page fade move | `src/assets/js/motion.js` |
 | The list of font files, or which ones load first | `src/_data/fonts.json`, then run `npm run fonts` |
 | Which free font stands in for a licensed one | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `npm run fonts:fallback` |
-| The text on the home page | `src/content/index.njk` |
+| Which sections the home page has, and their order | `src/content/index.njk` |
 | The page title or description shown in browser tabs and search results | `src/_data/site.json`, or the top of the page's own file |
 | The browser's toolbar color on phones | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`. |
 
 This table grows as sections are built.
+
+## The headline
+
+The sentence at the top of the home page is set in five pieces, all in `src/_data/headline.json`:
+
+| Piece | Where it shows | Font |
+|---|---|---|
+| `full` | Nowhere on screen. It is the page's main heading for screen readers and search engines. | none |
+| `opening` (`plain` and `italic`) | The serif line across the full width, above the giant line | Louize Display |
+| `giant` | The giant black line. Each entry is one line on tablets; on laptops they run together, and on phones they run down the left edge. | Manuka |
+| `flourish` | The outlined italic words that overlap the giant line | Louize Display Italic |
+| `serif` | The very large serif word | Louize Display |
+
+Read top to bottom, the opening line, giant line, italic words and serif word should make the whole sentence.
+
+The small grey line in the top banner is separate. It is the bio line, it shows on every page, and it lives in `src/_data/site.json` (`banner`).
+
+Three things to know when changing it:
+
+- **Run `npm run fit` afterwards.** The opening line, the giant line and the serif word are sized to fill their space exactly. `npm run fit` measures the new words and saves the numbers to `src/_data/textWidths.json`. If you forget, `npm run check` tells you.
+- **Shorter lines are bigger.** A line always fills the same width, so fewer letters means larger letters and a taller hero.
+- **Manuka has few characters.** Letters, digits, comma, hyphen and full stop only. An apostrophe in the giant line works anyway: the site draws it with Manuka's comma, raised into place. Other punctuation would be borrowed from the fallback font, and `npm run check` would report it.
+
+The layout has three arrangements, chosen by window width: phone (under 600px), tablet (600 to 899px) and laptop (900px and wider).
 
 ## Fonts
 
@@ -128,7 +164,9 @@ Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `s
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. The screenshots go to `../romitraj-private/screenshots/`, in the same `laptop-1440` and `phone-390` folders, split by browser, as the reference screenshots next door, so the two sets can be compared side by side. If that folder is not there, they go to `screenshots/` here, which git ignores.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, and hero lines that no longer fit.
+
+The screenshots go to `../romitraj-private/screenshots/`, in `laptop-1440`, `tablet-768` and `phone-390` folders, split by browser. The laptop and phone folders match the reference screenshots next door, so the two sets can be compared side by side. If that folder is not there, they go to `screenshots/` here, which git ignores.
 
 Open a few of the pictures before committing. The same page should look the same in all three browsers.
 
@@ -158,7 +196,8 @@ If your computer has a different Node.js version than `engines` asks for, `npm i
 
 These parts of the guide are written when the matching part of the site is built:
 
-- Spotify setup for the now-playing widget.
+- Spotify setup for the now-playing widget, and the weather. Both will appear in the status ticker.
 - Deployment with Dokploy, step by step.
-- Images: where the photos go and how the build converts them.
-- The pages beyond the temporary home page.
+- Images: where the photos go and how the build converts them. Until then the hero's picture frame is empty.
+- The rest of the home page (letter, about, projects, writing, footer) and the real About, Projects and Resume pages.
+- The small row with the site label, home link and tagline that sits under the banner on every page except the home page.

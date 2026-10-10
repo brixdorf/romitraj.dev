@@ -1,0 +1,310 @@
+/* The hero: the opening serif line, the giant headline, the outlined italic words over it, the large
+   serif word, the picture frame, the scroll note and the introduction. The ticker and navigation
+   lists sit in its grid too.
+
+   Sizing the big lines: a script measures how wide each line runs, in units of its own font size
+   (npm run fit writes these to _data/textWidths.json). The font size is then the space the line
+   should fill, divided by that number. "100cqw" below means the full width of the hero's content. */
+.hero {
+  container-type: inline-size;
+  display: grid;
+  padding: var(--gutter);
+  overflow: hidden;
+}
+
+.hero__opening,
+.hero__giant,
+.hero__flourish,
+.hero__serif,
+.hero__lead,
+.hero__note {
+  margin: 0;
+}
+
+/* The first half of the sentence: one serif line across the full width, above the giant line. */
+.hero__opening {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  font-family: var(--font-serif-display);
+  font-size: calc(100cqw * 0.996 / var(--opening-em));
+  line-height: var(--leading-serif-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hero__opening em {
+  font-style: italic;
+}
+
+.hero__giant {
+  font-family: var(--font-display);
+  line-height: var(--leading-giant);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hero__flourish {
+  z-index: 2;
+  font-family: var(--font-serif-display);
+  font-style: italic;
+  line-height: 1.37;
+  color: var(--color-paper);
+  -webkit-text-stroke: 0.02em var(--color-ink);
+  pointer-events: none;
+}
+
+.hero__serif {
+  font-family: var(--font-serif-display);
+  line-height: var(--leading-serif-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hero__lead {
+  margin-block-start: 8px;
+  font-size: var(--type-lead);
+  line-height: var(--leading-lead);
+  letter-spacing: var(--tracking-tight);
+}
+
+.hero__note {
+  font-size: var(--type-micro);
+  line-height: 1.17;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.hero__image {
+  display: grid;
+  place-items: center;
+  margin-block-end: 12px;
+  border: var(--rule) solid var(--color-ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.hero__image-note {
+  margin: 0;
+  padding: var(--gutter);
+  font-size: var(--type-micro);
+  line-height: 1.17;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+/* ---- Phone: the headline runs down the left edge, everything else stacks beside it. ---- */
+@media (width < 600px) {
+  .hero {
+    --giant-size: calc(100cqw * 0.275);
+    --beside-giant: calc(100cqw - var(--giant-size) * 0.72 - var(--grid-gap));
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto auto 1fr auto auto;
+    column-gap: var(--grid-gap);
+  }
+
+  .hero__opening {
+    margin-block-end: 12px;
+  }
+
+  .hero__giant {
+    grid-column: 1;
+    grid-row: 2 / span 5;
+    writing-mode: vertical-rl;
+    font-size: var(--giant-size);
+    line-height: 0.72;
+  }
+
+  .hero__image {
+    grid-column: 2;
+    grid-row: 2;
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero__note {
+    grid-column: 2;
+    grid-row: 3;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .hero__flourish {
+    grid-column: 2;
+    grid-row: 4;
+    margin-block-end: -0.232em;
+    font-size: 62px;
+  }
+
+  .hero__serif {
+    grid-column: 2;
+    grid-row: 5;
+    font-size: calc(var(--beside-giant) * 0.996 / var(--serif-em));
+    line-height: 0.78;
+  }
+
+  .hero__lead {
+    grid-column: 2;
+    grid-row: 6;
+  }
+
+  .hero .ticker {
+    grid-column: 1 / -1;
+    grid-row: 7;
+    margin-block-start: 32px;
+  }
+
+  .hero__nav {
+    grid-column: 1 / -1;
+    grid-row: 8;
+    margin-block-start: 32px;
+  }
+}
+
+@media (450px <= width < 600px) {
+  .hero__note {
+    font-size: var(--type-small);
+  }
+}
+
+/* ---- Tablet: the headline on two lines, the picture tucked beside the shorter first line. ---- */
+@media (600px <= width < 900px) {
+  .hero {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .hero__opening {
+    margin-block-end: 12px;
+  }
+
+  .hero__giant {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: calc(100cqw * 0.996 / var(--giant-line-em));
+  }
+
+  .hero__giant-line {
+    display: block;
+  }
+
+  .hero__image {
+    position: relative;
+    z-index: 1;
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    align-self: start;
+    /* As wide as the space the first headline line leaves free, and never wider than the reference's share. */
+    inline-size: min(41.7cqw, calc(100cqw * (1 - var(--giant-first-line-em) / var(--giant-line-em)) - var(--grid-gap)));
+    aspect-ratio: 1.4;
+    background: var(--color-paper);
+  }
+
+  .hero__flourish {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin: -0.9em 0 -0.232em 0.98em;
+    font-size: 62px;
+  }
+
+  .hero__serif {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    font-size: calc(100cqw * 0.996 / var(--serif-em));
+    line-height: 0.78;
+  }
+
+  .hero__lead {
+    grid-column: 1;
+    grid-row: 5;
+    text-wrap: balance;
+  }
+
+  .hero__note {
+    grid-column: 2;
+    grid-row: 5;
+    align-self: end;
+    text-align: end;
+  }
+
+  .hero .ticker {
+    grid-column: 1 / -1;
+    grid-row: 6;
+    margin-block-start: 16px;
+  }
+
+  .hero__nav {
+    grid-column: 1 / -1;
+    grid-row: 7;
+    margin-block-start: 32px;
+  }
+}
+
+/* ---- Laptop: twelve columns. Headline across the top, picture in the right four columns. ---- */
+@media (width >= 900px) {
+  .hero {
+    /* The width of eight columns with their seven gaps. */
+    --eight-columns: calc(100cqw * 8 / 12 - var(--grid-gap) * 4 / 12);
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    /* The last row is the only stretchy one, so the tall picture pushes the introduction down, not the rows apart. */
+    grid-template-rows: auto auto auto auto auto 1fr;
+    gap: var(--grid-gap);
+    margin-block-end: 80px;
+  }
+
+  .hero__giant {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: calc(100cqw * 0.996 / var(--giant-em));
+  }
+
+  .hero__flourish {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: end;
+    margin: 0 0 -0.3em 0.49em;
+    font-size: calc(100cqw * 0.08247);
+  }
+
+  .hero__serif {
+    grid-column: 1 / span 8;
+    grid-row: 3;
+    align-self: start;
+    font-size: calc(var(--eight-columns) * 0.996 / var(--serif-em));
+  }
+
+  .hero .ticker {
+    grid-column: 1 / span 8;
+    grid-row: 4;
+    align-self: start;
+  }
+
+  .hero__nav {
+    grid-column: 1 / span 8;
+    grid-row: 5;
+  }
+
+  .hero__note {
+    grid-column: 8;
+    grid-row: 5;
+    justify-self: end;
+    align-self: start;
+    margin-top: 7px;
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+  }
+
+  .hero__image {
+    grid-column: 9 / span 4;
+    grid-row: 3 / -1;
+    align-self: start;
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero__lead {
+    grid-column: 1 / span 5;
+    grid-row: 6;
+    align-self: end;
+    text-wrap: balance;
+  }
+}
