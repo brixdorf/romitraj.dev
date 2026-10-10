@@ -2,6 +2,16 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-10: The apostrophe during the headline's animation
+
+Romit noticed that the raised comma in DON'T was cut while the headline slid in, and whole only once the animation ended.
+
+- **Cause.** While a heading moves, each letter is shown through a window that opens around the letter's own box. The apostrophe is Manuka's comma, lifted to the top of the letters. It was lifted by moving its whole box up by half a letter-height, so its box no longer sat in the line: the comma's ink ended up at the very bottom of that box, with its tail hanging 25px below it at laptop size, where the window allows 19px. Two things followed. The tail was cut for as long as the window was there (measured: about 150 pixels of ink missing, the same in all three browsers). And because a window opens from the top of its box downward, the apostrophe appeared late and from the top down, as a flat bar, while N and T beside it were already mostly in view.
+- **Fix.** The apostrophe's box now stays in the line, exactly where a letter's box would be, and only the comma inside it is lifted (`.apostrophe::before` in `base.css`). Its ink sits in the upper part of an ordinary letter box, so it comes through the edge together with the tops of N and T, as every letter does, and nothing of it is outside the window afterwards. At rest the headline is unchanged: screenshots before and after are identical pixel for pixel in three browsers at six widths.
+- **The new check found a second case**, which was fixed with it: the comma after "DROP" in the opening line lost the tip of its tail (about 10 pixels at wide windows). An italic comma's tail leans left, out of its narrow box, and the windows reached only a tenth of the box's *width* to each side. They now reach half a letter-height to each side. The slide is up or down, so the sides play no part in the movement; above and below, the windows are as before. The shapes are written as `inset(...)` instead of `polygon(...)` for this.
+- **New test in `npm run check`** (`lettersStayWhole` in `scripts/lib/letters.mjs`), in three browsers at seven widths: each sliding heading is cut into letters and photographed twice, once as it is and once with every letter's window fully open. Any pixel that differs is ink the window took away. It reports the letter and the place. Before the fix it failed on the apostrophe at every width.
+- **What "whole" means here.** Every letter is deliberately hidden bit by bit as it passes the edge it slides through; that is the animation. The apostrophe now passes that edge with its neighbours (for one or two frames, like them) and is whole in every frame after that, where before it stayed cut until the animation ended.
+
 ## 2026-10-10: Pictures
 
 ### Versions verified

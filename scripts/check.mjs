@@ -3,15 +3,17 @@
 // confirms the hero's big lines still fit their space, clicks from page to page in each browser
 // to confirm the page changes work, that nothing moves once a page change has finished, and that
 // back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
-// cutting headings into letters for those changes moves nothing (lib/letters.mjs), confirms
-// that the headline's entrance on the home page is safe (lib/entrance.mjs), and confirms that
-// every picture has alt text, stays small and moves nothing as it loads (lib/pictures.mjs).
+// cutting headings into letters for those changes moves nothing and that no letter is cut by the
+// window it slides in (lib/letters.mjs), confirms that the headline's entrance on the home page
+// is safe (lib/entrance.mjs), and confirms that every picture is described or marked as
+// decoration, stays small, moves nothing as it loads and looks the same in every browser
+// (lib/pictures.mjs).
 // Run it with: npm run check
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium, firefox, webkit } from 'playwright';
 import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidths } from './lib/site.mjs';
-import { lettersStayInPlace, testWidths } from './lib/letters.mjs';
+import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.mjs';
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
@@ -43,6 +45,21 @@ async function lettersOnEveryPage(browser, address, pagePaths) {
     await page.goto(address + pagePath, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     problems.push(...await lettersStayInPlace(page, pagePath));
+  }
+  await page.close();
+  return problems;
+}
+
+// Opens every page and confirms that no letter of a sliding heading is cut by the visible window
+// it moves in (a raised apostrophe, the tail of a comma), at every width in "windowWidths".
+async function wholeLettersOnEveryPage(browser, address, pagePaths) {
+  const problems = [];
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await page.addInitScript(() => { window.steadyMotion = true; });
+  for (const pagePath of pagePaths) {
+    await page.goto(address + pagePath, { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    problems.push(...await lettersStayWhole(page, pagePath));
   }
   await page.close();
   return problems;
@@ -174,6 +191,11 @@ try {
     const letterProblems = await lettersOnEveryPage(browser, server.address, pages);
     if (letterProblems.length) {
       console.log(`\nLETTERS THAT MOVE in ${engineName} (they would jump during a page change):\n  ` + letterProblems.slice(0, 20).join('\n  ') + (letterProblems.length > 20 ? `\n  ... and ${letterProblems.length - 20} more` : ''));
+      process.exitCode = 1;
+    }
+    const cutProblems = await wholeLettersOnEveryPage(browser, server.address, pages);
+    if (cutProblems.length) {
+      console.log(`\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` + cutProblems.slice(0, 20).join('\n  ') + (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
     // ---- 8. The headline's entrance on the home page ----

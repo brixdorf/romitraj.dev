@@ -134,14 +134,18 @@ a {
 
 /* An apostrophe for the headline font, which has none: that font's own comma, lifted to the top of the letters. */
 .apostrophe {
-  /* A self-contained box, so every browser gives it the same width whatever letters sit beside it. */
+  /* A self-contained box, so every browser gives it the same width whatever letters sit beside it.
+     The box itself stays in the line, exactly where a letter's box would be: only the comma inside
+     it is lifted. Page changes show each letter through a window around its box, and a box that
+     was lifted along with the comma left the comma's tail hanging out of that window. */
+  display: inline-block;
+}
+
+.apostrophe::before {
+  content: ",";
   display: inline-block;
   /* Moved, not re-flowed, so the line keeps its height. "block-start" is up for normal text
      and the matching side for text turned on its side. */
   position: relative;
   inset-block-start: -0.5em;
-}
-
-.apostrophe::before {
-  content: ",";
 }
