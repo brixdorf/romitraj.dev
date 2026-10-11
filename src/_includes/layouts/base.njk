@@ -6,7 +6,9 @@
   how the change is animated (see assets/js/transitions.js).
   On the home page, two short scripts make the headline slide in when the page opens: one in the
   head and one after the content. See assets/js/intro.js.
-  The first script in the head adds the visitor counter (Rybbit), and only on the live site.
+  The first script in the head adds the visitor counter (Rybbit), and only on the live site. It
+  also keeps jumps within a page (to a "#section") from being counted as page views; for that the
+  content slot says which page it holds ("data-path").
 -#}
 <!doctype html>
 <html lang="{{ site.language }}">
@@ -22,6 +24,18 @@
     /* Visitor counting (Rybbit), on the live site only. This adds Rybbit's own tag to the head, exactly as its install page gives it:
        <script src="{{ site.analytics.script }}" data-site-id="{{ site.analytics.siteId }}" defer>
        It is added by this script instead of being written straight into the page because a written tag cannot tell where it is: it would also count visits to the preview on your own computer and the pages npm run check opens. Here it is added only when the page is being viewed at {{ liveHost }}. The head stays in place through page changes, so the tag is added once per visit and never again. */
+    /* Jumps within a page are not page views. Clicking a line under "Contents" on a project's page adds "#section" to the address, and the browser announces that with two events, "popstate" and "hashchange" (it does the same when the back and forward buttons move between such jumps). Rybbit counts a view whenever it hears either. The two listeners below are added before Rybbit's and before anything else on the page, so they hear the events first, and they stop an event from going any further when it is only a jump within the page now showing. The address still changes and the back button still works: only the announcement is cut short.
+       - "hashchange" is only ever sent for a jump within a page, so it is always stopped.
+       - "popstate" is also sent when the back or forward button leads to another page, which must go through (the page-change script and Rybbit both need it). It is stopped only when the address still belongs to the page being shown ("data-path" on the content slot). One more case goes through: while a move to another page is still under way (the content that was showing when it began, "leaving", is still there), so that the page-change script can deal with a quick back-then-forward itself. */
+    var leaving = null;
+    addEventListener("hashchange", function (event) { event.stopImmediatePropagation(); }, true);
+    addEventListener("popstate", function (event) {
+      var shown = document.querySelector("[data-taxi-view]");
+      if (!shown) return;
+      if (shown.getAttribute("data-path") === location.pathname && shown !== leaving) event.stopImmediatePropagation();
+      else leaving = shown;
+    }, true);
+
     if (location.hostname === "{{ liveHost }}") {
       var counter = document.createElement("script");
       counter.src = "{{ site.analytics.script }}";
@@ -47,7 +61,7 @@
   {%- include "partials/banner.njk" %}
   {%- include "partials/page-row.njk" %}
   <div data-taxi>
-    <main data-taxi-view data-page="{{ pageKind or 'plain' }}">
+    <main data-taxi-view data-page="{{ pageKind or 'plain' }}" data-path="{{ page.url }}">
       {{ content | safe }}
     </main>
   </div>
