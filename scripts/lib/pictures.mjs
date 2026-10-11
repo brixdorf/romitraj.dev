@@ -18,7 +18,9 @@ const heaviestAllowed = 24 * 1024;
 
 export function pictureFiles(siteDir) {
   const dir = path.join(siteDir, 'assets', 'img');
-  const files = fs.existsSync(dir) ? fs.readdirSync(dir).map((name) => ({ name, bytes: fs.statSync(path.join(dir, name)).size })) : [];
+  // The share image sits in the same folder but is not a picture on any page: visitors never
+  // load it, only sharing apps do. It has its own weight limit (lib/head.mjs).
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name !== 'share.png').map((name) => ({ name, bytes: fs.statSync(path.join(dir, name)).size })) : [];
   const total = files.reduce((sum, file) => sum + file.bytes, 0);
   const heaviest = files.reduce((most, file) => (file.bytes > (most?.bytes ?? 0) ? file : most), null);
   const kb = (bytes) => `${(bytes / 1024).toFixed(1)} KB`;

@@ -19,7 +19,8 @@
     "fit": "node scripts/fit.mjs",
     "check": "node scripts/check.mjs",
     "speed": "node scripts/speed.mjs",
-    "spotify": "node scripts/spotify.mjs"
+    "spotify": "node scripts/spotify.mjs",
+    "share": "node scripts/share.mjs"
   },
   "dependencies": {
     "@11ty/eleventy": "3.1.6",

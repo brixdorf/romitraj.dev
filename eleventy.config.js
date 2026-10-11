@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import * as esbuild from 'esbuild';
 import { convertImages } from './scripts/images.mjs';
+import { makeSiteIcons } from './scripts/icons.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -56,6 +57,22 @@ export default function (eleventyConfig) {
   // The headline font has no apostrophe. This swaps each apostrophe for an empty marker,
   // which the styles fill with that font's own comma, raised into place.
   eleventyConfig.addFilter('raisedApostrophe', (text) => escapeHtml(text).replace(/['’]/g, '<span class="apostrophe"></span>'));
+
+  // The share image: the card that WhatsApp, LinkedIn, X and similar apps show beside a link to
+  // the site. It is a picture kept in the repository (src/assets/img/share.png, made by
+  // "npm run share"), copied into the built site as it is. Those apps need its full address, and
+  // its fingerprint makes them fetch a changed picture again.
+  const shareFile = 'src/assets/img/share.png';
+  if (!fs.existsSync(shareFile)) throw new Error(`${shareFile} is missing. Make it with: npm run share`);
+  eleventyConfig.addPassthroughCopy({ [shareFile]: 'assets/img/share.png' });
+  eleventyConfig.addGlobalData('shareImage', {
+    url: `${site.url}/assets/img/share.png?v=${createHash('sha256').update(fs.readFileSync(shareFile)).digest('hex').slice(0, 8)}`,
+    width: 1200,
+    height: 630,
+  });
+  // The site's name on X ("@name"), taken from the X link in site.json, for the card X draws.
+  const xLink = site.elsewhere.find((link) => /^https:\/\/(x|twitter)\.com\//.test(link.url));
+  eleventyConfig.addGlobalData('xHandle', xLink ? '@' + new URL(xLink.url).pathname.split('/')[1] : '');
 
   // The year the site was built, for the copyright line.
   eleventyConfig.addGlobalData('build', { year: new Date().getFullYear() });
@@ -165,6 +182,19 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');
+
+  // The site's own icon: a water drop, made before every build by scripts/icons.mjs as a drawing
+  // for browser tabs, an old-style .ico, and squares for phone home screens. A template writes a
+  // file's address, with its fingerprint, with {% siteIcon "svg" %} ("svg", "ico", "touch" or "manifest").
+  let siteIcons = {};
+  eleventyConfig.on('eleventy.before', async ({ directories }) => {
+    siteIcons = await makeSiteIcons(directories.output);
+  });
+  eleventyConfig.addShortcode('siteIcon', (kind) => {
+    if (!siteIcons[kind]) throw new Error(`There is no site icon of the kind "${kind}".`);
+    return siteIcons[kind];
+  });
+  eleventyConfig.addWatchTarget('./scripts/icons.mjs');
 
   // The local preview (npm run dev) answers the widgets' two questions the same way the live
   // server does, so the weather and the now-playing line show while developing too.

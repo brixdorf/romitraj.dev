@@ -19,6 +19,7 @@
   "blogUrl": "https://blog.romitraj.dev",
   "fontsUrl": "https://fonts.romitraj.dev/",
   "themeColor": "#2a2722",
+  "shareImageAlt": "The words “What we know is a drop, what we don’t know is an ocean” in large black type, beside a pixel drawing of a deep-sea diver’s helmet.",
   "analytics": {
     "script": "https://analytics.romitraj.dev/api/script.js",
     "siteId": "4662ddf4f073"

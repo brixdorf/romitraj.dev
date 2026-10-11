@@ -17,7 +17,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
   <meta name="description" content="{{ description or site.description }}">
+  {#- The preview card that WhatsApp, LinkedIn, X and similar apps draw when a link to this page
+      is shared. They read these tags: the page's own title and description, its full address,
+      and the full address of the share image (src/assets/img/share.png, made by "npm run share").
+      The "og:" tags are the Open Graph tags most apps read; the "twitter:" ones are X's own.
+      The page for a missing address gives no address, as it has none of its own. #}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:title" content="{{ title or site.name }}">
+  <meta property="og:description" content="{{ description or site.description }}">
+  {%- if page.url != "/404.html" %}
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  {%- endif %}
+  <meta property="og:image" content="{{ shareImage.url }}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="{{ shareImage.width }}">
+  <meta property="og:image:height" content="{{ shareImage.height }}">
+  <meta property="og:image:alt" content="{{ site.shareImageAlt }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title or site.name }}">
+  <meta name="twitter:description" content="{{ description or site.description }}">
+  <meta name="twitter:image" content="{{ shareImage.url }}">
+  <meta name="twitter:image:alt" content="{{ site.shareImageAlt }}">
+  {%- if xHandle %}
+  <meta name="twitter:creator" content="{{ xHandle }}">
+  {%- endif %}
   <meta name="theme-color" content="{{ site.themeColor }}">
+  {#- The site's icon, a water drop (scripts/icons.mjs makes the files). The .ico is for older
+      browsers and comes first; browsers that can use the drawing take that one, which switches
+      between ink and paper with the color of the browser's tabs. The last two are for phones. #}
+  <link rel="icon" href="{% siteIcon "ico" %}" sizes="32x32">
+  <link rel="icon" href="{% siteIcon "svg" %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% siteIcon "touch" %}">
+  <link rel="manifest" href="{% siteIcon "manifest" %}">
   {%- include "partials/fonts.njk" %}
   {%- if site.analytics %}
   <script>

@@ -31,6 +31,7 @@ const types = {
   '.webp': 'image/webp',
   '.avif': 'image/avif',
   '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.pdf': 'application/pdf',
   '.woff2': 'font/woff2',
 };

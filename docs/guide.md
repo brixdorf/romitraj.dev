@@ -31,6 +31,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
 | `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather and music services. |
+| `npm run share` | Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image". |
 | `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit. |
 
 ## Where things live
@@ -79,7 +80,10 @@ scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallb
                 spotify.mjs (npm run spotify), lib/widgets.mjs (the check's tests of the
                 widgets), lib/pretend.mjs (stand-ins for Open-Meteo and Spotify during the check),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
-                letters, the page changes and the headline's entrance), speed.mjs (npm run speed)
+                letters, the page changes and the headline's entrance), speed.mjs (npm run speed),
+                icons.mjs (makes the site's icon files during every build), share.mjs (npm run share),
+                lib/lost.mjs and lib/head.mjs (the check's tests of the page for a missing address,
+                the icon and the preview tags)
 docs/           This guide and the decisions log
 _site/          The built site. Made by the build, never edited by hand, never committed.
 ```
@@ -109,6 +113,8 @@ Every file starts with a comment saying what it does.
 | The order of the projects | `order` at the top of each file in `src/content/projects/` |
 | The text on the About page | `src/_data/about.json` |
 | The resume note | `src/_data/pages.json` (`resume`) |
+| The site's icon (the drop in the browser tab) | `src/_data/icons.json` (`drop`); its colors follow `tokens.css` |
+| The picture shown when a link is shared | Run `npm run share`; its description is `shareImageAlt` in `src/_data/site.json` |
 | The page for a missing address ("Lost at sea") | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`) |
 | The giant name at the top of an inner page | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`) |
 | The line beside the version tag on inner pages | `src/_data/site.json` (`tagline`) |
@@ -441,6 +447,48 @@ What each kind of link does under the pointer, and when it is reached with the T
 - **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `npm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
 - **Lines that break around the tails of letters.** In the "Elsewhere" lists, a project's "Contents" and the Projects page's "Read more", the drawn line does not run through the tail of a g, p or y: it stops beside it. The letters carry an outline in the color of whatever is behind them, painted under the letters themselves, and the line sits under that outline. At rest the outline cannot be seen. The color behind is `--behind`: paper unless a block says otherwise, and the footer sets it to ink. If such a link is ever placed on another background, set `--behind` there to that background's color.
 
+## The site's icon and the share image
+
+Two things every page carries for the world outside the page.
+
+### The icon
+
+The small picture in a browser tab, in bookmarks and on a phone's home screen is a single water drop, for the headline's "what we know is a drop".
+
+- **The drawing** is "Drop Simple" from Phosphor Icons, the set the site's other icons come from (MIT license, kept in `src/assets/icons/LICENSE-phosphor.txt`). It is the line named `drop` in `src/_data/icons.json`.
+- **The build makes every file from it** (`scripts/icons.mjs`), in the site's ink and paper colors from `tokens.css`:
+
+  | File | What it is | Who uses it |
+  |---|---|---|
+  | `favicon.svg` | The drop as a drawing. It is ink on a light tab and paper on a dark one: the file switches by itself | Chrome, Edge, Firefox, and Safari from version 26 |
+  | `favicon.ico` | The ink drop at 16 and 32 pixels, in the old icon format | Older Safari, and anything that looks for an icon without reading the page |
+  | `apple-touch-icon.png` | A paper drop on an ink square, 180 pixels | An iPhone or iPad home screen |
+  | `icon-192.png`, `icon-512.png`, `site.webmanifest` | The same square at two sizes, and the small file that names them | An Android home screen |
+
+- **To change the icon**, replace the `drop` line in `icons.json` with another drawing's path (one shape, on the icon set's 256 by 256 grid) and rebuild. To change its colors, change the ink and paper colors in `tokens.css`; the whole site follows.
+- **Browsers keep icons for a long time.** Each icon's address carries a fingerprint, so a new icon is fetched at once, but a tab that is already open may show the old one until it is reloaded.
+- **To see it**, look at the tab of http://localhost:8080 while `npm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance.
+
+### The share image
+
+When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, the app shows a preview card: a picture, the page's title and its description.
+
+- **The picture** is `src/assets/img/share.png`, 1200 by 630 pixels: the headline in the site's own type beside the close-up of the diver, with the gradient bar's colors along the top. Every page uses the same picture.
+- **The title and description are each page's own**: the same `title` and `description` that sit at the top of the page's file (for a project, its title and description).
+- **The tags** that the apps read are written into every page's head by `src/_includes/layouts/base.njk`: the Open Graph tags (`og:title`, `og:description`, `og:url`, `og:image` and a few more), which nearly every app reads, and X's own (`twitter:card` and the rest). Addresses in them are full addresses, starting with `https://romitraj.dev`, because the apps do not know which site a tag came from.
+- **To make the picture again**, run:
+
+  ```powershell
+  npm run share
+  ```
+
+  It builds the site, draws the card in a real browser with the licensed fonts, and saves it. It also retakes `docs/screenshot.png`, the picture at the top of the README, from the site running on this computer (so that one shows the weather and the track of the moment). Run it after changing the headline, the fonts, the colors or the diver drawing, look at both pictures, and commit them.
+- **Why it is a command and not part of the build:** the card needs the licensed fonts, which are on your computer and not on the live server.
+- **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
+- **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
+
+`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the tab icon is the ink drop on a light tab and the paper drop on a dark one.
+
 ## Links that leave the site
 
 Every link to another website opens in a new tab. The build does this by itself (`eleventy.config.js`, "linksThatLeave"): it goes over each finished page and gives every such link `target="_blank"`, `rel="noopener noreferrer"` (the new tab cannot reach back into this one, and the other site is not told where the visitor came from) and the words "(opens in a new tab)", hidden from the eye but read out by screen readers.
@@ -728,7 +776,7 @@ node compare-report.mjs out/compare
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink drop on light and the paper drop on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 

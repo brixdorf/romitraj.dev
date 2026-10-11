@@ -23,6 +23,7 @@ import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
 import { lostAnswers, lostPage } from './lib/lost.mjs';
+import { headOfEveryPage, siteIconInBrowser } from './lib/head.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
 import { startPretend, unreachable } from './lib/pretend.mjs';
 import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
@@ -119,6 +120,17 @@ if (weights.problems.length) {
   process.exitCode = 1;
 }
 console.log(`Pictures: ${weights.summary}.`);
+
+// ---- Every page's head: the site's icon, and the tags for the preview card of a shared link ----
+{
+  const head = await headOfEveryPage(siteDir, root);
+  if (head.problems.length) {
+    console.log('\nICON AND PREVIEW CARD PROBLEMS:\n  ' + [...new Set(head.problems)].slice(0, 30).join('\n  '));
+    process.exitCode = 1;
+  } else {
+    console.log(`Icon and preview card: ${head.summary}.`);
+  }
+}
 
 // ---- The focus ring: does it stand out enough from the paper and from the ink? ----
 // Accessibility guidelines ask that a focus ring differ from what is behind it by at least 3 to 1.
@@ -267,6 +279,12 @@ try {
       console.log(`\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` + cutProblems.slice(0, 20).join('\n  ') + (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
+    // ---- The site's icon: is it served, and is it the ink drop on a light tab and the paper drop on a dark one? ----
+    const iconProblems = await siteIconInBrowser(browser, server.address);
+    if (iconProblems.length) {
+      console.log(`\nSITE ICON PROBLEMS in ${engineName}:\n  ` + iconProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     // ---- The page for a missing address: its entrance, its ways back, and links that lead to it ----
     const lostProblems = await lostPage(browser, server.address);
     if (lostProblems.length) {
@@ -300,7 +318,7 @@ try {
       process.exitCode = 1;
     }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, widgets, visitor counter and pictures: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, visitor counter and pictures: ${engineName} done.`);
   }
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);

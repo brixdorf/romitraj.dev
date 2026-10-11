@@ -2,6 +2,55 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: The icon, the share image and the README
+
+### Versions and sources checked
+
+| What | Version or page | Source, read on 2026-10-11 | What it settled |
+|---|---|---|---|
+| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 (unchanged) | `npm view @phosphor-icons/core version`; the drawings and the license text were read from the published package | The drop, and the README's small icons. MIT license |
+| Safari and drawn icons | Safari 26.0 release notes; WebKit's notes on Safari 26 | developer.apple.com, webkit.org | Safari takes an SVG icon from version 26 (September 2025). Older Safari needs the `.ico` |
+| LinkedIn Post Inspector | Its page | linkedin.com/post-inspector | It exists, for previewing a shared link |
+
+No package was installed: the drawings are copied in, as the other icons were.
+
+### The icon: a single water drop
+
+- **The drawing is "Drop Simple" from Phosphor Icons, fill weight.** The set has two solid drops. "Drop" has a thin highlight cut into it, half a pixel wide at tab size, which would only blur. "Drop Simple" is one clean shape and stays sharp at 16 pixels. It is the set the site's other icons come from, so nothing new was added.
+- **The license asks for no credit on the page.** Phosphor's MIT license asks that its license text travel with copies of the drawings; it has been in `src/assets/icons/LICENSE-phosphor.txt` since the first icons. The Credits page was left as it is. The README now names Phosphor, because the README's icons come from it too.
+- **Ink on a light tab, paper on a dark one.** The tab icon is a drawing (`favicon.svg`) with a rule inside it that picks the color from the browser's light or dark appearance. Drawn in each of the three browser engines on a light and on a dark background, it switched in all three.
+- **The reference's icon was looked at once**, as Romit allowed, for inspiration only: it is one solid black mark with nothing behind it, offered as two small pictures. What was taken from it is that idea alone, one solid shape with no tile behind it. The shape, the files and the switch between ink and paper are this site's own.
+- **For browsers that cannot use the drawing there is `favicon.ico`**, holding the ink drop at 16 and 32 pixels, each drawn at that size instead of being shrunk. It cannot switch colors.
+  - **Known limit:** in a dark tab of Safari older than 26 the ink drop is dark on dark, unless Safari puts a light plate behind it, which could not be tested here. A drop on a tile would have shown in both, but smaller and unlike what every other browser shows.
+- **Phone home screens get a paper drop on an ink square**, with nothing transparent (an iPhone paints transparent parts black) and room around the drop for rounded corners or a circle: `apple-touch-icon.png` for iPhones and iPads, two larger squares and `site.webmanifest` for Android.
+- **The build makes all of it from one line** (`drop` in `icons.json`) and the two colors in `tokens.css` (`scripts/icons.mjs`), so the icon follows the site. Every address carries a fingerprint.
+- **What could not be checked by a script:** how each real browser draws the icon in a real tab. The test browsers do not show tabs. The files, their addresses, how they are served and how the drawing renders on light and dark were all tested; the tab itself is for Romit to look at.
+
+### The share image and the preview tags
+
+- **One picture for every page**, 1200 by 630 pixels, 32 KB: the gradient bar's colors along the top, the headline set as on the site (the serif line, the giant line on two lines with its raised apostrophe, the outlined "is an", the large "OCEAN."), the name and the address, and the close-up of the diver in a frame. Type, colors and drawing are the site's own; nothing of the reference's was used or looked at for it.
+- **It uses the diver, not the whale's tail**, because the whale is a placeholder photo and the diver is this site's own drawing.
+- **It is a picture in the repository, made by a new command, `npm run share`,** and not by the build. The card is set in the licensed fonts, which the live server does not have. The command draws the card in a real browser from the site's own stylesheet, words and measurements, and stops if a font is missing.
+- **Every page carries the tags**, written once in `layouts/base.njk`: Open Graph (`og:type`, `og:site_name`, `og:title`, `og:description`, `og:url`, `og:image` with its type, size and description) and X's (`twitter:card` as a large picture, title, description, picture, its description, and `twitter:creator` from the X link in `site.json`).
+  - The title and description are each page's own. The title is given without the site's name after it, which has its own tag.
+  - Addresses are full ones, built from `url` in `site.json`.
+  - **The page for a missing address gives no `og:url`**: it has no address of its own.
+- **The same command retakes the README's screenshot** (`docs/screenshot.png`) from the site running on this computer. Unlike the check, it uses the real weather and track if the keys in `.env` are there, because it is a picture of the real site. The first one shows the track that was playing when it was taken.
+- **Previewing the card:** LinkedIn's Post Inspector, once the site is live. opengraph.xyz is another often-named free tool; it could not be opened from this computer to confirm, so the guide names only the first.
+
+### The README
+
+- **Rewritten at about two screens**, where the brief had asked for one: what the site is, the screenshot, what makes it special (page changes, live weather and music, the pictures), what it is built with, three commands to run it, credits and license. Romit asked for the longer version.
+- **In Romit's voice**, after reading his blog: first person, short sentences, plain words, a little fun at his own expense. It is draft text and is listed in his rewrite checklist.
+- **Small icons instead of emojis**, as image files in `docs/readme/`: ten Phosphor drawings, each as an ink file for GitHub's light mode and a paper file for its dark mode, chosen by a `<picture>` tag, which GitHub follows.
+- **It names no private folder and no fonts' location.** It says only that the real fonts are licensed and not in the repository.
+
+### Tests
+
+- **`npm run check`, on the built files** (`scripts/lib/head.mjs`): every page names the four icon files, each exists and is what it should be (the drawing switches between the two colors; the `.ico` holds a 16 and a 32 pixel picture; the squares are the right size with nothing transparent; the manifest names two icons that exist); every page has every tag, with its own title and description, its own full address, and one share image that exists, is 1200 by 630 pixels and weighs under 300 KB.
+- **In each browser:** the four icon files are served, each as the right kind of file; and the tab icon, drawn at 16 and at 64 pixels, is the ink drop on a light background and the paper drop on a dark one.
+- The share image is left out of the pictures' own weight test (24 KB a picture): no visitor's browser loads it.
+
 ## 2026-10-11: The page for a missing address
 
 Nothing was installed or upgraded.
@@ -763,5 +812,5 @@ All of these come from measuring the design reference, not from copying its code
 
 ### Still to do
 
-- A hero screenshot of the live site for the README, once there is a site to photograph. GSAP gets a README badge when it is added.
+- A hero screenshot of the live site for the README, once there is a site to photograph. GSAP gets a README badge when it is added. (Done on 2026-10-11: `docs/screenshot.png`, taken from the site running on this computer by `npm run share`. Retake it from the live site after the first deployment if it should show that.)
 - `src/_data/image-credits.json`, which the LICENSE note points to, arrives with the first photos.
