@@ -90,9 +90,36 @@ function refreshFrame(nextDocument) {
   if (description && nextDescription) description.content = nextDescription.content;
 }
 
+// A link that leads to a page that does not exist. The server answers such an address with the
+// status 404 and the "Lost at sea" page. Taxi takes any answer that is not a success as a
+// failure: it reloads the whole page at that address, or, if the visitor clicked while Taxi was
+// still fetching the page ahead of the click, it is left with no content to show at all.
+// So Taxi's own requests are watched here: a 404 that carries a page is handed to Taxi as an
+// answer it accepts, and the "Lost at sea" page then arrives like any other page, with its
+// letters and cards. Nothing changes between the browser and the server: the answer is still a
+// 404. Every other request, and every other kind of failure, is passed on untouched.
+function letTaxiShowMissingPages() {
+  const browserFetch = window.fetch;
+  window.fetch = async function fetchForPageChanges(input, options) {
+    const response = await browserFetch.call(this, input, options);
+    const fromTaxi = options?.headers?.['X-Requested-With'] === 'Taxi';
+    const isPage = (response.headers.get('content-type') || '').startsWith('text/html');
+    if (!fromTaxi || response.status !== 404 || !isPage) return response;
+    // The same answer, except that it says "ok" when asked.
+    return new Proxy(response, {
+      get(target, key) {
+        if (key === 'ok') return true;
+        const value = Reflect.get(target, key);
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+    });
+  };
+}
+
 export function startPageChanges(pageHooks) {
   hooks = pageHooks;
   startScrollMemory();
+  letTaxiShowMissingPages();
 
   taxi = new Core({
     transitions: { default: PageChange },

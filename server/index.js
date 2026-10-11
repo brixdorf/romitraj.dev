@@ -53,6 +53,25 @@ function send(response, status, body) {
   response.end(body);
 }
 
+// The answer for an address that leads nowhere: the site's own "Lost at sea" page, sent with the
+// status 404 (not found). The status is what tells browsers, search engines and the page-change
+// script that the address does not exist; the page is what the visitor sees.
+// A missing picture, stylesheet or other file gets two plain words instead: a page is no use there.
+const lostPage = path.join(siteDir, '404.html');
+function sendNotFound(request, response, urlPath) {
+  const extension = path.extname(urlPath).toLowerCase();
+  const stats = fs.statSync(lostPage, { throwIfNoEntry: false });
+  if (!stats?.isFile() || (extension && extension !== '.html')) return send(response, 404, 'Not found');
+  response.writeHead(404, {
+    'Content-Type': types['.html'],
+    'Content-Length': stats.size,
+    'Cache-Control': 'no-cache',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  if (request.method === 'HEAD') return response.end();
+  fs.createReadStream(lostPage).pipe(response);
+}
+
 const server = http.createServer(async (request, response) => {
   if (request.method !== 'GET' && request.method !== 'HEAD') return send(response, 405, 'Method not allowed');
 
@@ -68,7 +87,8 @@ const server = http.createServer(async (request, response) => {
   if (await answerApi(urlPath, request.method, response)) return;
 
   const found = findFile(siteDir, urlPath);
-  if (!found) return send(response, 404, 'Not found');
+  // Nothing there, or the "Lost at sea" page asked for by its own file name: either way, not found.
+  if (!found || found.filePath === lostPage) return sendNotFound(request, response, urlPath);
 
   // A folder asked for without its closing slash: send the browser to the proper address.
   if (found.isIndex && !urlPath.endsWith('/')) {

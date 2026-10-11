@@ -12,7 +12,7 @@
           {%- if parent %}
           <li class="crumb__item crumb__item--second"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><span class="crumb__elbow">{{ icon("elbow") }}</span><a class="crumb__link" href="{{ parent.url }}">{{ parent.title }}</a></li>
           {%- endif %}
-          <li class="crumb__item crumb__item--{{ 'third' if parent else 'second' }}"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><span class="crumb__elbow">{{ icon("elbow") }}</span><a class="crumb__link{% if parent %} crumb__link--leaf{% endif %}" href="{{ page.url }}" aria-current="page">{{ title }}</a></li>
+          <li class="crumb__item crumb__item--{{ 'third' if parent else 'second' }}"><span class="crumb__arrow" aria-hidden="true">&rarr;</span><span class="crumb__elbow">{{ icon("elbow") }}</span><a class="crumb__link{% if parent %} crumb__link--leaf{% endif %}" href="{% if here is defined %}{{ here }}{% else %}{{ page.url }}{% endif %}" aria-current="page">{{ title }}</a></li>
         </ol>
         {%- endif %}
       </div>

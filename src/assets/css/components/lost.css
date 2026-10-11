@@ -1,0 +1,58 @@
+/* The page for an address that leads nowhere ("Lost at sea"): one card with a few words and the
+   ways back, and a framed close-up of the diver beside it. Everything else on the page is the
+   same header, card and frame every inner page uses. */
+
+/* Where the card's number would say 01, this one says what kind of page it is. */
+.lost__card .panel__title::before {
+  content: "404";
+}
+
+/* The ways back: the same list of links as in the home page's hero. */
+.lost__ways {
+  margin-block-start: 16px;
+}
+
+.lost__ways .nav-list {
+  margin-block-end: 0;
+}
+
+.lost__searcher {
+  margin: 0;
+}
+
+/* Four wide to five tall, like the hero's picture. The width is set and the height follows from
+   it, never the other way round. */
+.lost__frame {
+  max-inline-size: 288px;
+  aspect-ratio: 4 / 5;
+}
+
+.lost__caption {
+  margin-block-start: 8px;
+  font-size: var(--type-micro);
+  font-style: italic;
+  line-height: 1.17;
+  color: var(--color-muted-on-paper);
+}
+
+/* Tablet: the card on the left, the diver on the right. */
+@media (width >= 600px) {
+  .lost__card {
+    grid-column: 1;
+  }
+
+  .lost__searcher {
+    grid-column: 2;
+  }
+}
+
+/* Laptop: the card where every single card sits, the diver in the three columns after it. */
+@media (width >= 1000px) {
+  .lost__card {
+    grid-column: 3 / span 6;
+  }
+
+  .lost__searcher {
+    grid-column: 9 / span 3;
+  }
+}

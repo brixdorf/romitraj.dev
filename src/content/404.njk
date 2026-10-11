@@ -1,0 +1,52 @@
+---
+title: Lost at sea
+picture: compass
+frame: square
+frameTone: ink
+layout: layouts/page.njk
+permalink: 404.html
+eleventyExcludeFromCollections: true
+entrance: true
+here: ""
+description: This page could not be found.
+---
+{#-
+  The page shown for an address that leads nowhere. The server sends it, with the status "404
+  Not Found", whenever a page is asked for that does not exist (server/index.js).
+  - "permalink" makes the build write it as 404.html, the name servers look for.
+  - "entrance: true" lets its giant name slide in letter by letter when the page opens, as the
+    home page's headline does (assets/js/intro.js). A missing page is nearly always reached by
+    a typed or outside address, never by a page change, so without this its name would never move.
+  - "here" is the address the "you are here" line gives this page: empty, which means "wherever
+    this page is being shown", because it has no address of its own.
+  Its words are in _data/pages.json ("lost"); the two links' descriptions come from navigation.json.
+-#}
+<div class="page-grid lost" data-part="cards">
+  <section class="panel lost__card" data-part="card">
+    <h2 class="panel__title">{{ pages.lost.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in pages.lost.paragraphs %}
+      <p>{{ paragraph | safe }}</p>
+      {%- endfor %}
+    </div>
+    {#- The ways back, as the same kind of list the home page's hero has. #}
+    <nav class="lost__ways" aria-labelledby="lost-ways">
+      <p class="nav-list__label" id="lost-ways">{{ pages.lost.waysLabel }}</p>
+      <ul class="nav-list">
+        <li><a class="nav-list__link" href="/"><span class="nav-list__title">{{ pages.crumb.home }}</span> <span class="nav-list__hint"><span class="dash" aria-hidden="true"></span> {{ pages.lost.homeHint }}</span></a></li>
+        {%- for group in navigation %}
+        {%- for item in group.items %}
+        {%- if item.url == "/projects/" or item.url == "/about/" %}
+        <li><a class="nav-list__link" href="{{ item.url }}"><span class="nav-list__title">{{ item.title }}</span> <span class="nav-list__hint"><span class="dash" aria-hidden="true"></span> {{ item.hint }}</span></a></li>
+        {%- endif %}
+        {%- endfor %}
+        {%- endfor %}
+      </ul>
+    </nav>
+  </section>
+
+  <figure class="lost__searcher" data-part="card">
+    <div class="frame lost__frame">{% picture "searcher" %}</div>
+    <figcaption class="lost__caption">{{ pages.lost.caption }}</figcaption>
+  </figure>
+</div>

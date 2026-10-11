@@ -109,6 +109,7 @@ Every file starts with a comment saying what it does.
 | The order of the projects | `order` at the top of each file in `src/content/projects/` |
 | The text on the About page | `src/_data/about.json` |
 | The resume note | `src/_data/pages.json` (`resume`) |
+| The page for a missing address ("Lost at sea") | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`) |
 | The giant name at the top of an inner page | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`) |
 | The line beside the version tag on inner pages | `src/_data/site.json` (`tagline`) |
 | Small labels on inner pages ("Go home", "You are here", "Read more", "Contents") | `src/_data/pages.json` |
@@ -199,6 +200,7 @@ Every page except the home page shares three pieces:
 | One project | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/` |
 | Resume | `src/content/resume.njk` | `pages.json` (`resume`) |
 | Credits | `src/content/credits.njk` | `pages.json` (`credits`), `image-credits.json` |
+| A missing address ("Lost at sea") | `src/content/404.njk` | `pages.json` (`lost`), `navigation.json` |
 
 ### A page's settings
 
@@ -214,8 +216,22 @@ The top of a page's file (between the two `---` lines) sets:
 | `frameTone: ink` | A dark frame, for a picture drawn in the paper colour (the compass) |
 | `ruled: true` | A line under the header, with more room below it |
 | `description` | The sentence search engines show |
+| `entrance: true` | The giant name slides in letter by letter when the page is opened (only the page for a missing address uses it) |
 
 On phones the giant name shrinks until its longest word fits the screen. This is worked out from the number of letters in that word, so no measuring step is needed.
+
+### The page for a missing address
+
+An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost at sea", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a close-up of the diver.
+
+- **The page** is `src/content/404.njk`. The build writes it as `404.html`. Its giant name is the `title` at the top of that file; its other words are in `src/_data/pages.json` (`lost`); the picture is `searcher` in `images.json` (a crop of the diver drawing). The words beside Projects and About are the ones from `navigation.json`.
+- **To look at it**, run `npm run dev` and open any address that does not exist, such as http://localhost:8080/nothing-here/.
+- **It is sent with the status 404.** A status is the number a server sends before a page: 200 means "here it is", 404 means "there is no such page". The visitor sees the page either way; the number is what tells browsers and search engines not to treat the address as a real one. The live server does this in `server/index.js`, and `npm run dev` does the same by itself.
+  - A missing picture, stylesheet or other file gets a plain `Not found` with the same status, not the page.
+- **Its name slides in when the page opens**, letter by letter, like the home page's headline. It is the second page with an entrance, and uses the same small script (`entrance: true` at the top of its file asks for it). A missing page is almost never reached by a page change, so without this its letters would never move.
+- **A link inside the site that leads to a missing page** also ends here, without a reload: the old page leaves, and "Lost at sea" arrives with its letters and cards, at the missing address. `npm run check` looks for broken links before every commit, so this should only happen with an old link or a typing mistake.
+- **"You are here" on this page** links its last step to wherever the page is being shown (`here: ""` at the top of the file), because it has no address of its own.
+- `npm run check` tests all of it in three browsers: the status, the page, the entrance, the ways back, and a link that leads to a missing page.
 
 ### The About page
 
@@ -287,7 +303,7 @@ The inner pages follow the same three arrangements as the home page (phone, tabl
 
 Following a link to another page of this site does not reload the browser. The banner, the small row under it and the footer stay where they are; only the content between them is swapped, with an animation. A library called Taxi.js fetches the next page and does the swap. Without scripts, links simply load pages the ordinary way.
 
-When a page is first opened nothing animates, with one exception: on the home page the headline slides in (see "The headline's entrance" below). The animations in this section only play when moving from one page to another.
+When a page is first opened nothing animates, with two exceptions: on the home page the headline slides in (see "The headline's entrance" below), and so does the giant name of the page for a missing address. The animations in this section only play when moving from one page to another.
 
 ### Which change gets which animation
 
@@ -712,7 +728,7 @@ node compare-report.mjs out/compare
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -866,6 +882,7 @@ If Dokploy can already see both repositories, skip this step.
 | Open https://romitraj.dev/api/now-playing | One short line with a track's title. An empty page means the three settings are missing or wrong: check step 5.5, save, and deploy again. |
 | Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload |
 | Open https://www.romitraj.dev | You end up on https://romitraj.dev |
+| Open https://romitraj.dev/nothing-here/ | The "Lost at sea" page, its name sliding in |
 | Open your Rybbit dashboard | Your own visit, counted once per page |
 | Open the site on your phone | The same, in the phone arrangement |
 

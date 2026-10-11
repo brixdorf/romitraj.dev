@@ -2,6 +2,52 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: The page for a missing address
+
+Nothing was installed or upgraded.
+
+### What it is
+
+- **"Lost at sea".** An address that leads nowhere now gets a page of the site's own, built on the headline's ocean ("What we know is a drop, what we don't know is an ocean"): the page is somewhere in the part we don't know.
+  - The giant name, LOST AT SEA, with the compass in a dark frame beside it.
+  - A card numbered 404 where other cards say 01, titled "Off the chart", with two short sentences.
+  - Three ways back under the label "Dry land": Home, Projects and About, as the same kind of list the home page's hero has, with the same descriptions.
+  - A close-up of the diver's helmet in a frame, captioned as the search party.
+- **Only the site's own parts were used:** the inner pages' header, card, frame and navigation list, the two drawings made for this site, its fonts, colors, spacing and motion. The reference's page for a missing address was not opened, measured or looked at.
+- **The diver's close-up is a new picture, `searcher`**, cut from the same drawing as the large diver and the jellyfish (`diver.svg`). It is described for screen readers; the compass stays decoration.
+- **The words are draft text** in Romit's voice, in `pages.json` (`lost`), and are listed in his rewrite checklist.
+
+### A real 404
+
+- **The server answers a missing address with the status 404 and this page.** Before, it answered 404 with two plain words. The status is unchanged; what the visitor sees is new.
+- **A missing picture, stylesheet or other file still gets the plain answer.** A page is no use where a picture was asked for. The server tells the two apart by the address: one that ends in a file extension other than `.html` is a file.
+- **The page asked for by its own file name (`/404.html`) is answered 404 as well**, so it has no address at which it looks like a real page.
+- **`npm run dev` does the same** without any change: Eleventy's preview server sends `404.html`, with the status 404, for any address it does not have.
+
+### A link inside the site that leads to a missing page
+
+- **What happened before, found while building this.** Page changes are made by Taxi.js, which fetches the next page. For any answer that is not a success Taxi gives up and reloads the browser at that address. But Taxi also fetches a page ahead of the click, when the pointer first rests on a link, and a click that came while that early fetch was still under way was left with nothing: the old page had animated away, the address had changed, and no content arrived. A visitor on a slow connection would have been left on a page with a banner, a footer and nothing between them.
+- **Now the "Lost at sea" page arrives like any other page.** A few lines in `transitions.js` watch Taxi's own requests. An answer with the status 404 that carries a page is handed to Taxi as one it accepts; Taxi then swaps the content in and the page arrives with its letters and cards, at the missing address, with no reload. The answer on the wire is still a 404. Every other request, and every other failure, is passed on untouched, so a server error still makes Taxi reload as before.
+- **Why not leave it to the reload:** the blank page above, and because a reload restarts the banner's gradient bar and the footer for no reason.
+
+### Its name slides in when the page opens
+
+- **Romit asked for the same letter-by-letter entrance as the other pages.** The other inner pages only show it during a page change, and a missing page is almost never reached by one: it is reached by a typed address or a link from elsewhere. So this page has the entrance on opening as well, like the home page: its letters rise into place one after another, at the same pace.
+- **This makes it the second page with an entrance.** The earlier entries say only the home page has one; that was true until this request. It uses the same small script (`intro.js`) with one more starting place, and a page asks for it with `entrance: true` at the top of its file. Every condition set for the home page's entrance holds here too, and is tested: the name is hidden until its letters are ready and never flashes in place first; it ends exactly where a still page has it; visitors who asked for less motion get no entrance; without scripts the name is simply there.
+- Only the name moves on opening. The card and the frame are there from the start, as the rest of the home page is.
+
+### Tests
+
+- **`npm run check` asks the server directly** for five missing pages (with GET and HEAD), three missing files and one real page, and checks the status and what came back.
+- **In each of the three browsers** (`scripts/lib/lost.mjs`): the page at laptop and phone size (status, name, the three ways back, nothing wider than the window); the entrance, as above; a link on the home page pointed at an address that does not exist and clicked (it must end on this page, at that address, with every answer for that address a 404); "Projects" on this page (a page change with no reload and nothing left behind); and the back button (back to the missing address).
+- **The page is also photographed** with every other page at three widths in three browsers, and its heading goes through the letter tests at thirteen widths.
+- The check's photograph run opens the page at `/404.html`, which answers 404 on purpose; that one answer is no longer counted as a problem.
+
+### Known issues
+
+- **The browser's own console notes the 404** when a link leads to a missing page ("Failed to load resource"). That is the browser reporting the status, not an error in the page.
+- **The descriptions beside the three ways back start faint and blurred**, as in the hero, and sharpen under the pointer. On touch screens they stay faint.
+
 ## 2026-10-11: Ready to deploy
 
 Nothing was installed or upgraded in the site. Nothing was deployed: this entry records what was checked and what the guide's new section rests on.

@@ -32,6 +32,12 @@
   text-transform: uppercase;
 }
 
+/* On a page whose name slides in when it opens (the page for a missing address), the name waits
+   out of sight while the page is marked "intro". See assets/js/intro.js. */
+.intro .page-header__title {
+  visibility: hidden;
+}
+
 .page-header__title--long {
   font-size: min(var(--type-page-heading-long), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37));
 }

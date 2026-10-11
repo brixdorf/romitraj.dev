@@ -45,9 +45,9 @@
     }
   </script>
   {%- endif %}
-  {%- if pageKind == "home" %}
+  {%- if pageKind == "home" or entrance %}
   <script>
-    /* The headline slides in when the page opens. Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while npm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */
+    /* The headline slides in when the page opens (the home page, and any page that says "entrance: true" at the top of its file). Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while npm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */
     if (!window.steadyMotion && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("intro");
       setTimeout(function () { document.documentElement.classList.remove("intro"); }, 3000);
@@ -65,7 +65,7 @@
       {{ content | safe }}
     </main>
   </div>
-  {%- if pageKind == "home" %}
+  {%- if pageKind == "home" or entrance %}
   <script>{% introScript %}</script>
   {%- endif %}
   {%- include "partials/footer.njk" %}

@@ -1,8 +1,11 @@
 // The headline's entrance when the home page is first opened or reloaded: its letters slide into
 // their lines, as they do when arriving from the Projects page.
+// The page for a missing address ("Lost at sea") has the same entrance for its giant name: that
+// page is reached by a typed or outside address, never by a page change, so this is the only
+// time its letters can slide in. A page asks for it with "entrance: true" at the top of its file.
 //
 // This file is not part of the main script. The build turns it into a very small script of its
-// own and writes it straight into the home page (see eleventy.config.js and layouts/base.njk), so
+// own and writes it straight into those pages (see eleventy.config.js and layouts/base.njk), so
 // it can start the moment the headline's fonts arrive instead of waiting for the main script.
 //
 // How it stays safe:
@@ -44,6 +47,8 @@ const startingPlaces = {
   serif: (size) => ({ transform: `translateY(${-size}px)`, clipPath: shape.bottomEdge }),
   // The opening line sits right under the banner: its own height above, so it never shows over the gradient bar.
   opening: () => ({ transform: 'translateY(-100%)', clipPath: shape.bottomEdge }),
+  // An inner page's giant name: its own height below, behind its top edge, as when arriving by a page change.
+  title: () => ({ transform: 'translateY(100%)', clipPath: shape.topEdge }),
 };
 
 // Puts the plain headline back and stops listening.
@@ -74,7 +79,7 @@ function settle() {
 }
 
 function enter() {
-  const content = document.querySelector('[data-page="home"]');
+  const content = document.querySelector('[data-taxi-view]');
   for (const [part, startingPlace] of Object.entries(startingPlaces)) {
     for (const element of content.querySelectorAll(`[data-part="${part}"]`)) {
       const split = splitLetters(element);

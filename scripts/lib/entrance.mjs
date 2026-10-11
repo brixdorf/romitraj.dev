@@ -9,7 +9,8 @@
 const lines = '[data-part="opening"], [data-part="giant"], [data-part="serif"]';
 
 // Where every letter of the headline is, whether it is in letter boxes or plain text.
-const letterPlaces = (page) => page.evaluate((selector) => {
+// (Also used, with another heading, by the test of the page for a missing address: lib/lost.mjs.)
+export const letterPlaces = (page, headings = lines) => page.evaluate((selector) => {
   const range = document.createRange();
   const out = [];
   for (const element of document.querySelectorAll(selector)) {
@@ -35,8 +36,8 @@ const letterPlaces = (page) => page.evaluate((selector) => {
     }
   }
   return out;
-}, lines);
-const furthest = (a, b) => (a.length !== b.length ? Infinity : Math.max(0, ...a.map((place, index) => Math.max(Math.abs(place[0] - b[index][0]), Math.abs(place[1] - b[index][1])))));
+}, headings);
+export const furthest = (a, b) => (a.length !== b.length ? Infinity : Math.max(0, ...a.map((place, index) => Math.max(Math.abs(place[0] - b[index][0]), Math.abs(place[1] - b[index][1])))));
 
 // Watches the headline from the page's very first frame: was it ever shown before its letters were ready?
 const watchFromTheStart = () => {

@@ -22,6 +22,7 @@ import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidth
 import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.mjs';
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
+import { lostAnswers, lostPage } from './lib/lost.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
 import { startPretend, unreachable } from './lib/pretend.mjs';
 import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
@@ -170,6 +171,15 @@ const pretend = await startPretend(4174);
 const server = await startServer(4173, pretend.env);
 const quietServer = await startServer(4176, unreachable(4177));
 try {
+  // ---- A missing address: is it answered with a real 404 and the "Lost at sea" page? ----
+  const lostAnswerProblems = await lostAnswers(server.address);
+  if (lostAnswerProblems.length) {
+    console.log('\nMISSING ADDRESS PROBLEMS:\n  ' + lostAnswerProblems.join('\n  '));
+    process.exitCode = 1;
+  } else {
+    console.log('Missing addresses: answered with status 404 and the "Lost at sea" page; missing files with a plain 404.');
+  }
+
   fs.rmSync(shotsDir, { recursive: true, force: true });
   for (const [engineName, engine] of Object.entries(engines)) {
     let browser;
@@ -204,7 +214,8 @@ try {
           problems.push(`fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (npm run fonts lists the characters each licensed font lacks)`);
         }
       });
-      page.on('response', (response) => { if (response.status() >= 400) problems.push(`${response.url()} answered ${response.status()}`); });
+      // (The page for a missing address is photographed at its own file name, which is answered with a 404 on purpose.)
+      page.on('response', (response) => { if (response.status() >= 400 && new URL(response.url()).pathname !== '/404.html') problems.push(`${response.url()} answered ${response.status()}`); });
       page.on('pageerror', (error) => problems.push(`script error on ${new URL(page.url()).pathname}: ${error.message}`));
       for (const pagePath of pages) {
         await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
@@ -256,6 +267,12 @@ try {
       console.log(`\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` + cutProblems.slice(0, 20).join('\n  ') + (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
+    // ---- The page for a missing address: its entrance, its ways back, and links that lead to it ----
+    const lostProblems = await lostPage(browser, server.address);
+    if (lostProblems.length) {
+      console.log(`\nMISSING PAGE PROBLEMS in ${engineName}:\n  ` + lostProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     // ---- 8. The headline's entrance on the home page ----
     const entranceProblems = await headlineEntrance(browser, server.address);
     if (entranceProblems.length) {
@@ -283,7 +300,7 @@ try {
       process.exitCode = 1;
     }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, widgets, visitor counter and pictures: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, widgets, visitor counter and pictures: ${engineName} done.`);
   }
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);
