@@ -1,28 +1,40 @@
 {
-  "note": "Where each photo in src/assets/img/source/ came from. All are placeholder photos from Unsplash, free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; the credit is kept here anyway. The build stops if a photo is used without an entry here. The drawings (the .svg files) are the site's own and need none.",
+  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. All are placeholder photos from Unsplash, free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the whale’s tail'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. The drawings (the .svg files) are the site's own and need none.",
   "photos": {
     "whale-tail.jpg": {
       "photographer": "Zac Bowling",
+      "profile": "https://unsplash.com/@zbowling",
+      "subject": "the whale’s tail",
       "url": "https://unsplash.com/photos/a-whale-tail-flups-out-of-the-water-1QF3rWzi7CM"
     },
     "marble-bust.jpg": {
       "photographer": "Ian Noble",
+      "profile": "https://unsplash.com/@i_m_noble",
+      "subject": "the marble bust",
       "url": "https://unsplash.com/photos/ancient-man-statue-jpBx2YFfVAU"
     },
     "server-rack.jpg": {
       "photographer": "Domaintechnik",
+      "profile": "https://unsplash.com/@fslfsl",
+      "subject": "the server rack",
       "url": "https://unsplash.com/photos/server-rack-with-blinking-green-lights-VHmBX7FnXw0"
     },
     "padlock.jpg": {
       "photographer": "Hush Naidoo Jade Photography",
+      "profile": "https://unsplash.com/@hush52",
+      "subject": "the padlock",
       "url": "https://unsplash.com/photos/brass-padlock-with-key-on-white-background-gxAUvs7fjvc"
     },
     "container-ship.jpg": {
       "photographer": "Haydn",
+      "profile": "https://unsplash.com/@hgpound",
+      "subject": "the container ship",
       "url": "https://unsplash.com/photos/a-large-cargo-ship-with-lots-of-containers-on-its-back-ZT3i-6XW8J8"
     },
     "harbour-cranes.jpg": {
       "photographer": "Werner Hilversum",
+      "profile": "https://unsplash.com/@werner80",
+      "subject": "the harbour cranes",
       "url": "https://unsplash.com/photos/a-group-of-cranes-sitting-on-top-of-a-body-of-water-vFLJEhS_y5w"
     }
   }

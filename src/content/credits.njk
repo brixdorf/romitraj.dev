@@ -1,0 +1,44 @@
+---
+title: Credits
+picture: swells
+layout: layouts/page.njk
+description: Who and what this site owes thanks to.
+---
+{#-
+  The Credits page: three numbered cards. Their words are in _data/pages.json ("credits"); the
+  photographers come from _data/image-credits.json (as "photoCredits": see eleventy.config.js).
+  Each card is marked data-part="card": during a page change they arrive one after another.
+-#}
+<div class="page-grid" data-part="cards">
+  <section class="panel page-grid__main" data-part="card">
+    <h2 class="panel__title">{{ pages.credits.design.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in pages.credits.design.paragraphs %}
+      <p>{{ paragraph | safe }}</p>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <section class="panel page-grid__main" data-part="card">
+    <h2 class="panel__title">{{ pages.credits.photos.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in pages.credits.photos.paragraphs %}
+      <p>{{ paragraph | safe }}</p>
+      {%- endfor %}
+      <ul class="panel__list">
+        {%- for person in photoCredits %}
+        <li><a href="{{ person.profile }}">{{ person.name }}</a>, for {{ person.subjects | join(" and ") }}</li>
+        {%- endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel page-grid__main" data-part="card">
+    <h2 class="panel__title">{{ pages.credits.weather.title }}</h2>
+    <div class="panel__text">
+      {%- for paragraph in pages.credits.weather.paragraphs %}
+      <p>{{ paragraph | safe }}</p>
+      {%- endfor %}
+    </div>
+  </section>
+</div>

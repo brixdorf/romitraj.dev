@@ -25,6 +25,28 @@
     "contentsLabel": "Contents"
   },
 
+  "credits": {
+    "note": "The Credits page. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes. The photographers themselves come from image-credits.json.",
+    "design": {
+      "title": "Design",
+      "paragraphs": [
+        "Design based on <a href=\"https://henry.codes\">henry.codes</a> by Henry Desroches. The code, words and pictures here are my own."
+      ]
+    },
+    "photos": {
+      "title": "Photographs",
+      "paragraphs": [
+        "The exception, for now: the photographs are placeholders from Unsplash, standing in until I take my own. Thank you to:"
+      ]
+    },
+    "weather": {
+      "title": "Weather",
+      "paragraphs": [
+        "<a href=\"https://open-meteo.com/\">Weather data by Open-Meteo.com</a>, under their <a href=\"https://open-meteo.com/en/licence\">licence (CC BY 4.0)</a>."
+      ]
+    }
+  },
+
   "resume": {
     "title": "Coming soon",
     "paragraphs": [

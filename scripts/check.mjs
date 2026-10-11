@@ -10,7 +10,9 @@
 // (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
 // facts and hide quietly when a service is down (lib/widgets.mjs). The whole check runs against
 // stand-ins for Open-Meteo and Spotify (lib/pretend.mjs): it never asks the real services and
-// never uses the keys in .env. Last, it compares how thick each browser paints the drawn lines
+// never uses the keys in .env. It confirms that the visitor counter (Rybbit) is not loaded on
+// this computer, and that on the live site it would be loaded once and count each page change
+// once (lib/analytics.mjs); the real counter is never contacted. Last, it compares how thick each browser paints the drawn lines
 // in the ticker (lib/dashes.mjs).
 // Run it with: npm run check
 import fs from 'node:fs';
@@ -24,6 +26,7 @@ import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.
 import { startPretend, unreachable } from './lib/pretend.mjs';
 import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
 import { dashThickness, dashesDiffer } from './lib/dashes.mjs';
+import { visitorCounting } from './lib/analytics.mjs';
 
 const privateDir = path.join(root, '..', 'romitraj-private');
 // Screenshots go next to the reference screenshots when that folder exists, otherwise into this repo (ignored by git).
@@ -126,6 +129,9 @@ if (answerProblems.length) {
   console.log('Widgets: the server answers correctly, and with nothing when a service is down, expired or missing its keys.');
 }
 
+// The address of the visitor counter, which nothing in this check may contact.
+const counterHost = new URL(JSON.parse(fs.readFileSync(path.join(root, 'src', '_data', 'site.json'), 'utf8')).analytics.script).hostname;
+
 // Where every picture ended up in each browser, and how thick each browser paints the drawn
 // lines, to compare them at the end.
 const pictureWhere = {};
@@ -161,6 +167,8 @@ try {
       const page = await context.newPage();
       const problems = [];
       page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));
+      // Nothing here may ever reach the visitor counter: that is for the live site only.
+      page.on('request', (request) => { if (new URL(request.url()).hostname === counterHost) problems.push(`${new URL(page.url()).pathname} asked the visitor counter for ${request.url()}`); });
       // The free fallback fonts should never be needed. If one is fetched, a licensed font failed or lacks a character.
       page.on('request', (request) => {
         const url = new URL(request.url());
@@ -232,6 +240,12 @@ try {
       console.log(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
       process.exitCode = 1;
     }
+    // ---- The visitor counter: absent here, loaded once and counting once on the live site ----
+    const countingProblems = await visitorCounting(browser, server.address);
+    if (countingProblems.length) {
+      console.log(`\nVISITOR COUNTER PROBLEMS in ${engineName}:\n  ` + countingProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     // ---- 9. Pictures: sized, described, sharp, and moving nothing as they load ----
     const { problems: pictureProblems, where } = await picturesHoldStill(browser, server.address, pages);
     pictureWhere[engineName] = where;
@@ -241,7 +255,7 @@ try {
       process.exitCode = 1;
     }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, widgets and pictures: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, widgets, visitor counter and pictures: ${engineName} done.`);
   }
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);

@@ -27,8 +27,11 @@
     {%- for group in navigation %}
     <p class="nav-list__label" id="nav-{{ group.label | slugify }}" data-part="nav-piece">{{ group.label }}</p>
     <ul class="nav-list" aria-labelledby="nav-{{ group.label | slugify }}">
+      {#- A link marked "footerOnly" in navigation.json is listed in the footer but not here. #}
       {%- for item in group.items %}
+      {%- if not item.footerOnly %}
       <li data-part="nav-piece"><a class="nav-list__link" href="{{ item.url }}"><span class="nav-list__title">{{ item.title }}</span> <span class="nav-list__hint"><span class="dash" aria-hidden="true"></span> {{ item.hint }}</span></a></li>
+      {%- endif %}
       {%- endfor %}
     </ul>
     {%- endfor %}

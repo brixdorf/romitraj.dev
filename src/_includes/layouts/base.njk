@@ -6,6 +6,7 @@
   how the change is animated (see assets/js/transitions.js).
   On the home page, two short scripts make the headline slide in when the page opens: one in the
   head and one after the content. See assets/js/intro.js.
+  The first script in the head adds the visitor counter (Rybbit), and only on the live site.
 -#}
 <!doctype html>
 <html lang="{{ site.language }}">
@@ -16,6 +17,20 @@
   <meta name="description" content="{{ description or site.description }}">
   <meta name="theme-color" content="{{ site.themeColor }}">
   {%- include "partials/fonts.njk" %}
+  {%- if site.analytics %}
+  <script>
+    /* Visitor counting (Rybbit), on the live site only. This adds Rybbit's own tag to the head, exactly as its install page gives it:
+       <script src="{{ site.analytics.script }}" data-site-id="{{ site.analytics.siteId }}" defer>
+       It is added by this script instead of being written straight into the page because a written tag cannot tell where it is: it would also count visits to the preview on your own computer and the pages npm run check opens. Here it is added only when the page is being viewed at {{ liveHost }}. The head stays in place through page changes, so the tag is added once per visit and never again. */
+    if (location.hostname === "{{ liveHost }}") {
+      var counter = document.createElement("script");
+      counter.src = "{{ site.analytics.script }}";
+      counter.setAttribute("data-site-id", "{{ site.analytics.siteId }}");
+      counter.defer = true;
+      document.head.appendChild(counter);
+    }
+  </script>
+  {%- endif %}
   {%- if pageKind == "home" %}
   <script>
     /* The headline slides in when the page opens. Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while npm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */

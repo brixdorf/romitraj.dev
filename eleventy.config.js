@@ -30,6 +30,28 @@ const sectionHeading = /<h2>(.*?)<\/h2>/g;
 export default function (eleventyConfig) {
   eleventyConfig.addGlobalData('fontBase', fontBase);
 
+  // The site's own address without "https://", such as "romitraj.dev". The page compares it with
+  // the address it is being viewed at, to count visitors on the live site only (layouts/base.njk).
+  eleventyConfig.addGlobalData('liveHost', new URL(site.url).hostname);
+
+  // The photographers to thank on the Credits page, from _data/image-credits.json: one entry per
+  // photographer, with what each photographed. (That file's name has a hyphen in it, which
+  // templates cannot spell, so it is handed to them under this name.)
+  eleventyConfig.addGlobalData('photoCredits', () => {
+    const photos = JSON.parse(fs.readFileSync('src/_data/image-credits.json', 'utf8')).photos;
+    const people = new Map();
+    for (const [file, photo] of Object.entries(photos)) {
+      for (const fact of ['photographer', 'profile', 'subject', 'url']) {
+        if (!photo[fact]) throw new Error(`image-credits.json: ${file} needs "${fact}".`);
+      }
+      if (!photo.profile.startsWith('https://unsplash.com/@')) throw new Error(`image-credits.json: the profile of ${file} should be an address like https://unsplash.com/@name.`);
+      const person = people.get(photo.profile) || { name: photo.photographer, profile: photo.profile, subjects: [] };
+      person.subjects.push(photo.subject);
+      people.set(photo.profile, person);
+    }
+    return [...people.values()];
+  });
+
   // The headline font has no apostrophe. This swaps each apostrophe for an empty marker,
   // which the styles fill with that font's own comma, raised into place.
   eleventyConfig.addFilter('raisedApostrophe', (text) => escapeHtml(text).replace(/['’]/g, '<span class="apostrophe"></span>'));

@@ -10,7 +10,8 @@
     "label": "Me",
     "items": [
       { "title": "About", "url": "/about/", "hint": "Who I am, minus the buzzwords" },
-      { "title": "Resume", "url": "/resume/", "hint": "The formal version of all this" }
+      { "title": "Resume", "url": "/resume/", "hint": "The formal version of all this" },
+      { "title": "Credits", "url": "/credits/", "hint": "Who to thank for what", "footerOnly": true }
     ]
   }
 ]

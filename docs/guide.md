@@ -62,7 +62,8 @@ src/
   assets/fonts/ The free fallback fonts and their license files
   assets/icons/ The license of the icon set
   assets/img/source/  The photos and drawings the pictures are made from
-  content/      The pages. index.njk is the home page, about.njk the About page, resume.njk the
+  content/      The pages. index.njk is the home page, about.njk the About page, credits.njk the
+                Credits page, resume.njk the
                 resume note, projects.njk the list of projects. projects/ holds one Markdown
                 file per project (its facts on top, its write-up below), plus
                 projects.11tydata.js, the settings those files share.
@@ -74,6 +75,7 @@ scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallb
                 images.mjs (turns the photos and drawings into the site's pictures, during
                 every build), lib/paint.mjs (paints the texture behind the hero picture),
                 lib/pictures.mjs (the check's tests of the pictures),
+                lib/analytics.mjs (the check's test of the visitor counter),
                 spotify.mjs (npm run spotify), lib/widgets.mjs (the check's tests of the
                 widgets), lib/pretend.mjs (stand-ins for Open-Meteo and Spotify during the check),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
@@ -89,6 +91,9 @@ Every file starts with a comment saying what it does.
 | I want to change | Open this file |
 |---|---|
 | My name, email, city, social links, blog address | `src/_data/site.json` |
+| The words on the Credits page | `src/_data/pages.json` (`credits`) |
+| A photographer's name, profile or what they are thanked for | `src/_data/image-credits.json` |
+| The visitor counter's address or site number, or switching it off | `src/_data/site.json` (`analytics`) |
 | The bio line in the top banner | `src/_data/site.json` (`banner`) |
 | The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
 | The introduction sentence, the scroll note | `src/_data/home.json` |
@@ -192,6 +197,7 @@ Every page except the home page shares three pieces:
 | Projects (the list) | `src/content/projects.njk` | The files in `src/content/projects/`, `pages.json` (`projects`) |
 | One project | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/` |
 | Resume | `src/content/resume.njk` | `pages.json` (`resume`) |
+| Credits | `src/content/credits.njk` | `pages.json` (`credits`), `image-credits.json` |
 
 ### A page's settings
 
@@ -355,6 +361,46 @@ To measure the cost again, run `npm run speed`. It loads the home page nine time
 
 To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `src/assets/js/motion.js`. They are shared with the page changes, so both stay in step. To switch the entrance off, remove the script in the head of `layouts/base.njk`.
 
+## The Credits page
+
+`/credits/` thanks the people and services the site rests on, in three numbered cards like the About page's:
+
+1. **Design:** the sentence saying the design is based on henry.codes by Henry Desroches, with a link, and that the code, words and pictures are your own.
+2. **Photographs:** every Unsplash photographer by name, linked to their Unsplash profile, with what they photographed.
+3. **Weather:** "Weather data by Open-Meteo.com", linked to open-meteo.com, and a link to its licence (CC BY 4.0).
+
+Where things are:
+
+- The words are in `src/_data/pages.json` (`credits`). The cards are set in the serif font: use the curly apostrophe and no slashes.
+- **The photographers come from `src/_data/image-credits.json`**, the same file the build uses to make sure every photo is on record. Each photo there has `photographer`, `profile` (their page on Unsplash, `https://unsplash.com/@name`), `subject` (how the page names the photo: "the whale's tail") and `url` (the photo's own page). The build stops if one is missing. A photographer with two photos is listed once, with both subjects.
+- **When you replace a placeholder photo with your own**, delete its entry from `image-credits.json` and the photographer drops off the page. When none are left, the Photographs card can be deleted from `src/content/credits.njk`.
+- The page is linked from the footer on every page ("Credits", under "Me"). It is not in the hero's list: in `src/_data/navigation.json` it is marked `"footerOnly": true`.
+
+## Visitor counting
+
+The live site counts its visitors with Rybbit, running on your own server at analytics.romitraj.dev. Nothing is counted on your own computer.
+
+How it works:
+
+- A few lines of script at the top of every page (`src/_includes/layouts/base.njk`) look at the address the page is being viewed at. Only if it is `romitraj.dev` do they add Rybbit's tag to the page's head, exactly as Rybbit's install page gives it:
+
+  ```html
+  <script src="https://analytics.romitraj.dev/api/script.js" data-site-id="4662ddf4f073" defer></script>
+  ```
+
+- So the counter is never loaded by `npm run dev`, `npm start` on your computer, or `npm run check`: those view the site at `localhost`. No setting has to be remembered when deploying, and a copy of the site at any other address counts nothing either.
+- The address and the site number are in `src/_data/site.json` (`analytics`). To switch counting off, delete that `analytics` entry.
+
+Page changes:
+
+- **The tag is added once per visit.** Moving between pages swaps only the content; the head stays, so the counter's script is never loaded a second time.
+- **Each page change counts once.** Rybbit counts a view when the page opens and whenever the browser's history is written to or stepped through. A page change writes to the history exactly once. The site's own note-taking for scroll positions (`scroll-memory.js`) also writes there, without changing the address; it does so in a way the counter does not see, because otherwise opening a page could count twice.
+- **Known and left alone:** on a project's page, clicking a line under "Contents" jumps to that section and adds `#section` to the address. Rybbit counts that as another view of the same page, and so is going back from it. That is Rybbit's own rule for addresses with a `#`.
+
+`npm run check` tests all of this in three browsers without ever contacting the real counter: that nothing is loaded on this computer, and, with the test browser told it is looking at the live address and a stand-in in place of Rybbit's script, that the tag is right, the script runs once, and every page change (by link and by the back button) counts once.
+
+The server sends no rule that limits which scripts may run (no Content-Security-Policy header), so nothing had to be allowed for analytics.romitraj.dev. If such a rule is ever added, on the server or in Cloudflare, it must allow scripts from and connections to `https://analytics.romitraj.dev`, and the small scripts written into each page.
+
 ## Links that leave the site
 
 Every link to another website opens in a new tab. The build does this by itself (`eleventy.config.js`, "linksThatLeave"): it goes over each finished page and gives every such link `target="_blank"`, `rel="noopener noreferrer"` (the new tab cannot reach back into this one, and the other site is not told where the visitor came from) and the words "(opens in a new tab)", hidden from the eye but read out by screen readers.
@@ -419,7 +465,7 @@ Where each picture is shown:
 
 ### Credits
 
-`src/_data/image-credits.json` lists the photographer and the Unsplash page of every photo. The Unsplash License does not require credit, but the record is kept anyway, and the build stops if a photo is used without an entry. Before adding a photo from Unsplash, check that its page says "Free to use under the Unsplash License": photos marked Unsplash+ are paid and are not covered.
+`src/_data/image-credits.json` lists the photographer, their Unsplash profile and the Unsplash page of every photo, and the Credits page is built from it (see "The Credits page"). The Unsplash License does not require credit, but the record is kept anyway, and the build stops if a photo is used without an entry. Before adding a photo from Unsplash, check that its page says "Free to use under the Unsplash License": photos marked Unsplash+ are paid and are not covered.
 
 The drawings (`diver.svg`, `compass.svg`, `swells.svg`) were made for this site and need no credit. They are ordinary SVG files in shades of grey and can be edited in any drawing program. Do not put text in them: the build would draw it with whatever fonts the computer has, and the live server has different ones.
 
@@ -473,9 +519,7 @@ These are there because Spotify's terms ask for them. Do not remove them:
 
 - **Spotify's icon before the track** (at least 21px across), **the title linking to that track on Spotify** (it opens in a new tab), and **the title and artists written exactly as Spotify gives them**, not in the ticker's capitals. Spotify's design rules ask for all three wherever its content is shown.
 
-One thing is still owed:
-
-- **A credit for Open-Meteo.** Its data is under the CC BY 4.0 licence, and its terms ask for a link to open-meteo.com where the data is shown. The home page deliberately carries no such words or link: the credit is to go on a page of its own, which is not built yet. Until that page exists the weather is shown without credit, so build it before the site goes live. The sentence to use is "Weather data by Open-Meteo.com", linking to https://open-meteo.com/.
+The weather's source is credited on the Credits page ("Weather data by Open-Meteo.com", with links to Open-Meteo and to its CC BY 4.0 licence), not in the ticker. Open-Meteo's licence asks for that credit, so do not remove it from the Credits page while the weather is shown.
 
 ### Spotify: the first setup
 
@@ -622,7 +666,7 @@ Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `s
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -662,5 +706,4 @@ If your computer has a different Node.js version than `engines` asks for, `npm i
 These parts of the guide are written when the matching part of the site is built:
 
 - Deployment with Dokploy, step by step.
-- A page that credits Open-Meteo for the weather ("Weather data by Open-Meteo.com", linking to https://open-meteo.com/). It is owed under Open-Meteo's licence and should exist before the site goes live. See "The live widgets".
 - The resume itself. Until `resume.pdf` exists, the Resume page is a short note.

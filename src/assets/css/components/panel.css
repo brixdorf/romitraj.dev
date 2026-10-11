@@ -49,6 +49,35 @@
   color: var(--color-muted-on-paper);
 }
 
+/* A list inside a card's text (the photographers on the Credits page). Its dots are drawn here,
+   the same in every browser: the browser's own bullet is kept, so that screen readers still
+   announce a list, but made invisible and set in the text font, because Safari draws bullets as
+   a letter and the serif font has no bullet letter. */
+.panel__list {
+  margin: 0 0 16px;
+  padding-inline-start: 1.2em;
+}
+
+.panel__list li {
+  position: relative;
+}
+
+.panel__list li::marker {
+  font-family: var(--font-text);
+  color: transparent;
+}
+
+.panel__list li::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.65em;
+  inset-inline-start: -0.8em;
+  inline-size: 0.25em;
+  block-size: 0.25em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 /* A row of links at the bottom of a card, pushed to the right. */
 .panel__links {
   display: flex;

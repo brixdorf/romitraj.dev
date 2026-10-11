@@ -2,6 +2,42 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: Visitor counting and the Credits page
+
+### Sources checked
+
+No package was added. Read on 2026-10-11:
+
+| What | Source | What it settled |
+|---|---|---|
+| Rybbit's tag and settings | rybbit.com, "Tracking script" | The tag goes in the head of every page; views in single-page sites are counted through the browser's History API, after a waiting time of half a second (`data-debounce`); automatic counting is switched in the dashboard, not on the tag |
+| The script Romit's own Rybbit serves | https://analytics.romitraj.dev/api/script.js, fetched and read | It reads `data-site-id` from its own tag; it counts one view when it starts, and one more, half a second after the last of them, whenever `history.pushState` or `history.replaceState` is called or a `popstate` or `hashchange` event fires. It does not compare addresses |
+| How Taxi changes pages | `@unseenco/taxi` 2.0.0, its bundled code | One `pushState` per page change by link, none for back and forward; it reloads only scripts marked `data-taxi-reload` |
+| How the build could know it is the live one | railpack.com, "Node" | `NODE_ENV=production` is documented at run time only, and nothing says whether a setting made in Dokploy reaches the build. Not something to rely on |
+| Each photographer's Unsplash profile | The six profile pages, opened one by one | Each profile shows the name on record |
+
+### Visitor counting (Rybbit)
+
+- **Rybbit's tag is added to the head of every page, on the live site only.** Romit asked for the tag exactly as Rybbit's install page shows it (`src` https://analytics.romitraj.dev/api/script.js, `data-site-id` 4662ddf4f073, `defer`), and for it never to load in `npm run dev` or `npm run check`.
+- **How "live only" is decided: by the address the page is viewed at.** A tag written straight into the page cannot be conditional, and the build has no reliable way to know that it is the live build (see the table). So a few lines of script in the head add the tag, with exactly those attributes, only when `location.hostname` is `romitraj.dev`. This needs no setting in Dokploy, cannot be forgotten, and also keeps any copy of the site at another address from counting. The cost is that the tag is not literally in the page's source; it is in the page once the page is open.
+  - The other way, a tag written into the page when a Dokploy setting says so, is possible if Romit prefers it. It would depend on that setting reaching the build.
+- **Loaded once.** The head is not touched by page changes, and Taxi reloads no script that is not marked for it. Checked with the real script: one tag at the start and after seven page changes.
+- **Each page change counts once.** With the real script, watched once in a test browser with everything it tried to send caught on this computer (nothing reached the counter): one view on opening the home page, and one each for changes by link, by the back button and by a footer link, with the right address every time.
+- **One fix was needed for that.** The site's scroll memory wrote a key into the browser's history with `history.replaceState`, on first load and after each page change. Rybbit counts every call to that function. Half a second usually hid it; with a counter that starts early, opening a page counted twice. The key is now written with the browser's own function taken from `History.prototype`, which the counter does not replace, so it never sees it. Rule: besides Taxi, nothing on the site may call `history.pushState` or `history.replaceState` directly.
+- **Known and left alone:** jumping to a section from a project's "Contents" list, and going back from it, each count as a view of the same page. That is Rybbit's rule for `hashchange`, not a page change. Stopping it would mean either hiding those events from the counter or taking the `#section` out of the address.
+- **Security headers:** the site's server sends `X-Content-Type-Options` and nothing that limits scripts, so there was nothing to allow. The guide says what to allow if a Content-Security-Policy is ever added.
+- **Tests** (`scripts/lib/analytics.mjs`, in three browsers): on this computer no tag and no request to the counter, and the check's screenshot run also fails if any page asks the counter for anything. Then, with the test browser told that the live address is answered by the local site and a stand-in in place of Rybbit's script: the tag's attributes, one run of the script, and exactly one view and one history write per page change. Putting the old `history.replaceState` back makes it fail, as it should.
+
+### The Credits page
+
+- **A page at `/credits/`, in the About page's style** (giant name, numbered cards), linked from the footer under "Me". Romit asked for it; it is also where the Open-Meteo credit, owed since the ticker's "(via Open-Meteo)" was removed, now lives.
+- **Design card:** Romit's sentence, word for word: "Design based on henry.codes by Henry Desroches. The code, words and pictures here are my own.", with a link to henry.codes.
+- **Photographs card:** each Unsplash photographer by name, linked to their Unsplash profile, with what they photographed. It is built from `image-credits.json`, which gained `profile` and `subject` for each photo; the build stops if either is missing. Since the first card says the pictures are Romit's own and six photos are not yet, this card opens by saying the photographs are placeholders standing in until he takes his own. That sentence is mine; it is in `pages.json`.
+- **Weather card:** "Weather data by Open-Meteo.com", linking to open-meteo.com, and "licence (CC BY 4.0)", linking to Open-Meteo's licence page.
+- **Footer only.** The link is not in the hero's two lists, which keep the four destinations measured against the reference. `navigation.json` marks it `"footerOnly": true`. The reference's footer also lists more than its hero does.
+- **Open-Meteo's wording is "a link next to any location Open-Meteo data are displayed".** The credit is on a separate page by Romit's decision, not beside the weather. The home page still may not mention Open-Meteo (the check enforces it).
+- The page's picture is the sea band, which is decoration.
+
 ## 2026-10-11: Weather and now playing
 
 ### Sources checked
@@ -35,7 +71,7 @@ No package was added or upgraded. These pages were read on 2026-10-11, before an
 - **The weather shows a word for the sky as well as the temperature** ("21°C, clear"). The reference shows the temperature alone. Romit confirmed he wants both (2026-10-11). The wording is one line in `home.json` (`ticker.weather`).
 - **The home page carries no credit for Open-Meteo. Romit's decision (2026-10-11): the credit will go on a separate page, to be built later.** The first version had "(via Open-Meteo)" with a link in the line; he had it removed completely, with no link on the weather either.
   - What Open-Meteo asks: its data is under CC BY 4.0, and its licence page says "You must include a link next to any location Open-Meteo data are displayed", with the example "Weather data by Open-Meteo.com".
-  - **Still owed:** the page with that credit does not exist yet, so for now the weather is shown without any. It should be built before the site goes live. Whether a credit on another page, and not beside the data, satisfies that sentence is Romit's call.
+  - **Done later the same day:** the Credits page carries that credit (see the entry above this one). Whether a credit on another page, and not beside the data, satisfies that sentence is Romit's call.
   - `npm run check` fails if the home page mentions Open-Meteo, so the words cannot creep back in by accident.
 - **Spotify's icon is 21px across**, the smallest its rules allow, where the reference's icon is a little smaller. The line stays 20px tall.
 - **The title and the artists are written as Spotify gives them** ("Elastic Heart, Sia"), not in the ticker's capitals, and the title links to that track on Spotify in a new tab. Romit's choice (2026-10-11), to follow Spotify's design rules, which say titles and artist names must be shown as Spotify provides them. The first version showed them in capitals to match the reference's look. He named the title; the artists are shown the same way because the rule covers both and a title in its own case beside an artist in capitals read badly.

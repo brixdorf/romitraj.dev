@@ -17,9 +17,13 @@ const read = () => {
 let currentKey = null;
 
 // Gives the current history entry a key if it has none, and notes it as the current one.
+// The key is written with the browser's own "replaceState", fetched from where the browser keeps
+// it (History.prototype), not with "history.replaceState". The visitor counter (Rybbit) puts its
+// own function in place of history.replaceState and counts a page view whenever it is called.
+// Writing a key changes no address and is not a page view, so it goes around the counter.
 export function markEntry() {
   if (!history.state?.scrollKey) {
-    history.replaceState({ ...history.state, scrollKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}` }, '');
+    History.prototype.replaceState.call(history, { ...history.state, scrollKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}` }, '');
   }
   currentKey = history.state.scrollKey;
 }

@@ -19,6 +19,10 @@
   "blogUrl": "https://blog.romitraj.dev",
   "fontsUrl": "https://fonts.romitraj.dev/",
   "themeColor": "#2a2722",
+  "analytics": {
+    "script": "https://analytics.romitraj.dev/api/script.js",
+    "siteId": "4662ddf4f073"
+  },
   "elsewhere": [
     { "title": "GitHub", "url": "https://github.com/brixdorf", "icon": "github" },
     { "title": "X", "url": "https://x.com/brixdorf", "icon": "x" },
