@@ -1,5 +1,5 @@
 <h1>
-  <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/drop-dark.svg"><img src="docs/readme/drop-light.svg" width="30" height="30" align="absmiddle" alt=""></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/compass-dark.svg"><img src="docs/readme/compass-light.svg" width="30" height="30" align="absmiddle" alt=""></picture>
   romitraj.dev
 </h1>
 
@@ -14,7 +14,7 @@ My corner of the internet. Part portfolio, part proof that I do finish things (e
 
 ![The home page: the headline "What we know is a drop, what we don't know is an ocean" in very large letters, above a pixel picture of a whale's tail](docs/screenshot.png)
 
-## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/compass-dark.svg"><img src="docs/readme/compass-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What this is
+## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/anchor-dark.svg"><img src="docs/readme/anchor-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What this is
 
 This is the code behind my personal website. It has a home page, a list of things I built, a page about me, and a resume I keep promising to finish. The longer writing lives on [my blog](https://blog.romitraj.dev), and the newest posts show up here by themselves.
 

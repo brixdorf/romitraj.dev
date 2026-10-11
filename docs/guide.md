@@ -113,7 +113,7 @@ Every file starts with a comment saying what it does.
 | The order of the projects | `order` at the top of each file in `src/content/projects/` |
 | The text on the About page | `src/_data/about.json` |
 | The resume note | `src/_data/pages.json` (`resume`) |
-| The site's icon (the drop in the browser tab) | `src/_data/icons.json` (`drop`); its colors follow `tokens.css` |
+| The site's icon (the compass in the browser tab) | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css` |
 | The picture shown when a link is shared | Run `npm run share`; its description is `shareImageAlt` in `src/_data/site.json` |
 | The page for a missing address ("Lost at sea") | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`) |
 | The giant name at the top of an inner page | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`) |
@@ -453,19 +453,19 @@ Two things every page carries for the world outside the page.
 
 ### The icon
 
-The small picture in a browser tab, in bookmarks and on a phone's home screen is a single water drop, for the headline's "what we know is a drop".
+The small picture in a browser tab, in bookmarks and on a phone's home screen is a compass: the one in the footer, reduced to a ring, four long points, four short points and a hub. (It was a water drop for a few hours on 2026-10-11; you chose the compass from three options.)
 
-- **The drawing** is "Drop Simple" from Phosphor Icons, the set the site's other icons come from (MIT license, kept in `src/assets/icons/LICENSE-phosphor.txt`). It is the line named `drop` in `src/_data/icons.json`.
+- **The drawing** is this site's own: `src/assets/icons/site-icon.svg`, on a 64 by 64 grid. Its sizes were chosen so that at 16 pixels the ring is exactly one pixel thick and sits on whole pixels. Each shape in the file says what it is with a class (`ring`, `mark` for the points, `hub`), and the build colors them.
 - **The build makes every file from it** (`scripts/icons.mjs`), in the site's ink and paper colors from `tokens.css`:
 
   | File | What it is | Who uses it |
   |---|---|---|
-  | `favicon.svg` | The drop as a drawing. It is ink on a light tab and paper on a dark one: the file switches by itself | Chrome, Edge, Firefox, and Safari from version 26 |
-  | `favicon.ico` | The ink drop at 16 and 32 pixels, in the old icon format | Older Safari, and anything that looks for an icon without reading the page |
-  | `apple-touch-icon.png` | A paper drop on an ink square, 180 pixels | An iPhone or iPad home screen |
+  | `favicon.svg` | The compass as a drawing. It is ink on a light tab and paper on a dark one: the file switches by itself | Chrome, Edge, Firefox, and Safari from version 26 |
+  | `favicon.ico` | The ink compass at 16 and 32 pixels, in the old icon format | Older Safari, and anything that looks for an icon without reading the page |
+  | `apple-touch-icon.png` | A paper compass on an ink square, 180 pixels | An iPhone or iPad home screen |
   | `icon-192.png`, `icon-512.png`, `site.webmanifest` | The same square at two sizes, and the small file that names them | An Android home screen |
 
-- **To change the icon**, replace the `drop` line in `icons.json` with another drawing's path (one shape, on the icon set's 256 by 256 grid) and rebuild. To change its colors, change the ink and paper colors in `tokens.css`; the whole site follows.
+- **To change the icon**, edit or replace `site-icon.svg` (keep the 64 by 64 grid and the three class names: anything marked `ring` or `mark` takes the main color, anything marked `hub` the other) and rebuild. The README's title icon (`docs/readme/compass-light.svg` and `compass-dark.svg`) is a copy of the same drawing in each color and has to be changed by hand. To change its colors, change the ink and paper colors in `tokens.css`; the whole site follows.
 - **Browsers keep icons for a long time.** Each icon's address carries a fingerprint, so a new icon is fetched at once, but a tab that is already open may show the old one until it is reloaded.
 - **To see it**, look at the tab of http://localhost:8080 while `npm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance.
 
@@ -487,7 +487,7 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
 - **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
 - **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
 
-`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the tab icon is the ink drop on a light tab and the paper drop on a dark one.
+`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the tab icon is the ink compass on a light tab and the paper compass on a dark one.
 
 ## Links that leave the site
 
@@ -776,7 +776,7 @@ node compare-report.mjs out/compare
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink drop on light and the paper drop on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 

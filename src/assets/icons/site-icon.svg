@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The site's icon: this site's compass, reduced to a ring, four long points, four short
+       points and a hub. Drawn for romitraj.dev. scripts/icons.mjs makes every icon file from it
+       and sets the colors itself; the style below only makes this file viewable on its own. -->
+  <style>.ring{fill:none;stroke:#2a2722;stroke-width:4}.mark{fill:#2a2722}.hub{fill:#fafafa}</style>
+  <circle class="ring" cx="32" cy="32" r="26"/>
+  <polygon class="mark" points="46.14,17.86 36.24,36.24 32,32 27.76,27.76"/>
+  <polygon class="mark" points="46.14,46.14 27.76,36.24 32,32 36.24,27.76"/>
+  <polygon class="mark" points="17.86,46.14 27.76,27.76 32,32 36.24,36.24"/>
+  <polygon class="mark" points="17.86,17.86 36.24,27.76 32,32 27.76,36.24"/>
+  <polygon class="mark" points="32,0.4 38.51,25.49 32,32 25.49,25.49"/>
+  <polygon class="mark" points="63.6,32 38.51,38.51 32,32 38.51,25.49"/>
+  <polygon class="mark" points="32,63.6 25.49,38.51 32,32 38.51,38.51"/>
+  <polygon class="mark" points="0.4,32 25.49,25.49 32,32 25.49,38.51"/>
+  <circle class="hub" cx="32" cy="32" r="3.4"/>
+</svg>

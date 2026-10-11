@@ -41,8 +41,13 @@ async function splitScript() {
 // Returns a list of problems (empty if none).
 export async function lettersStayWhole(page, pagePath) {
   await page.addScriptTag({ content: await splitScript() });
-  // Nothing else may change between the two photographs: stop the tickers and the gradient bar.
-  await page.addStyleTag({ content: '*, *::before, *::after { animation-play-state: paused !important; transition: none !important; }' });
+  // Nothing else may change between the two photographs: stop the gradient bar, and take the
+  // tickers out of the picture altogether (they keep their place, so nothing moves). Pausing a
+  // ticker is not enough: it builds itself again, and starts moving again, a moment after the
+  // window changes size, and whenever the page asks for the weather or the track again. When
+  // that fell between the two photographs, its movement under "OCEAN." was counted as ink cut
+  // from the letters (seen once, in one browser, at the widest window).
+  await page.addStyleTag({ content: '*, *::before, *::after { animation-play-state: paused !important; transition: none !important; } [data-ticker] { visibility: hidden !important; }' });
   const problems = [];
   for (const width of windowWidths) {
     await page.setViewportSize({ width, height: width < 700 ? 844 : 900 });

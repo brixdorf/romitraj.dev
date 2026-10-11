@@ -183,7 +183,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');
 
-  // The site's own icon: a water drop, made before every build by scripts/icons.mjs as a drawing
+  // The site's own icon: a compass, made before every build by scripts/icons.mjs as a drawing
   // for browser tabs, an old-style .ico, and squares for phone home screens. A template writes a
   // file's address, with its fingerprint, with {% siteIcon "svg" %} ("svg", "ico", "touch" or "manifest").
   let siteIcons = {};

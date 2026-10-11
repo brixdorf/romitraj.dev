@@ -10,7 +10,7 @@
 //     description, the page's full address, and the full address of the share image;
 //   - the share image exists, is 1200 by 630 pixels and is light enough for every app.
 // "siteIconInBrowser" asks a browser for the icon files and draws the tab icon on a light and on
-// a dark background: it must be the ink drop on light and the paper drop on dark.
+// a dark background: it must be the ink compass on light and the paper compass on dark.
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -142,7 +142,7 @@ export async function siteIconInBrowser(browser, address) {
   await context.close();
 
   // The tab icon, drawn at tab size and larger, on a light and on a dark background.
-  for (const [scheme, background, drop] of [['light', '#f1f3f4', 'dark'], ['dark', '#202124', 'light']]) {
+  for (const [scheme, background, tone] of [['light', '#f1f3f4', 'dark'], ['dark', '#202124', 'light']]) {
     const tab = await browser.newContext({ viewport: { width: 200, height: 120 }, colorScheme: scheme, deviceScaleFactor: 1 });
     const sheet = await tab.newPage();
     await sheet.route(address + '/icon-sheet', (route) => route.fulfill({ contentType: 'text/html', body: `<body style="margin:0;background:${background}"><img id="small" src="/favicon.svg" width="16" height="16" style="position:absolute;left:20px;top:20px"><img id="large" src="/favicon.svg" width="64" height="64" style="position:absolute;left:80px;top:20px"></body>` }));
@@ -150,14 +150,14 @@ export async function siteIconInBrowser(browser, address) {
     await sheet.waitForTimeout(200);
     const { data, info } = await sharp(await sheet.screenshot()).greyscale().raw().toBuffer({ resolveWithObject: true });
     const grey = (x, y) => data[y * info.width + x];
-    // The middle of each drop (a little below the middle of its box, where the drop is widest), and a corner of each box.
+    // A spot on the compass (on its south point, a little below the middle of its box), and a corner of each box, which the round compass leaves clear.
     for (const [name, left, size] of [['16 pixels', 20, 16], ['64 pixels', 80, 64]]) {
       const middle = grey(left + Math.floor(size / 2), 20 + Math.floor(size * 0.62));
       const corner = grey(left + 1, 20 + 1);
-      const isDrop = drop === 'dark' ? middle < 90 : middle > 200;
-      const cornerIsBackground = drop === 'dark' ? corner > 200 : corner < 90;
-      if (!isDrop) problems.push(`on a ${scheme} tab the icon at ${name} is not the ${drop === 'dark' ? 'ink' : 'paper'} drop (its middle is grey level ${middle} of 255)`);
-      if (!cornerIsBackground) problems.push(`on a ${scheme} tab the icon at ${name} is not a drop on a clear background (its corner is grey level ${corner} of 255)`);
+      const isIcon = tone === 'dark' ? middle < 90 : middle > 200;
+      const cornerIsBackground = tone === 'dark' ? corner > 200 : corner < 90;
+      if (!isIcon) problems.push(`on a ${scheme} tab the icon at ${name} is not the ${tone === 'dark' ? 'ink' : 'paper'} compass (its south point is grey level ${middle} of 255)`);
+      if (!cornerIsBackground) problems.push(`on a ${scheme} tab the icon at ${name} is not a compass on a clear background (its corner is grey level ${corner} of 255)`);
     }
     await tab.close();
   }

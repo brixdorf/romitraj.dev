@@ -2,6 +2,37 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: The icon is a compass
+
+Romit found the water drop too plain and asked for three options to choose from, all in ink and paper and all original. He chose the third.
+
+### The three options
+
+| Option | What it was | How it looked at 16 pixels |
+|---|---|---|
+| A pixel helmet | A diver's helmet drawn by hand on a 16 by 16 grid, in the style of the site's pixel pictures | Sharp: every pixel placed |
+| A letter R | See the note below | Readable but soft |
+| **A simple compass (chosen)** | This site's compass (the footer's drawing) reduced to a ring, four long points, four short points and a hub | Soft in the first drawing; reworked, see below |
+
+- **The R was not set in the headline font.** A logo made from a typeface needs a licence that covers logos, which is separate from a licence to show text on a website and is Romit's to settle with the foundry. So the option shown was an R in Anton, the free stand-in the site already ships under the SIL Open Font License, which does not restrict artwork made with it.
+- The preview of all three, at 16, 32 and 180 pixels on a light and a dark background, was saved outside both repositories (`favicon-options/` beside them), with each option's drawings.
+
+### The compass, as built
+
+- **It is this site's own drawing**, `src/assets/icons/site-icon.svg`, not from an icon set, so there is no licence to follow and nothing to credit. The water drop (Phosphor's "Drop Simple") is gone from `icons.json`, from the built site and from the README.
+- **Made for 16 pixels.** On the drawing's 64 by 64 grid the ring has a radius of 26 and a thickness of 4, which at 16 pixels is a ring exactly one pixel thick whose top, bottom and sides fall on whole pixels. The first drawing's ring was a little larger and landed between pixels, which is why it looked soft in the preview. The long points reach the edge of the grid; the hub is a dot in the other color.
+- **Everything else is as it was for the drop** (the entry below): `scripts/icons.mjs` makes the tab drawing that switches between ink and paper, the `.ico` with a 16 and a 32 pixel picture, the paper-on-ink squares for phones and the small file for Android, all with fingerprints, and `base.njk` names them on every page. Only where the drawing comes from changed: a file with three kinds of shape (`ring`, `mark`, `hub`) that the script colors, in place of one line in `icons.json`.
+- **The README's title carries the same compass** (`docs/readme/compass-light.svg` and `compass-dark.svg`). Its "What this is" heading, which had Phosphor's compass, has Phosphor's anchor now, so the page does not show two compasses.
+- **The same limit as before:** the `.ico` cannot switch colors, so in a dark tab of Safari older than 26 the ink compass is dark on dark unless Safari puts a light plate behind it.
+- **Tests:** unchanged in what they check (`scripts/lib/head.mjs`); the spot they sample on the tab icon is now on the compass's south point.
+
+### A test that failed once, for another reason
+
+- **The full check failed once while this was being applied**, in one browser, saying that every letter of "OCEAN." was cut at the widest window. Nothing was cut and nothing about the letters had changed.
+- **Cause.** That test photographs a heading twice and counts every pixel that differs. The status ticker sits right under "OCEAN." at that width, inside the photograph. The test pauses the ticker first, but the ticker builds itself again, and moves again, a moment after the window changes size and whenever the page asks for the weather or the track again. When that falls between the two photographs, the ticker's movement is counted as missing ink. It can only have started with the widgets; it had not shown in the runs since.
+- **Fix, in the test only** (`scripts/lib/letters.mjs`): the tickers are made invisible for those photographs. They keep their place, so nothing else moves, and the test still catches what it is for: with the raised apostrophe's fix taken away, it reports the cut at once.
+- The exact failure could not be made to happen again on demand; the ticker restarting by itself after being paused could, and was.
+
 ## 2026-10-11: The icon, the share image and the README
 
 ### Versions and sources checked
@@ -15,6 +46,8 @@ A dated log of what was chosen and why. Newest entries at the top. Add an entry 
 No package was installed: the drawings are copied in, as the other icons were.
 
 ### The icon: a single water drop
+
+**Replaced the same day by a compass: see the entry above. What follows is how the drop was chosen and built; the files and tests it describes are still the ones in use, with another drawing.**
 
 - **The drawing is "Drop Simple" from Phosphor Icons, fill weight.** The set has two solid drops. "Drop" has a thin highlight cut into it, half a pixel wide at tab size, which would only blur. "Drop Simple" is one clean shape and stays sharp at 16 pixels. It is the set the site's other icons come from, so nothing new was added.
 - **The license asks for no credit on the page.** Phosphor's MIT license asks that its license text travel with copies of the drawings; it has been in `src/assets/icons/LICENSE-phosphor.txt` since the first icons. The Credits page was left as it is. The README now names Phosphor, because the README's icons come from it too.

@@ -279,7 +279,7 @@ try {
       console.log(`\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` + cutProblems.slice(0, 20).join('\n  ') + (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
-    // ---- The site's icon: is it served, and is it the ink drop on a light tab and the paper drop on a dark one? ----
+    // ---- The site's icon: is it served, and is it the ink compass on a light tab and the paper compass on a dark one? ----
     const iconProblems = await siteIconInBrowser(browser, server.address);
     if (iconProblems.length) {
       console.log(`\nSITE ICON PROBLEMS in ${engineName}:\n  ` + iconProblems.join('\n  '));
