@@ -1,4 +1,4 @@
-/* Text links: a thin line that draws itself under the link from the left on hover or keyboard focus. */
+/* Text links: a thin line that draws itself under the link from the left on hover. */
 .link {
   position: relative;
   display: inline-block;
@@ -17,8 +17,7 @@
   transition: transform var(--duration-base) var(--ease-in-out-cubic);
 }
 
-.link:hover::after,
-.link:focus-visible::after {
+.link:hover::after {
   transform: scaleX(1);
 }
 

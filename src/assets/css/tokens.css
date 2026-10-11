@@ -18,6 +18,9 @@
   --color-line-on-ink: #3a3a3a;
   --color-label-on-ink: #b3b3b3;
   --color-hint-on-ink: #a9a9a9;
+  /* The dashed ring around whatever has keyboard focus. Dark blocks set their own (base.css). */
+  --color-focus: #bdbdbd;
+  --color-focus-on-ink: #474239;
 
   /* Color: the gradient bar under the top banner (Dusk). */
   --color-bar-1: #6a7cf5;

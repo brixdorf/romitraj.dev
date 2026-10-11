@@ -138,6 +138,8 @@
     grid-row: 4;
     margin-block-end: -0.232em;
     font-size: 62px;
+    /* Exactly the reference's line at this size (1.37 would be a pixel taller). */
+    line-height: 84px;
   }
 
   .hero__serif {
@@ -210,6 +212,8 @@
     grid-row: 3;
     margin: -0.9em 0 -0.232em 0.98em;
     font-size: 62px;
+    /* Exactly the reference's line at this size (1.37 would be a pixel taller). */
+    line-height: 84px;
   }
 
   .hero__serif {

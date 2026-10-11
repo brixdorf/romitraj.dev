@@ -3,8 +3,12 @@
    compass that is half out of sight: its top half at the bottom on phones and tablets, its left
    half at the right edge on laptops. */
 .footer {
+  --behind: var(--color-ink);
+
   position: relative;
-  padding: 32px var(--gutter) 0;
+  /* No padding on top. On phones and tablets the home page's first line starts at the footer's
+     very top, under the sea band; "You are here" brings its own room on the other pages. */
+  padding: 0 var(--gutter) 0;
   background: var(--color-ink);
   color: var(--color-paper);
 }
@@ -57,6 +61,9 @@
    on its own line, indented under the one before; on laptops the steps run along one line. */
 .footer__group--crumb {
   margin-block-end: 64px;
+  /* 48px of ink above "You are here" up to 1099px wide, 96px from 1100px (the rest of it is the
+     32px that sits above every group from 900px). */
+  padding-block-start: 48px;
 }
 
 .crumb {
@@ -122,8 +129,7 @@
   transition: transform var(--duration-base) var(--ease-in-out-cubic);
 }
 
-.crumb__link:hover::after,
-.crumb__link:focus-visible::after {
+.crumb__link:hover::after {
   transform: scaleX(1);
 }
 
@@ -164,8 +170,7 @@
   transition: transform var(--duration-base) var(--ease-in-out-cubic);
 }
 
-.footer__link:hover::after,
-.footer__link:focus-visible::after {
+.footer__link:hover::after {
   transform: scaleX(1);
 }
 
@@ -205,7 +210,8 @@
     display: grid;
     grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
     column-gap: var(--grid-gap);
-    margin-block-end: 112px;
+    margin-block-end: 64px;
+    padding-block-start: 32px;
   }
 
   .footer__group {
@@ -215,6 +221,7 @@
   .footer__group--crumb {
     grid-column: 1 / -1;
     margin-block-end: 32px;
+    padding-block-start: 16px;
   }
 
   .crumb {
@@ -286,5 +293,15 @@
     /* Half as wide as it is tall: the left half of the picture shows. */
     inline-size: calc(var(--compass) / 2);
     block-size: var(--compass);
+  }
+}
+
+@media (width >= 1100px) {
+  .footer__nav {
+    margin-block-end: 112px;
+  }
+
+  .footer__group--crumb {
+    padding-block-start: 64px;
   }
 }

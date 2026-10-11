@@ -39,9 +39,7 @@
 }
 
 .page-row__version:hover::after,
-.page-row__version:focus-visible::after,
-.page-row__back:hover .page-row__back-text::after,
-.page-row__back:focus-visible .page-row__back-text::after {
+.page-row__back:hover .page-row__back-text::after {
   transform: scaleX(1);
 }
 
@@ -98,7 +96,7 @@
     justify-self: start;
   }
 
-  /* "Go home" waits out of sight and slides in when the version tag is hovered or focused. */
+  /* "Go home" waits out of sight and slides in when the pointer is over the version tag. */
   .page-row__home {
     position: absolute;
     inset-block-start: 0;
@@ -114,9 +112,7 @@
   }
 
   .page-row__version:hover .page-row__home,
-  .page-row__version:focus-visible .page-row__home,
-  .page-row__version:hover .dash,
-  .page-row__version:focus-visible .dash {
+  .page-row__version:hover .dash {
     opacity: 1;
     transform: none;
   }

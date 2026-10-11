@@ -35,6 +35,15 @@
   border-color: var(--color-line-on-paper-strong);
 }
 
+.card:focus-visible {
+  outline: none;
+}
+
+.card:focus-visible .card__more {
+  outline: var(--rule) dashed var(--color-focus);
+  outline-offset: 2px;
+}
+
 .card__meta {
   margin-block-end: 12px;
   font-size: var(--type-micro);

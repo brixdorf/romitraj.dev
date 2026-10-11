@@ -44,16 +44,12 @@
   text-transform: none;
 }
 
-/* A link in the ticker (the track's title, to the track on Spotify): underlined, and it turns
-   grey under the pointer, at once, like a link inside a sentence. */
+/* A link in the ticker (the track's title, to the track on Spotify): underlined. It does not
+   change under the pointer. */
 .ticker__link {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.12em;
-}
-
-.ticker__link:hover {
-  color: var(--color-muted-on-paper);
 }
 
 /* Spotify's icon before the track. Spotify asks for its round mark to be at least 21px across.

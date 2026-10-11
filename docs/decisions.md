@@ -2,6 +2,140 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: The whole site compared with the reference
+
+Nothing was installed or upgraded in this step.
+
+### How it was compared
+
+New scripts in the private folder (`../romitraj-private/reference/scripts/`) measure the reference and this site in the same way and list the differences. They read rendered values only: sizes, colors, positions and timings as a browser reports them. Each ran in Chromium, Firefox and WebKit (Safari's engine).
+
+| What | How much | Script |
+|---|---|---|
+| Layout, spacing, type sizes, colors | About 150 pieces and 50 gaps between pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px | `compare.mjs`, `compare-report.mjs` |
+| Hover and keyboard focus | 24 kinds of link: what changes, what it ends at, how long it takes | `compare-states.mjs` |
+| Movement | The two tickers, the gradient bar, the scroll-tied movement and how long it takes to catch up | `compare-motion.mjs` |
+| Page changes | Ten changes of page, each as a timeline of what leaves and arrives | `pagechange.mjs`, `pagechange-compare.mjs` |
+
+**The three browsers agree.** Every difference found was between the two sites, the same in all three browsers. None showed in one browser only.
+
+### Fixed
+
+Each line gives the reference's value, what this site had, and what it has now.
+
+**Layout and spacing**
+
+| Where | Reference | Was | Now |
+|---|---|---|---|
+| Navigation rows in the hero, phones and tablets | 27.2px tall | 32px (the link took the body text's taller line) | 27.2px |
+| The letter's text on phones | Flush left | Centered | Flush left under 600px, centered from there |
+| Faint copies of project names on phones | Sharp | Blurred | Sharp under 600px, blurred from there |
+| The ring in the corner of the card of links | Pale grey `#bdbdbd` | Ink | `#bdbdbd` |
+| The outlined italic words in the hero, phones and tablets | A line of 84px | 84.9px | 84px |
+| Footer on the home page, phones and tablets: room above the first line | None: it starts at the footer's top edge, under the band | 32px | None |
+| Footer on the other pages: ink above "You are here" | 48px up to 1099px wide, 96px from 1100px | 32px at every width | 48px and 96px |
+| Footer between 900px and 1099px: room under the links | 64px | 112px | 64px (112px from 1100px, as before) |
+| About page: gap between the portrait and its caption | 8px | 14px | 8px |
+| About page: gap between the latest post's text and its link | 32px | 40px (the link sat in a line of text) | 32px |
+| About page on tablets: room above the latest post | 32px | 16px | 32px |
+| Projects page, stacked cards: gap between a card's number and its name | 16px | 12px | 16px |
+| A project's page on tablets: gap between the rows of its header | 16px | None | 16px |
+| A project's page on laptops: where the name sits | 240px below the top of its header (80px, then its logo's 160px) | 80px | 240px. This log already said the name stands "in the same place" without a logo; on phones and tablets it did, on laptops it did not |
+
+**Hover**
+
+| Link | Reference | Was | Now |
+|---|---|---|---|
+| The track's title in the ticker | No change | Turned grey | No change |
+| "View all projects", "Read the blog" | Underlined at once | No change | Underlined at once |
+| The links at the bottom of the About page's first card, and "Read the post" | Underlined at once | No change | Underlined at once |
+| A link inside a project's write-up | Turns grey at once | No change | Turns grey at once |
+| A line in a project's "Contents" | Turns grey while a line grows 1px above the bottom of its letters' box | The same, with the line one pixel lower | As the reference |
+| Links in the "Elsewhere" lists, "Contents" and the Projects page's "Read more" | The drawn line breaks around the tails of letters (g, p, y) | The line ran through them | Breaks around them |
+
+- **The third row corrects this log.** The entry for the inner pages says those links "do not react at all". That came from a measurement that watched an underline's color and thickness but not whether there was one. Watching that as well shows the underline appearing.
+- **How the line breaks around a tail.** The reference gives those letters a 2px outline in the color of whatever is behind them, painted under the letters, and puts the line under that outline. This site now does the same. At rest the outline cannot be seen: photographs with and without it are identical pixel for pixel in all three browsers. In Chromium before version 123 (early 2024), which could not yet paint an outline under HTML text, these few links would look thinner; the reference has the same limit.
+
+**Keyboard focus**
+
+- **The ring is the reference's:** a 2px dashed outline, 2px from the link, `#bdbdbd` on paper and `#474239` on the dark blocks. It was a solid 2px outline in the text's color, 3px away. No look for it had been recorded before.
+  - **It is faint.** Its contrast with the background is about 1.8 to 1 on paper and 1.4 to 1 on ink, where accessibility guidelines ask for 3 to 1. The brief puts the look first, so the reference's ring was taken as it is. The two colors are in `tokens.css` if Romit wants a stronger one.
+- **Focus shows a hover effect only where the reference does:** the hero's navigation links (line and description), "View all projects" and "Read the blog" (underline), and the cards (their outline, and on a writing card the line under "Read more"). Everywhere else focus shows the ring alone. Before, every link showed its hover effect on focus as well.
+- **On a writing card the ring goes around "Read more"**, as on the reference, not around the whole card. The whole card is still the link.
+
+**Movement**
+
+| What | Reference | Was | Now |
+|---|---|---|---|
+| Scroll-tied movement catching up after the scroll position jumps | Halfway after about 0.14s, nine tenths after 0.5s, settled after about 1.0s | Nine tenths after 0.27s, settled after 0.53s: twice as quick | Nine tenths after 0.5s, settled after about 1.0s, in all three browsers |
+
+- The earlier note "trailing the scroll by about a second" was right about the reference, but the setting handed to GSAP was 1, and GSAP eases toward the new place, so the movement was done in half that time. The setting is 2 now (`scrollCatchUp` in `motion.js`).
+
+**Browser consistency**
+
+- The short line beside a section number in a project's write-up was a filled box 1.92px tall. Like the ticker's dashes before it, a box of that height can come out one pixel thick in one browser and two in another. It is a 2px border now.
+
+### Left as they are, each from a choice recorded in this log
+
+| Difference | Recorded choice |
+|---|---|
+| The giant line is smaller, the serif word larger, and the hero has one more line above the giant line | "How the headline is set" (2026-10-10): version B, chosen by Romit; 18 letters against the reference's 12 |
+| On phones the sideways headline is narrower (71px against 108.5px), so everything beside it starts further left and is wider | The same: its letters are about two thirds as tall |
+| On tablets the hero's picture frame is smaller (186px wide against 307px) | "On tablets the picture is as wide as the space the first headline line leaves free" (2026-10-10) |
+| The weather shows a word for the sky; the track's title and artists are not in capitals; Spotify's icon is larger | "The ticker's line" (2026-10-11): Romit's choices, and Spotify's rules |
+| No dark first card in the writing section; no category, tags or reading time on cards | "No dark featured card", and the feed has neither (2026-10-10) |
+| The footer's compass is 300px across, not 400px, and the footer is shorter | "Positions are the measured ones" under Pictures (2026-10-10): this footer has fewer links |
+| The frame beside "About the human" is dark with a compass in it; the reference's is light with padding | "The inner pages reuse these" (2026-10-10) |
+| No logo above a project's name or beside a name on the Projects page (its cards have four columns, not five) | "A project's page has no logo above its name" (2026-10-10) |
+| Giant page names are smaller on phones ("Projects" 121px against 160px) | "Giant names shrink on phones by letter count" (2026-10-10) |
+| The About page's table is stacked on narrow windows where the reference swaps in a list | "The table is a real table" (2026-10-10): a stand-in |
+| The About page's cards are about other things, and the piece beside the second card has no video | "The About page's cards" (2026-10-10) |
+| About and Resume are choreographed where the reference fades plainly; back and forward return to the scroll position; the headline slides in on first load | Romit's choices, all recorded on 2026-10-10 |
+| The small row sits a fixed distance below the banner (1px lower than the reference in Firefox on tablets) | "The small row sits a fixed distance below the banner" (2026-10-10) |
+| The one bold label is weight 600, not 700 | "Neue Montreal Semibold stands in for bold" (2026-10-09) |
+| The status ticker moves at 41px a second where the reference's moved at 39.5px on the day of the comparison | "The ticker runs on the browser's built-in animation engine ... at 41px per second" (2026-10-10). See the note below |
+| The ticker also slows while keyboard focus is inside it | The same entry: "under the pointer or keyboard focus" |
+| No Now page, block or link | "No Now page" (2026-10-10) |
+
+- **A note on the tickers' speed.** The comparison showed the rule behind the reference's speeds: each of its tickers takes 20 seconds for one loop, however long its line is. Its status line was 822px long when first measured (41px a second) and 790px on the day of the comparison, with a shorter song title (39.5px a second); its quote strip is 1205px (60px a second). This site moves at the fixed speeds first measured, 41px and 60px a second. With the reference's rule this site's status line would move at about 44px a second and its shorter quote strip at about 36px a second. The fixed speeds were kept because they are the recorded choice and keep the quote strip at the pace seen on the reference; Romit can ask for the 20-second rule instead.
+
+### Left as they are, and not from an earlier choice
+
+These three could not be fixed. They are recorded here for the first time.
+
+- **The reference's page of case studies ends with a strip of its past portfolios.** This site has no earlier versions to show, so the Projects page ends with its cards.
+- **Rows of the reference's table are 2px taller** (49px against 47px). Its rows hold an empty fourth cell that wraps onto a line of its own. This table has three columns.
+- **Heights that follow from the words:** the About page's first card and the frames beside it (490px against 507px), a project card with a shorter description, the footer. The rules are the same; the content is shorter.
+
+### Page changes
+
+All ten changes of page on the route (home to About and back, home to Projects, into a project, back out twice, home to a project, a project to About, About to Projects, and the back button) were recorded on both sites in all three browsers, with every moving piece's start and length.
+
+- **This site against the reference, in Chromium:** the timelines line up as they did when the page changes were built. Leaving the home page for the list, for instance: letters take 0.93 to 0.95s each and start 0.02s apart on both; the sections fade over 0.3s, 0.1s apart; the navigation's pieces leave over 0.2s each, 0.033s apart; the picture frame follows at about 0.4s. Nothing was changed.
+- **This site in Firefox against Chromium:** of about 200 moving pieces per change, at most 10 differ by more than 70ms (four frames) in start or length.
+- **This site in WebKit against Chromium:** at most 23 of about 200. WebKit starts 40 to 200ms later while a page is leaving, and its lengths scatter by a frame or two. That is the recording itself: watching every element on every frame slows WebKit on Windows down the most. The reference shows the same and more under the same recording (up to 72 of 139 pieces).
+- So no page change was found to behave differently from one browser to the next on this site, beyond what the reference itself shows when measured the same way.
+
+### Loading speed
+
+`npm run speed` after all the changes (Chromium, the home page, nine loads each way, the middle value; lowest and highest in brackets):
+
+| | With the headline's entrance | Without it |
+|---|---|---|
+| Slow phone, First Contentful Paint | 1236ms (1232 to 1284) | 1252ms (1236 to 1308) |
+| Slow phone, Largest Contentful Paint | 1236ms (1232 to 1284) | 1252ms (1236 to 1308) |
+| Fast laptop, First Contentful Paint | 152ms (104 to 168) | 148ms (112 to 172) |
+| Fast laptop, Largest Contentful Paint | 152ms (104 to 168) | 148ms (112 to 172) |
+
+- "Slow phone" is the connection and processor Lighthouse uses for its mobile score. The largest piece is the hero picture, drawn with the first paint.
+- The figures are the same as after the pictures were added (1252ms and 1236ms then); the difference between the two columns is within the spread from one load to the next. Nothing in this step changed what the page loads.
+- These are measurements of the locally built site on Romit's computer. The live site will differ.
+
+### Other changes
+
+- **`npm run speed` now serves the site with the stand-in weather and music services**, as `npm run check` does. Before, it started the site with the real keys in `.env`, so each run asked Spotify and Open-Meteo. The paint times do not depend on the widgets, which load after them.
+- **The guide has two new sections:** "Hover and keyboard focus" (what every kind of link does) and "Comparing with the design reference" (how to run the comparison again).
+
 ## 2026-10-11: Visitor counting and the Credits page
 
 ### Sources checked
@@ -244,7 +378,7 @@ The first motion measurements (2026-10-09) covered the home page's first load an
 - **The tickers, the scroll movement and the widgets can now be stopped and restarted**, because the content they belong to is replaced.
 - **Hover details measured on the reference's inner pages**, corrected here:
   - A link inside a sentence turns grey at once under the pointer (about text on the home page and in the cards).
-  - The row of links at the bottom of the "Who" card and the "Read the post" link do not react at all.
+  - The row of links at the bottom of the "Who" card and the "Read the post" link do not react at all. (Corrected on 2026-10-11, in the entry on comparing the whole site: they are underlined at once. This measurement did not watch whether an underline was there.)
   - A project card's outline darkens at once, while "Read more" draws its underline.
   - A link in a project's list of sections turns grey over 0.2s while its line draws.
 - **A heading that received focus after a page change shows no outline.** Safari drew one around the whole heading.

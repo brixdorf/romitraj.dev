@@ -4,9 +4,12 @@
 // loads the page several times on a simulated phone connection and on a fast one.
 // On the home page it measures twice, with and without the headline's entrance, and prints the
 // difference, so the cost of the entrance is always known.
+// Like the check, it serves the site with stand-ins for the weather and music services, so it
+// never contacts the real ones or uses the keys in .env, and the numbers do not depend on them.
 // Run it with: npm run speed     (add a page, for example: npm run speed -- /about/)
 import { chromium } from 'playwright';
 import { buildSite, startServer } from './lib/site.mjs';
+import { startPretend } from './lib/pretend.mjs';
 
 const pagePath = process.argv[2] || '/';
 const runs = 9;
@@ -48,7 +51,8 @@ async function load(browser, address, setting, entrance) {
 }
 
 await buildSite();
-const server = await startServer(4175);
+const pretend = await startPretend(4176);
+const server = await startServer(4175, pretend.env);
 const browser = await chromium.launch();
 try {
   const compare = pagePath === '/';
@@ -75,4 +79,5 @@ try {
 } finally {
   await browser.close();
   server.stop();
+  await pretend.stop();
 }

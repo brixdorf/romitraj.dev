@@ -30,7 +30,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
-| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. |
+| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather and music services. |
 | `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit. |
 
 ## Where things live
@@ -124,6 +124,7 @@ Every file starts with a comment saying what it does.
 | Which fonts are used for what | `src/assets/css/tokens.css` (the `--font` lines) |
 | Spacing, corner size, line thickness | `src/assets/css/tokens.css` |
 | How fast a hover or the gradient bar moves | `src/assets/css/tokens.css` (the `--duration` lines) |
+| The color of the ring around whatever has keyboard focus | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks) |
 | How fast the tickers and scroll drift move | `src/assets/js/motion.js` |
 | How a page change moves: how long, how far, in what order | `src/assets/js/motion.js` (`pageChange`) |
 | How the headline slides in when the home page opens | `src/assets/js/motion.js` (`intro`, and the letter pace above it) |
@@ -402,6 +403,27 @@ Page changes:
 
 The server sends no rule that limits which scripts may run (no Content-Security-Policy header), so nothing had to be allowed for analytics.romitraj.dev. If such a rule is ever added, on the server or in Cloudflare, it must allow scripts from and connections to `https://analytics.romitraj.dev`, and the small scripts written into each page.
 
+## Hover and keyboard focus
+
+What each kind of link does under the pointer, and when it is reached with the Tab key. All of it was measured on the design reference, link by link, in three browsers.
+
+| Link | Under the pointer | With keyboard focus |
+|---|---|---|
+| Navigation links in the hero | A line draws under the name (0.2s) and the description sharpens | The same, plus the ring |
+| Links in the footer, the "Elsewhere" lists, "You are here", the small row under the banner, the bold link that ends a card, the code link on a project's page | A line draws under the words (0.2s) | The ring only |
+| A link inside a sentence (about text, cards, a project's write-up) | Turns grey at once | The ring only |
+| "View all projects", "Read the blog" | Underlined at once | Underlined, plus the ring |
+| The links at the bottom of the About page's first card, and "Read the post" | Underlined at once | The ring only |
+| A writing card on the home page | Its outline darkens at once and a line draws under "Read more" (0.2s) | The same, with the ring around "Read more" |
+| A project card on the Projects page | Its outline darkens at once and a line draws under "Read more" (0.2s) | Its outline darkens, plus the ring around "Read more" |
+| A project row on the home page | The name opens near its middle and its faint copies sharpen (0.15s) | The ring only |
+| A line in a project's "Contents" | Turns grey while a line draws under it (0.2s) | The ring only |
+| The track's title in the ticker | Nothing (it is already underlined) | The ring only |
+
+- **The ring** is a 2px dashed outline, 2px away from the link: pale grey on paper, dark grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
+- **It is faint.** The reference's ring has little contrast (pale grey on off-white), and this one matches it. To make it easier to see for people who use the keyboard, change the two colors in `tokens.css`; nothing else depends on them.
+- **Lines that break around the tails of letters.** In the "Elsewhere" lists, a project's "Contents" and the Projects page's "Read more", the drawn line does not run through the tail of a g, p or y: it stops beside it. The letters carry an outline in the color of whatever is behind them, painted under the letters themselves, and the line sits under that outline. At rest the outline cannot be seen. The color behind is `--behind`: paper unless a block says otherwise, and the footer sets it to ink. If such a link is ever placed on another background, set `--behind` there to that background's color.
+
 ## Links that leave the site
 
 Every link to another website opens in a new tab. The build does this by itself (`eleventy.config.js`, "linksThatLeave"): it goes over each finished page and gives every such link `target="_blank"`, `rel="noopener noreferrer"` (the new tab cannot reach back into this one, and the other site is not told where the visitor came from) and the words "(opens in a new tab)", hidden from the eye but read out by screen readers.
@@ -660,6 +682,28 @@ The live site loads the licensed fonts from fonts.romitraj.dev, a small server i
 ### Adding or swapping a font
 
 Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `src/_data/fonts.json` (including which fallback file stands in for it), run `npm run fonts`, then `npm run fonts:fallback`, and reload.
+
+## Comparing with the design reference
+
+The private folder next door has scripts that measure the reference and this site in the same way and list the differences. They live in `../romitraj-private/reference/scripts/`, read rendered values only (sizes, colors, positions, timings as a browser reports them), and are never deployed. Build the site first; the scripts start it themselves, with the stand-in weather and music services.
+
+```powershell
+cd "..\romitraj-private\reference\scripts"
+node compare.mjs out/compare
+node compare-report.mjs out/compare
+```
+
+| Script | What it compares | Time |
+|---|---|---|
+| `compare.mjs`, then `compare-report.mjs` | Layout, spacing, type and color: about 150 pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px, in three browsers | about 7 minutes |
+| `compare-states.mjs`, then the same with `differences` | What 24 kinds of link do under the pointer and with keyboard focus, and how long each change takes | about 15 minutes |
+| `compare-motion.mjs` | The two tickers' speeds, the gradient bar's loop, and how the scroll-tied movement follows the scroll position | about 15 minutes |
+| `pagechange.mjs`, then `pagechange-compare.mjs` | Every page change as a timeline: what leaves, what arrives, when and for how long | about 2 minutes per site and browser |
+
+- **Which piece is which** is written in `compare-map.mjs`: for each piece, where it is on the reference and where it is here. When a section of this site is rebuilt, update its lines there.
+- **Reading the report.** Each line is one value of one piece: the reference's, this site's, and the browsers and widths it shows in. Many lines are not visible differences: the two sites are built differently (a margin there is a gap here), and their words are different lengths. A line matters when a size, a color, a gap between two pieces or an edge differs. [decisions.md](decisions.md) lists the differences that are there by choice.
+- **After changing this site**, add `--only=here` to `compare.mjs` or `compare-states.mjs`: it measures this site again and keeps the reference's saved values, so the reference is not visited again.
+- **The reference sits behind a bot check.** The scripts visit it with one browser at a time, one page at a time. Do not run two of them at once.
 
 ## Checking before a commit
 

@@ -13,8 +13,10 @@ export const rate = {
 };
 
 export const duration = {
-  // Movement tied to scroll trails the scroll position and takes about this long to catch up.
-  scrollCatchUp: 1,
+  // Movement tied to scroll trails the scroll position. This is the catch-up time handed to GSAP,
+  // which eases toward the new place: with 2, a piece is halfway there after about 0.15s, nine
+  // tenths of the way after 0.5s and settled after about 1s, as measured on the reference.
+  scrollCatchUp: 2,
 };
 
 export const ease = {

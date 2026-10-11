@@ -75,13 +75,24 @@
   gap: 0.311em;
 }
 
-/* A link in the list of sections also turns grey while its line draws under it. */
+/* A link in the list of sections turns grey while a line draws under it. The line is a 1px
+   strip of the link's own background, and the letters carry an outline in the paper's color
+   painted under them, so the line breaks around the tails of letters (p, g, y) instead of
+   crossing them. It sits one pixel above the bottom of the letters' own box, as measured: a
+   little above the bottom of the line. */
 .study__contents-list .link {
-  transition: color var(--duration-base) var(--ease-in-out-cubic);
+  background: linear-gradient(currentColor, currentColor) no-repeat left 0 bottom calc(0.056em + 1px) / 0% 1px;
+  transition: color var(--duration-base) var(--ease-in-out-cubic), background-size var(--duration-base) var(--ease-in-out-cubic);
+  -webkit-text-stroke: 2px var(--color-paper);
+  paint-order: stroke fill;
 }
 
-.study__contents-list .link:hover,
-.study__contents-list .link:focus-visible {
+.study__contents-list .link::after {
+  content: none;
+}
+
+.study__contents-list .link:hover {
+  background-size: 100% 1px;
   color: var(--color-muted-on-paper);
 }
 
@@ -143,6 +154,11 @@
   text-underline-offset: 0.12em;
 }
 
+/* A link in the write-up turns grey under the pointer, at once. */
+.study__body a:hover {
+  color: var(--color-muted-on-paper);
+}
+
 .study__body h2 {
   margin: 72px 0 32px;
   font-family: var(--font-serif-display);
@@ -193,12 +209,13 @@
   .study__top {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--grid-gap);
+    gap: var(--grid-gap);
   }
 
+  /* The 16px under the name is the gap between the grid's rows. */
   .study__title {
     grid-column: 1 / -1;
-    margin: 256px 0 16px;
+    margin: 256px 0 0;
   }
 
   .study__lead {
@@ -230,10 +247,12 @@
 
   .study__top {
     grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    row-gap: 0;
   }
 
+  /* 240px above the name: the 80px the reference leaves, plus the 160px its logo takes there. */
   .study__title {
-    margin: 80px 0 128px;
+    margin: 240px 0 128px;
   }
 
   /* Each of the three pieces is only as tall as its own content. */
@@ -293,7 +312,9 @@
     inset-block-start: 0.56em;
     inset-inline-end: calc(100% + 16px);
     inline-size: 1em;
-    block-size: max(1px, 0.04em);
-    background: currentColor;
+    /* Drawn as a border, which every browser rounds to whole pixels in the same way; a box with
+       a height of 1.92px was not. */
+    block-size: 0;
+    border-block-start: 2px solid currentColor;
   }
 }

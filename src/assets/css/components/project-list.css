@@ -63,8 +63,7 @@
   transition: inline-size var(--duration-fast) ease-in;
 }
 
-.project-list__link:hover .project-list__gap,
-.project-list__link:focus-visible .project-list__gap {
+.project-list__link:hover .project-list__gap {
   inline-size: 1.47em;
 }
 
@@ -75,7 +74,6 @@
   display: flex;
   gap: 0.21em;
   color: var(--color-ghost-on-ink);
-  filter: blur(1.5px);
   transition: filter var(--duration-fast) ease;
   pointer-events: none;
 }
@@ -96,13 +94,17 @@
   margin-inline-end: 3.732px;
 }
 
-.project-list__strip:hover .project-list__ghosts,
-.project-list__strip:focus-within .project-list__ghosts {
+.project-list__strip:hover .project-list__ghosts {
   filter: blur(0);
 }
 
-/* Tablet and laptop: each name rests a little left of the middle of its row. */
+/* Tablet and laptop: each name rests a little left of the middle of its row, and its faint
+   copies are blurred until the pointer is over the row. On phones they are sharp. */
 @media (width >= 600px) {
+  .project-list__ghosts {
+    filter: blur(1.5px);
+  }
+
   .project-list__row {
     justify-content: center;
     padding-inline-end: 6.8%;

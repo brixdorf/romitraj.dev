@@ -89,9 +89,13 @@
   line-height: 1.5;
 }
 
-/* These links do not react to the pointer, as on the reference: the arrow already marks them. */
+/* Underlined at once under the pointer. */
 .panel__links a {
   text-decoration: none;
+}
+
+.panel__links a:hover {
+  text-decoration: underline;
 }
 
 /* The one small bold link that ends a card. */

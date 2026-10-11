@@ -18,6 +18,9 @@
 .nav-list__link {
   display: inline-block;
   padding-block: 4px;
+  /* The same size and line as the page name inside it, so the row is exactly that line plus the padding. */
+  font-size: var(--type-nav);
+  line-height: var(--leading-text);
   letter-spacing: var(--tracking-tight);
   text-decoration: none;
   white-space: nowrap;

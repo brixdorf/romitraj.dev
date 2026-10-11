@@ -1,5 +1,5 @@
-/* The intro letter: a dark block with a thin frame set in from its edges, centered serif text, and
-   the small label repeated upside down at the bottom. */
+/* The intro letter: a dark block with a thin frame set in from its edges, serif text (flush left
+   on phones, centered from tablets up), and the small label repeated upside down at the bottom. */
 .letter {
   position: relative;
   padding: var(--gutter);
@@ -39,6 +39,7 @@
   font-family: var(--font-serif);
   font-size: var(--type-letter);
   line-height: 1.3;
+  text-align: start;
 }
 
 .letter__text p {
@@ -64,6 +65,7 @@
 
   .letter__text {
     margin-block-end: 64px;
+    text-align: center;
   }
 }
 

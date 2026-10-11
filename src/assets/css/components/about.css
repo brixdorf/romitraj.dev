@@ -108,7 +108,7 @@
   inset-inline-end: 32px;
   inline-size: 20px;
   block-size: 20px;
-  border: var(--rule) solid currentColor;
+  border: var(--rule) solid var(--color-line-on-paper-strong);
   border-radius: 50%;
 }
 

@@ -1,4 +1,4 @@
-/* A list of links, each with a small icon before it. A line draws under the link's name on hover or keyboard focus. */
+/* A list of links, each with a small icon before it. A line draws under the link's name on hover. */
 .icon-list {
   margin: 0;
   padding: 0;
@@ -19,16 +19,24 @@
 }
 
 /* The link reaches back over its icon, so the icon is part of what you can click. */
+/* Its letters carry an outline in the color of whatever is behind them ("--behind"), painted
+   under the letters themselves, and the drawn line sits under that outline. So the line breaks
+   around the tails of letters such as g, p and y instead of running through them. At rest the
+   outline cannot be seen. */
 .icon-list__link {
   position: relative;
+  z-index: 0;
   margin-inline-start: -32px;
   padding-inline-start: 32px;
   text-decoration: none;
+  -webkit-text-stroke: 2px var(--behind, var(--color-paper));
+  paint-order: stroke fill;
 }
 
 .icon-list__link::after {
   content: "";
   position: absolute;
+  z-index: -1;
   inset-inline: 32px 0;
   inset-block-end: 4px;
   block-size: 1px;
@@ -38,8 +46,7 @@
   transition: transform var(--duration-base) var(--ease-in-out-cubic);
 }
 
-.icon-list__link:hover::after,
-.icon-list__link:focus-visible::after {
+.icon-list__link:hover::after {
   transform: scaleX(1);
 }
 

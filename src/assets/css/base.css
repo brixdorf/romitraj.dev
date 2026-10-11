@@ -25,9 +25,17 @@ a {
   color: inherit;
 }
 
+/* Keyboard focus: a dashed ring, pale grey on paper and dark grey on the ink blocks, as measured
+   on the reference. */
 :focus-visible {
-  outline: var(--rule) solid currentColor;
-  outline-offset: 3px;
+  outline: var(--rule) dashed var(--color-focus);
+  outline-offset: 2px;
+}
+
+.letter,
+.works,
+.footer {
+  --color-focus: var(--color-focus-on-ink);
 }
 
 /* After a page change, keyboard focus is moved to the new page's heading so that screen readers
@@ -108,6 +116,12 @@ a {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+/* Underlined at once under the pointer and under keyboard focus. */
+.section-link:hover,
+.section-link:focus-visible {
+  text-decoration: underline;
 }
 
 /* A drawn line that stands where a long dash would go between two pieces of text.
