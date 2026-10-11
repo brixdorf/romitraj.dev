@@ -119,6 +119,34 @@ if (weights.problems.length) {
 }
 console.log(`Pictures: ${weights.summary}.`);
 
+// ---- The focus ring: does it stand out enough from the paper and from the ink? ----
+// Accessibility guidelines ask that a focus ring differ from what is behind it by at least 3 to 1.
+{
+  const tokens = fs.readFileSync(path.join(root, 'src', 'assets', 'css', 'tokens.css'), 'utf8');
+  const color = (name) => new RegExp(`--${name}:\\s*(#[0-9a-f]{6})\\b`, 'i').exec(tokens)?.[1];
+  // How light a color is, from 0 (black) to 1 (white), the way the guidelines work it out.
+  const lightness = (hex) => {
+    const [red, green, blue] = [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16) / 255).map((part) => (part <= 0.04045 ? part / 12.92 : ((part + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+  const contrast = (one, other) => { const [lighter, darker] = [lightness(one), lightness(other)].sort((a, b) => b - a); return (lighter + 0.05) / (darker + 0.05); };
+  const pairs = [['color-focus', 'color-paper', 'paper'], ['color-focus-on-ink', 'color-ink', 'ink']];
+  const ringProblems = [];
+  const found = [];
+  for (const [ring, behind, word] of pairs) {
+    if (!color(ring) || !color(behind)) { ringProblems.push(`tokens.css has no six-digit color for --${ring} or --${behind}`); continue; }
+    const ratio = contrast(color(ring), color(behind));
+    found.push(`${ratio.toFixed(1)} to 1 on ${word}`);
+    if (ratio < 3) ringProblems.push(`the focus ring on ${word} (--${ring}: ${color(ring)}) has a contrast of ${ratio.toFixed(2)} to 1 against ${color(behind)}; it needs at least 3 to 1`);
+  }
+  if (ringProblems.length) {
+    console.log('\nFOCUS RING PROBLEMS:\n  ' + ringProblems.join('\n  '));
+    process.exitCode = 1;
+  } else {
+    console.log(`Focus ring: ${found.join(', ')} (at least 3 to 1 is needed).`);
+  }
+}
+
 // ---- 4. Screenshots ----
 // ---- Widgets: what the server answers, in every situation ----
 const answerProblems = await widgetAnswers(4260);

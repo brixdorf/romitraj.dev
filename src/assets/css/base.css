@@ -25,8 +25,8 @@ a {
   color: inherit;
 }
 
-/* Keyboard focus: a dashed ring, pale grey on paper and dark grey on the ink blocks, as measured
-   on the reference. */
+/* Keyboard focus: a dashed ring, in the reference's shape (2px, dashed, 2px away) but in greys
+   strong enough to be seen: mid grey on paper, a lighter warm grey on the ink blocks. */
 :focus-visible {
   outline: var(--rule) dashed var(--color-focus);
   outline-offset: 2px;

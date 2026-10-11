@@ -364,11 +364,12 @@ To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `
 
 ## The Credits page
 
-`/credits/` thanks the people and services the site rests on, in three numbered cards like the About page's:
+`/credits/` thanks the people and services the site rests on, in four numbered cards like the About page's:
 
 1. **Design:** the sentence saying the design is based on henry.codes by Henry Desroches, with a link, and that the code, words and pictures are your own.
 2. **Photographs:** every Unsplash photographer by name, linked to their Unsplash profile, with what they photographed.
 3. **Weather:** "Weather data by Open-Meteo.com", linked to open-meteo.com, and a link to its licence (CC BY 4.0).
+4. **Visits:** one sentence saying that visits are counted with Rybbit on your own server, without cookies, with a link to rybbit.com.
 
 Where things are:
 
@@ -420,8 +421,8 @@ What each kind of link does under the pointer, and when it is reached with the T
 | A line in a project's "Contents" | Turns grey while a line draws under it (0.2s) | The ring only |
 | The track's title in the ticker | Nothing (it is already underlined) | The ring only |
 
-- **The ring** is a 2px dashed outline, 2px away from the link: pale grey on paper, dark grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
-- **It is faint.** The reference's ring has little contrast (pale grey on off-white), and this one matches it. To make it easier to see for people who use the keyboard, change the two colors in `tokens.css`; nothing else depends on them.
+- **The ring** is a 2px dashed outline, 2px away from the link: mid grey on paper, a lighter warm grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
+- **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `npm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
 - **Lines that break around the tails of letters.** In the "Elsewhere" lists, a project's "Contents" and the Projects page's "Read more", the drawn line does not run through the tail of a g, p or y: it stops beside it. The letters carry an outline in the color of whatever is behind them, painted under the letters themselves, and the line sits under that outline. At rest the outline cannot be seen. The color behind is `--behind`: paper unless a block says otherwise, and the footer sets it to ink. If such a link is ever placed on another background, set `--behind` there to that background's color.
 
 ## Links that leave the site
@@ -613,7 +614,7 @@ The current token was obtained on 2026-10-11 and lasts until about **2027-04-11*
 
 Notes:
 
-- The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. Its documentation does not name the save and deploy buttons, so they are described here instead of named; they will be filled in when the deployment part of this guide is written.
+- The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. It names the **Deploy** button but not the save button on the Environment tab: see "What Dokploy's documentation did not confirm" under "Deploying with Dokploy".
 - The Client ID and Client secret do not change. Only the refresh token is renewed.
 - If `npm run spotify` says the Client ID or secret is wrong, or Spotify's page shows an error about the redirect address, the app's settings on https://developer.spotify.com/dashboard have changed: see "Spotify: the first setup" above.
 - If the Client secret ever leaks, open the app's Settings in Spotify's dashboard, rotate the secret, put the new one in `.env` and in Dokploy's Environment tab, then do all the steps above.
@@ -711,13 +712,193 @@ node compare-report.mjs out/compare
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
 The screenshots go to `../romitraj-private/screenshots/`, in `laptop-1440`, `tablet-768` and `phone-390` folders, split by browser. The laptop and phone folders match the reference screenshots next door, so the two sets can be compared side by side. If that folder is not there, they go to `screenshots/` here, which git ignores.
 
 Open a few of the pictures before committing. The same page should look the same in all three browsers.
+
+## Deploying with Dokploy
+
+The live site is two applications on your own server, both set up in Dokploy's dashboard:
+
+| Application | Address | Built from | What it is |
+|---|---|---|---|
+| The site | https://romitraj.dev | `brixdorf/romitraj.dev` (public), branch `main` | The pages, and the two small questions the ticker asks |
+| The fonts | https://fonts.romitraj.dev | `brixdorf/romitraj-private` (private), branch `main` | The licensed fonts, sent to the site and to nobody else |
+
+Both are built by Railpack, Dokploy's builder that reads `package.json` and works out the rest. There is no Dockerfile and nothing to type on the server: every step below is a click in a dashboard.
+
+**Nothing here has been done yet.** These are the steps for the first deployment, and for doing it again on a new server.
+
+### What the server will do
+
+Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) and by building and starting clean copies of both repositories on Linux under Node.js 24.21.0, with no `.env` file and no private folder beside the site.
+
+| | The site | The fonts |
+|---|---|---|
+| Node.js | 24.21.0, from `"engines": { "node": "24.x" }` in `package.json` | the same |
+| Install | `npm install` | `npm install` (nothing to install) |
+| Build | `npm run build` (about 3 seconds) | none |
+| Start | `npm run start` | `npm run start` |
+| Port inside the container | 3000 | 3000 |
+| Settings to enter | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` | none |
+
+- **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
+- **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
+- **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog.
+- **On the server the pages load the fonts from https://fonts.romitraj.dev.** That is why the fonts application comes first below.
+- **The fonts go to romitraj.dev only.** A page on any other website that asks for one is refused, and browsers will not use a font for another site even if they get it. The server answers nothing but the seven font files: not the brief, not the original font files, not its own code.
+
+### Before you start
+
+- You can log in to your Dokploy dashboard, to Cloudflare, and to GitHub as `brixdorf`.
+- Both repositories are pushed (`git status` in each folder says there is nothing to commit, and `git push` says everything is up to date).
+- `npm run check` passed on the last commit.
+- The three Spotify values are in `.env` on your PC. You will copy them from there in step 5. Never paste them anywhere but Dokploy's own page.
+
+### Step 1: Cloudflare
+
+Skip any part that is already as described. On 2026-10-11 both names already pointed at Cloudflare with the proxy on.
+
+1. Log in to Cloudflare, click **Account Home**, and choose `romitraj.dev`.
+2. Click **DNS**, then **Records**. There should be a record for `romitraj.dev` and one for `fonts`, both pointing at your server's address, both with the orange cloud (proxied). If `fonts` is missing: **Add Record**, type **A**, name `fonts`, your server's IPv4 address, proxy on, **Save**.
+3. Click **SSL/TLS**, then **Overview**, then **Configure SSL/TLS Encryption**. Choose **Full (Strict)** and click **Save**.
+4. You need your origin certificate and its private key as two blocks of text. An origin certificate is the one Cloudflare issues for the stretch between Cloudflare and your server.
+   - **If you still have both** from when you set up the blog or the visitor counter, and the certificate covers `romitraj.dev` and `*.romitraj.dev`, use them.
+   - **If you no longer have the private key** (Cloudflare shows it only once), make a new certificate: **SSL/TLS**, **Origin Server**, **Create Certificate**. Keep the option that lets Cloudflare generate the private key, make sure the hostnames are `romitraj.dev` and `*.romitraj.dev`, choose how long it is valid, and click **Create**. Copy the **Origin Certificate** and the **Private Key** (PEM format) into your password manager before closing the page.
+   - Never put either block in a repository, a chat or a screenshot.
+
+### Step 2: the certificate in Dokploy
+
+If your Dokploy already holds this certificate (your other sites on `romitraj.dev` use it), skip this step.
+
+1. Open your Dokploy dashboard and log in.
+2. Open **Certificates** and click **Add Certificate**.
+3. Give it a name, for example `cloudflare-origin-romitraj`.
+4. Paste the certificate into the certificate field and the key into **Private Key**. (Dokploy's documentation calls the certificate field "Certificate Data" on one page and "Origin Certificate" on another.) Leave the optional server choice as it is.
+5. Save it with the button at the bottom of the form.
+
+### Step 3: GitHub in Dokploy
+
+If Dokploy can already see both repositories, skip this step.
+
+1. In Dokploy open **Git** and choose **Github**.
+2. Click **Create Github App**, give it a name (it must be unique on GitHub, for example `dokploy-romitraj`), and click **Create Github App** again. GitHub opens; confirm, and you are sent back to Dokploy.
+3. Click the **Install** button that has appeared.
+4. On GitHub, choose the repositories Dokploy may read: select `romitraj.dev` and `romitraj-private` (or all repositories). Click **Install & Authorize**.
+5. **If the app existed already** but cannot see one of the two repositories: on github.com open your **Settings**, then **Applications**, find the Dokploy app under installed GitHub Apps, click **Configure**, add the repository under repository access, and save.
+
+### Step 4: the fonts application
+
+1. In Dokploy, create a project for this site (for example `romitraj`), or open the one you want to use.
+2. Inside the project, create a new service of the kind **Application**. Name it `fonts`.
+3. Open the application. On the **General** tab, choose **Github** as the source, then:
+   - **Repository:** `romitraj-private`
+   - **Branch:** `main`
+   - **Build path:** `/`
+   
+   Save the source settings.
+4. Still on **General**, choose **Railpack** as the build type and save. Leave the **Railpack Version** field as it is.
+5. Turn on **Auto Deploy** on the **General** tab, if it is not on already.
+6. The **Environment** tab stays empty for this application.
+7. Click **Deploy**.
+8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 24, `npm install` and `npm run start`, and end without an error. This takes a minute or two.
+9. Open the **Logs** tab. The last line should read `Font server running at http://localhost:3000`.
+10. Open the **Domains** tab and click **Create Domain**:
+    - **Host:** `fonts.romitraj.dev`
+    - **Path:** `/`
+    - **Container Port:** `3000`
+    - **HTTPS:** on
+    - **Certificate:** **None** (not Let's Encrypt: the certificate from step 2 is used)
+    
+    Click **Create**. A domain takes effect at once; no new deploy is needed.
+
+**Check the fonts application**
+
+| Open this | You should get |
+|---|---|
+| https://fonts.romitraj.dev/manuka-black.woff2 | A small file is downloaded or shown (8,692 bytes). This is the one address that proves it works. |
+| https://fonts.romitraj.dev/ | The two words `Not found` |
+| https://fonts.romitraj.dev/BRIEF.md | `Not found` |
+
+### Step 5: the site application
+
+1. In the same project, create another service of the kind **Application**. Name it `site`.
+2. On the **General** tab, choose **Github** as the source:
+   - **Repository:** `romitraj.dev`
+   - **Branch:** `main`
+   - **Build path:** `/`
+   
+   Save.
+3. Choose **Railpack** as the build type and save.
+4. Turn on **Auto Deploy**.
+5. Open the **Environment** tab. Type these three lines, each followed by its value from the `.env` file on your PC (open it with `notepad .env` in the site's folder). No spaces around the `=`, no quotes:
+
+   ```
+   SPOTIFY_CLIENT_ID=
+   SPOTIFY_CLIENT_SECRET=
+   SPOTIFY_REFRESH_TOKEN=
+   ```
+
+   Save the settings with the save button on that tab. Close Notepad without saving.
+6. Go back to **General** and click **Deploy**.
+7. On the **Deployments** tab, watch the newest entry. It should mention Node 24, `npm install`, `npm run build` (with lines beginning `[11ty]`) and `npm run start`.
+8. On the **Logs** tab the last line should read `Site running at http://localhost:3000`.
+9. On the **Domains** tab click **Create Domain**:
+   - **Host:** `romitraj.dev` (never `www.romitraj.dev`: Cloudflare already sends `www` to the plain name)
+   - **Path:** `/`
+   - **Container Port:** `3000`
+   - **HTTPS:** on
+   - **Certificate:** **None**
+   
+   Click **Create**.
+
+**Check the site**
+
+| Do this | You should see |
+|---|---|
+| Open https://romitraj.dev | The home page, with the headline in its tall heavy letters and the serif lines in the fine serif. If the text is in plainer fonts, the fonts application is not answering: check step 4. |
+| Wait two seconds and look at the ticker | The weather, the coordinates, the time, and Spotify's icon with a track |
+| Open https://romitraj.dev/api/weather | One short line with a temperature and a word for the sky |
+| Open https://romitraj.dev/api/now-playing | One short line with a track's title. An empty page means the three settings are missing or wrong: check step 5.5, save, and deploy again. |
+| Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload |
+| Open https://www.romitraj.dev | You end up on https://romitraj.dev |
+| Open your Rybbit dashboard | Your own visit, counted once per page |
+| Open the site on your phone | The same, in the phone arrangement |
+
+### If something is wrong
+
+| What you see | What it means | Where to look |
+|---|---|---|
+| The newest entry on **Deployments** ends in an error | The build failed | Read the last lines of that entry. A wrong Node version there (not 24) means an old Railpack: type `0.40.1` into **Railpack Version** on **General**, save, deploy again. |
+| `404 page not found` | The server has no application for that address | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://` |
+| Cloudflare's page "Bad gateway" (502) | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains** |
+| Cloudflare's page "Invalid SSL certificate" (526) | The server is not presenting the origin certificate | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. If it still shows, tell me: one page of Dokploy's documentation says its proxy may need pointing at a new certificate by hand. |
+| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all | The DNS record's address in Cloudflare, and that the server is running |
+| The site shows but the ticker has no track | The Spotify settings | **Environment**, then deploy again. See "If a widget is missing". |
+
+### After the first deployment
+
+- **Every `git push` to `main` deploys.** Push the site's repository and the site is rebuilt and restarted, usually within two minutes. Push the private repository and the fonts application restarts too, even when only the brief changed. That is harmless: browsers and Cloudflare keep the fonts for a year.
+  - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json` and `package-lock.json`. Its documentation does not say where the field is, so this is left for when we look at your dashboard together.
+- **A changed setting does nothing until the next deploy.** After saving anything on the **Environment** tab, click **Deploy** on **General**.
+- **Visitors get new files at once.** Pages are never kept by browsers or by Cloudflare. The stylesheet, the script, the pictures and the fonts may be kept, and each carries a fingerprint in its address (`main.css?v=...`) that changes when the file changes.
+- **Push only what you have checked.** There is no test on the server: `npm run check` on your PC is the test.
+
+### What Dokploy's documentation did not confirm
+
+The steps above use the names in Dokploy's documentation as read on 2026-10-11 (Dokploy 0.30.8). Where it gives no name, the step describes the thing instead. These are the places to compare with your dashboard, so the wording here can be corrected:
+
+1. **Creating a project and an application** (steps 4.1, 4.2, 5.1): the documentation does not name the buttons.
+2. **Choosing the source and the build type** (steps 4.3, 4.4, 5.2, 5.3): it names the fields (Repository, Branch, Build path, Railpack Version) and that they are on **General**, but not the buttons that save them.
+3. **The save button on the Environment tab** (step 5.5).
+4. **Whether Auto Deploy is already on** for a new application (steps 4.5, 5.4). The documentation says it is a button on **General**.
+5. **The certificate form** (step 2): the name of the certificate field and of its save button.
+6. **Whether a certificate added in step 2 is used at once.** The Cloudflare page of the documentation says to add it and choose **None**; the certificates page says the proxy's configuration may need adjusting. The 526 line in the table above is how you would notice.
+7. **Where Watch Paths is.**
 
 ## Secrets
 
@@ -750,5 +931,4 @@ If your computer has a different Node.js version than `engines` asks for, `npm i
 
 These parts of the guide are written when the matching part of the site is built:
 
-- Deployment with Dokploy, step by step.
 - The resume itself. Until `resume.pdf` exists, the Resume page is a short note.

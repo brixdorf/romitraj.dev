@@ -2,6 +2,75 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: Ready to deploy
+
+Nothing was installed or upgraded in the site. Nothing was deployed: this entry records what was checked and what the guide's new section rests on.
+
+### Versions and sources checked
+
+| What | Version or page | Source, read on 2026-10-11 | What it settled |
+|---|---|---|---|
+| Node.js, newest LTS line | 24 (24.21.0, "Krypton"); 26 is the current line and not yet LTS | https://nodejs.org/dist/index.json | `engines` stays at `24.x` in both repositories |
+| Railpack | 0.40.1 (released 2026-09-28) | github.com/railwayapp/railpack, latest release; railpack.com, "Node" | How the Node.js version, the install, build and start commands are chosen; which settings it reads |
+| Dokploy | 0.30.8 (released 2026-09-29) | github.com/Dokploy/dokploy, latest release | The version the documentation below describes |
+| Dokploy's documentation | Applications, Build Type, Domains, Cloudflare, Certificates, Auto Deploy, GitHub, Watch Paths, Variables, Going Production | docs.dokploy.com | The tab, field and button names used in the guide, and the ones it does not give |
+| Rybbit | Its home page | rybbit.com | "cookieless", "no cookies, no consent banner": the Credits page's sentence is accurate |
+
+### What the live server needs, and how each was checked
+
+- **Railpack's own plan for each repository** (`railpack info`, version 0.40.1): Node.js 24.21.0 "from package.json > engines > node (24.x)"; install with `npm install`; for the site, build with `npm run build`; start with `npm run start`. It finds the start script and so does not put its own static file server in front.
+- **A clean copy of each repository was built and started on Linux** (in the Windows Subsystem for Linux, under Node.js 24.21.0, in a temporary folder): only the files git knows about, so no `.env`, no `node_modules`, no built site, and no private folder beside the site.
+  - The site: `npm ci` took 6 seconds and `npm run build` 3 seconds. The pages load their fonts from https://fonts.romitraj.dev and no font file is in the built site. Started with no `PORT` and no settings, it listened on 3000 and answered every page with 200, `/about` with a redirect to `/about/`, an unknown address with 404, and attempts to read `/.env` or `/../package.json` with 404.
+  - With no Spotify settings `/api/now-playing` answers 204 (nothing to show) and the ticker hides that piece. With the weather service out of reach `/api/weather` answers 204 as well. Neither is an error.
+  - The font server: started with no settings, it listened on 3000.
+- **The port is 3000 for both**, which is the container port to enter in Dokploy. Neither Railpack nor Dokploy sets `PORT`, and none needs to be set.
+- **The settings to enter in Dokploy are three names, for the site only:** `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`. The fonts application needs none. `FONT_BASE_URL` stays unset: without the private folder the build already uses `fontsUrl` from `site.json`.
+- **The lock file covers the server.** `package-lock.json` lists the Linux builds of sharp and esbuild (x64 and arm64, glibc and musl), although it was written on Windows.
+- **Railpack installs the development packages too** (it sets `NPM_CONFIG_PRODUCTION=false`), so Playwright's package is installed on the server. Its browsers are not: those only come with a separate command. This costs a little disk space and nothing else. `RAILPACK_PRUNE_DEPS` would remove it; it was left alone, following the rule to add a `RAILPACK_` setting only when a default does not work.
+- **Railpack suggests naming the package manager and its version in `package.json`.** It is a suggestion, printed as a warning; npm is found from the lock file without it. Left alone for the same reason.
+- **The domain names already point at Cloudflare** with the proxy on, and the server answers both with `404 page not found`: nothing is attached to them yet.
+
+### Three changes that getting ready needed
+
+- **The stylesheet and the script now carry a fingerprint in their address** (`/assets/css/main.css?v=2eb25f32`). The server lets browsers keep these two files for an hour, and Cloudflare keeps them for as long at its edge. Without a fingerprint, a visitor could have been shown a new page with the old stylesheet for up to an hour after every deploy. The pictures and the fonts had fingerprints already. The build works each one out from the file's contents (`{% asset %}` in `eleventy.config.js`).
+- **The font server also reads the `Origin` header.** A browser sends it with every request for a font on another site, even when the site hides the page's address (`Referer`), which was the only header read before. A request that names another website in either header is answered 403.
+- **The private repository has a `package-lock.json`.** It has no packages, so the file is nearly empty, but with it both install commands (`npm install` and `npm ci`) work.
+
+### The font server and "only to romitraj.dev"
+
+Tested with seventeen requests against the server as it will run:
+
+| Who asks | Answer |
+|---|---|
+| A page on romitraj.dev (with or without its address shown) | 200, the font, marked for use by `https://romitraj.dev` only, to be kept for a year |
+| A page on another website, a look-alike address, or `www.romitraj.dev` | 403 |
+| Anything that is not one of the font files: the folder, the brief, an original font file, the server's own code, a path that climbs out of the folder | 404 |
+| Anything but a GET or HEAD request | 405 |
+| The font's address typed into a browser, or fetched by a program that names no website | 200, the font |
+
+- **The last row cannot be closed.** A browser has to be able to download a web font to show it, so anyone who looks up a font's address on the site can fetch that one file. What the server prevents is other websites using the fonts, and anything else in the private repository being reached.
+- **Cloudflare sits in front and keeps the fonts at its edge**, so most requests are answered by Cloudflare without reaching this server, including a second site's request for a font Cloudflare already holds. The answer still says the font is for `https://romitraj.dev` only, and browsers refuse to use a font for any other site. That header, not the 403, is the protection that always holds.
+- **The whole private repository is copied into the fonts application when it is built** (the brief, the original fonts, the reference screenshots: about 60 MB). The server reaches none of it but `fonts/web/`. It stays on Romit's own server.
+
+### Deploying is by hand in the dashboard, and the guide says how
+
+- `docs/guide.md` has a new section, "Deploying with Dokploy": Cloudflare, the origin certificate, GitHub, then the fonts application and the site application, each with its checks, a table of what each error page means, and what changes after the first deployment.
+- **Fonts first, then the site**, because the site's pages load their fonts from the fonts application.
+- **The domain is `romitraj.dev`, never `www`**, with HTTPS on and the certificate provider set to None, so that the Cloudflare origin certificate added under Certificates is used and no Let's Encrypt certificate is requested.
+- **Seven things Dokploy's documentation does not confirm** are listed at the end of that section: the buttons that create a project and an application, the buttons that save the source, the build type and the settings, whether Auto Deploy starts switched on, the certificate form's field name, whether a newly added certificate is used at once, and where Watch Paths is. The guide describes each instead of naming it. They are to be corrected on Romit's dashboard.
+- **Dokploy's documentation advises building in a pipeline elsewhere and only running the result on the server**, because builds can exhaust a small server. This site's build is small (seconds, one process), so it is built on the server as the brief asks. If a build ever stalls the server, that advice is the way out.
+
+### Before this, on the same day
+
+- **The focus ring now meets 3 to 1.** Romit asked for it after the comparison had matched the reference's faint ring. It keeps the reference's shape (2px, dashed, 2px away) and uses `#8c8c8c` on paper (3.2 to 1) and `#7d7565` on ink (3.3 to 1), a warm grey in the same family as the reference's. A new line in `npm run check` works both contrasts out from `tokens.css` and fails below 3 to 1. This replaces the ring's colors in the entry below; the other three things raised there (focus without hover effects, the project name's place, the tickers' fixed speeds) stay as they are, by his choice.
+- **The Credits page has a fourth card, "Visits":** "Visits are counted with Rybbit, a privacy-friendly analytics tool I run on my own server. It uses no cookies." His sentence, with Rybbit linked to rybbit.com.
+- **`REWRITE.md` in the private repository** lists every piece of visible text, by page, with its file and key, and marks the guesses and samples to replace first.
+
+### Known issues
+
+- **No deployment has been run.** Everything above was checked on this computer; the first real build on the server is still the first.
+- **The first visit after a deploy asks the services afresh**, so the ticker's weather and track appear a moment later than usual.
+
 ## 2026-10-11: The whole site compared with the reference
 
 Nothing was installed or upgraded in this step.
@@ -59,7 +128,7 @@ Each line gives the reference's value, what this site had, and what it has now.
 **Keyboard focus**
 
 - **The ring is the reference's:** a 2px dashed outline, 2px from the link, `#bdbdbd` on paper and `#474239` on the dark blocks. It was a solid 2px outline in the text's color, 3px away. No look for it had been recorded before.
-  - **It is faint.** Its contrast with the background is about 1.8 to 1 on paper and 1.4 to 1 on ink, where accessibility guidelines ask for 3 to 1. The brief puts the look first, so the reference's ring was taken as it is. The two colors are in `tokens.css` if Romit wants a stronger one.
+  - **It is faint.** Its contrast with the background is about 1.8 to 1 on paper and 1.4 to 1 on ink, where accessibility guidelines ask for 3 to 1. The brief puts the look first, so the reference's ring was taken as it is. The two colors are in `tokens.css` if Romit wants a stronger one. (He did, the same day: see "Ready to deploy" above. The ring keeps this shape with stronger colors.)
 - **Focus shows a hover effect only where the reference does:** the hero's navigation links (line and description), "View all projects" and "Read the blog" (underline), and the cards (their outline, and on a writing card the line under "Read more"). Everywhere else focus shows the ring alone. Before, every link showed its hover effect on focus as well.
 - **On a writing card the ring goes around "Read more"**, as on the reference, not around the whole card. The whole card is still the link.
 

@@ -44,6 +44,12 @@
       "paragraphs": [
         "<a href=\"https://open-meteo.com/\">Weather data by Open-Meteo.com</a>, under their <a href=\"https://open-meteo.com/en/licence\">licence (CC BY 4.0)</a>."
       ]
+    },
+    "visits": {
+      "title": "Visits",
+      "paragraphs": [
+        "Visits are counted with <a href=\"https://rybbit.com\">Rybbit</a>, a privacy-friendly analytics tool I run on my own server. It uses no cookies."
+      ]
     }
   },
 

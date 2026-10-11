@@ -2,6 +2,7 @@
 // pictures are made, and where the web fonts load from.
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import * as esbuild from 'esbuild';
 import { convertImages } from './scripts/images.mjs';
 import { answerApi } from './server/api.js';
@@ -176,6 +177,12 @@ export default function (eleventyConfig) {
   });
 
   // Bundle and minify the CSS and JavaScript before every build.
+  // Each of the two files then gets a fingerprint: a few characters worked out from its contents.
+  // A template writes a file's address with {% asset "/assets/css/main.css" %}, which adds the
+  // fingerprint ("?v=..."). Browsers, and Cloudflare in front of the live site, may keep these
+  // files for an hour; with the fingerprint in the address a changed file is a new address, so
+  // nobody is shown a new page with an old stylesheet after a deploy.
+  const assetVersions = {};
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {
     await esbuild.build({
       entryPoints: {
@@ -190,6 +197,13 @@ export default function (eleventyConfig) {
       target: browsers,
       logLevel: 'warning',
     });
+    for (const address of ['/assets/css/main.css', '/assets/js/main.js']) {
+      assetVersions[address] = createHash('sha256').update(fs.readFileSync(path.join(directories.output, address))).digest('hex').slice(0, 8);
+    }
+  });
+  eleventyConfig.addShortcode('asset', (address) => {
+    if (!assetVersions[address]) throw new Error(`There is no built file at ${address} to write an address for.`);
+    return `${address}?v=${assetVersions[address]}`;
   });
   eleventyConfig.addWatchTarget('./src/assets/css/');
   eleventyConfig.addWatchTarget('./src/assets/js/');

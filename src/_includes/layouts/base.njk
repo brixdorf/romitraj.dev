@@ -54,8 +54,8 @@
     }
   </script>
   {%- endif %}
-  <link rel="stylesheet" href="/assets/css/main.css">
-  <script src="/assets/js/main.js" defer></script>
+  <link rel="stylesheet" href="{% asset "/assets/css/main.css" %}">
+  <script src="{% asset "/assets/js/main.js" %}" defer></script>
 </head>
 <body>
   {%- include "partials/banner.njk" %}
