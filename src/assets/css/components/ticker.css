@@ -38,6 +38,39 @@
   color: var(--color-muted-on-paper);
 }
 
+/* Text shown exactly as it was written, not in the ticker's capitals: the track and its artists,
+   which Spotify asks to be shown the way it provides them. */
+.ticker__item--as-written {
+  text-transform: none;
+}
+
+/* A link in the ticker (the track's title, to the track on Spotify): underlined, and it turns
+   grey under the pointer, at once, like a link inside a sentence. */
+.ticker__link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+.ticker__link:hover {
+  color: var(--color-muted-on-paper);
+}
+
+/* Spotify's icon before the track. Spotify asks for its round mark to be at least 21px across.
+   The drawing has some empty room around the mark, so the drawing is 26px to make the mark 21px,
+   and the negative margins take that empty room back: the line stays 20px tall and the gaps
+   beside the mark stay as they are everywhere else in the line. */
+.ticker__mark {
+  display: flex;
+  flex: none;
+  margin: -3px -2.5px;
+}
+
+.ticker__mark .icon {
+  inline-size: 26px;
+  block-size: 26px;
+}
+
 /* The thinner quote ticker: smaller grey text, one rule below, wider gaps between repeats. */
 .ticker--quote {
   margin-block-end: 32px;

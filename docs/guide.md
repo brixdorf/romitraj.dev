@@ -26,6 +26,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run dev` | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C. |
 | `npm run build` | Builds the finished site into `_site/`. |
 | `npm start` | Serves `_site/` the way the live server does, at http://localhost:3000. Run `npm run build` first. |
+| `npm run spotify` | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below. |
 | `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
@@ -41,6 +42,7 @@ src/
                 about.json (the About page), pages.json (small labels on the inner pages, and the
                 resume note), navigation.json (the page links),
                 icons.json (icon drawings), fonts.json,
+                weather.json (the words for the sky in the ticker),
                 images.json (every picture: its source file, alt text and look),
                 image-credits.json (who took each photo),
                 blog.js (fetches the latest blog posts during the build),
@@ -64,12 +66,16 @@ src/
                 resume note, projects.njk the list of projects. projects/ holds one Markdown
                 file per project (its facts on top, its write-up below), plus
                 projects.11tydata.js, the settings those files share.
-server/         index.js: the small server behind npm start
+server/         index.js: the small server behind npm start. api.js answers the widgets' two
+                questions, weather.js asks Open-Meteo, spotify.js asks Spotify, cache.js
+                keeps their answers for a while
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
                 fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers),
                 images.mjs (turns the photos and drawings into the site's pictures, during
                 every build), lib/paint.mjs (paints the texture behind the hero picture),
                 lib/pictures.mjs (the check's tests of the pictures),
+                spotify.mjs (npm run spotify), lib/widgets.mjs (the check's tests of the
+                widgets), lib/pretend.mjs (stand-ins for Open-Meteo and Spotify during the check),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
                 letters, the page changes and the headline's entrance), speed.mjs (npm run speed)
 docs/           This guide and the decisions log
@@ -86,6 +92,9 @@ Every file starts with a comment saying what it does.
 | The bio line in the top banner | `src/_data/site.json` (`banner`) |
 | The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
 | The introduction sentence, the scroll note | `src/_data/home.json` |
+| The ticker's small words, and how the weather is worded | `src/_data/home.json` (`ticker`) |
+| The words for the sky ("partly cloudy") | `src/_data/weather.json` |
+| The city whose weather and time are shown | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`) |
 | A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below) |
 | Which picture a project shows | `image` at the top of the project's file |
 | Which picture sits beside a page's giant name | `picture` at the top of the page's file |
@@ -152,7 +161,7 @@ The home page is a stack of sections, listed in order in `src/content/index.njk`
 
 | Section | What it is | Its words |
 |---|---|---|
-| Hero | Headline, ticker, page links, the framed picture | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`) |
+| Hero | Headline, ticker (weather, place, local time, what is playing), page links, the framed picture | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`) |
 | Letter | A short signed note on a dark block | `home.json` (`letter`) |
 | About | Sliding heading, quote ticker, bio, card of links, a large drawing behind them | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`diver`) |
 | Projects | One row per project on a dark block | The files in `src/content/projects/`, `home.json` (`projects`) |
@@ -435,6 +444,125 @@ The hero picture alone sits on a faint surface like thick white paint. It is not
 - **At some window sizes a block is not a whole number of screen pixels**, so now and then one column of blocks is a pixel wider than its neighbours. This is how hard-edged pixel pictures behave at a fluid size.
 - **The compass in the footer rises by 14 pixels** as the footer scrolls into view (`ornamentDistance` in `motion.js`), on tablets and laptops.
 
+## The live widgets
+
+The status ticker in the hero shows four things: the weather in Bangalore, the coordinates and city, the local time, and what is playing on Spotify.
+
+```
+21°C, CLEAR @ N 12° 58′ E 77° 35′ (BANGALORE, INDIA)  |  6:39 AM  |  Elastic Heart, Sia
+```
+
+(Each `|` stands for the short drawn line between two pieces, and Spotify's icon sits before the track.)
+
+| Piece | Where it comes from | How fresh |
+|---|---|---|
+| Local time | Worked out in the visitor's browser | Every minute |
+| Weather | The site's server asks Open-Meteo (`server/weather.js`) | The server keeps an answer for 15 minutes |
+| Now playing | The site's server asks Spotify (`server/spotify.js`) | The server keeps an answer for 30 seconds |
+
+How it fits together:
+
+- The page never talks to Open-Meteo or Spotify itself. It asks this site's own server two small questions, `/api/weather` and `/api/now-playing` (`server/api.js`), and the server asks the services. That is what keeps the Spotify keys out of the page.
+- Because the server keeps each answer for a while, a thousand visitors cause the same handful of requests as one.
+- **Every piece fails quietly.** If a service is down, slow (more than 5 seconds), or its keys are missing or expired, the server answers "nothing" and the page hides that piece. The rest of the ticker carries on. Nothing is shown as an error.
+- When nothing is playing (or it is paused, or it is a podcast), the last track played is shown instead. Screen readers hear "Now playing on Spotify:" or "Last played on Spotify:" before it.
+- **Both work in `npm run dev` too**, as well as with `npm run build` and `npm start`.
+- The weather needs no key and no account. Open-Meteo is free for sites without ads or subscriptions, up to 10,000 requests a day; this site makes at most 96.
+
+These are there because Spotify's terms ask for them. Do not remove them:
+
+- **Spotify's icon before the track** (at least 21px across), **the title linking to that track on Spotify** (it opens in a new tab), and **the title and artists written exactly as Spotify gives them**, not in the ticker's capitals. Spotify's design rules ask for all three wherever its content is shown.
+
+One thing is still owed:
+
+- **A credit for Open-Meteo.** Its data is under the CC BY 4.0 licence, and its terms ask for a link to open-meteo.com where the data is shown. The home page deliberately carries no such words or link: the credit is to go on a page of its own, which is not built yet. Until that page exists the weather is shown without credit, so build it before the site goes live. The sentence to use is "Weather data by Open-Meteo.com", linking to https://open-meteo.com/.
+
+### Spotify: the first setup
+
+This was done on 2026-10-11. The steps are here for a new computer or a new Spotify account.
+
+1. **Create the app.** On https://developer.spotify.com/dashboard, logged in with the Spotify account whose listening should show, create an app. Any name and description. Under Redirect URIs enter exactly `http://127.0.0.1:8888/callback`. If asked which API you will use, tick Web API.
+2. **Put its two keys in `.env`.** Copy `.env.example` to `.env` if there is none. In the dashboard open the app, then Settings. Paste the Client ID after `SPOTIFY_CLIENT_ID=` and the Client secret (behind "View client secret") after `SPOTIFY_CLIENT_SECRET=`. No spaces, no quotes.
+3. **Get the refresh token.** Run `npm run spotify`. Your browser opens Spotify's approval page; click Agree. The script saves `SPOTIFY_REFRESH_TOKEN` in `.env` without showing it, tests it, and prints the last track you played and the date the token stops working.
+
+What the three values are:
+
+- The **Client ID** names the app. It is not secret (it appears in the approval page's address).
+- The **Client secret** is the app's password. Keep it out of chats, screenshots and commits.
+- The **refresh token** is your standing permission for the app to read what you are playing and what you played recently, and nothing else. Treat it like a password too.
+
+Spotify's rules, as of October 2026:
+
+- **The app only works while its owner has Spotify Premium.** If Premium lapses, the line hides until you resubscribe.
+- **`localhost` is not accepted as a redirect address.** It must be `127.0.0.1`.
+- An app that has not been through Spotify's review ("development mode") can be used by up to 5 accounts. This site needs only yours.
+
+### Spotify: every 6 months
+
+**A refresh token stops working 6 months after you approved the app, however often it is used.** When that happens the now-playing line quietly disappears from the site and the server's log says why. Nothing else breaks. Renewing it takes five minutes and has two halves: a new token on your PC, then the same token on the live site.
+
+The current token was obtained on 2026-10-11 and lasts until about **2027-04-11**. Put a reminder in your calendar for a week before, and do these steps then.
+
+**On your PC**
+
+1. Open PowerShell in the site's folder:
+
+   ```powershell
+   cd "D:\My Codes\Personal Website\romitraj.dev"
+   ```
+
+2. Run:
+
+   ```powershell
+   npm run spotify
+   ```
+
+3. Your browser opens Spotify's approval page. Log in with your Spotify account if asked, and click **Agree**.
+4. The browser shows a page saying **Saved**. Close it.
+5. PowerShell prints three lines: that the token was saved, the last track you played (proof that it works), and the new end date. Write the new end date into your calendar.
+6. Open the file to copy the new token:
+
+   ```powershell
+   notepad .env
+   ```
+
+   Select everything after `SPOTIFY_REFRESH_TOKEN=` on that line (a long string of letters and digits) and copy it. Do not change the file. Leave Notepad open until the next part is done.
+
+**In Dokploy**
+
+7. Open your Dokploy dashboard and log in.
+8. Open the project that holds the site, then click the site's application (the one for romitraj.dev, not the fonts one).
+9. Open the **Environment** tab. It shows the application's settings as lines of `NAME=value`.
+10. Find the line that starts with `SPOTIFY_REFRESH_TOKEN=`. Replace everything after the `=` with the token you copied. Change nothing else, and leave no spaces or quotes around it.
+11. Save the settings with the save button on that tab.
+12. Go to the **General** tab and deploy the application again, so that the server restarts with the new token. A saved setting does nothing until the application has been deployed again.
+13. Wait until the newest entry on the **Deployments** tab shows as finished.
+
+**Check it**
+
+14. Open https://romitraj.dev/api/now-playing in your browser. It should show a line with a track's title. An empty page means the server still has no working token: look at steps 10 to 12 again.
+15. Open https://romitraj.dev and look for the track in the ticker.
+16. Close Notepad without saving.
+
+Notes:
+
+- The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. Its documentation does not name the save and deploy buttons, so they are described here instead of named; they will be filled in when the deployment part of this guide is written.
+- The Client ID and Client secret do not change. Only the refresh token is renewed.
+- If `npm run spotify` says the Client ID or secret is wrong, or Spotify's page shows an error about the redirect address, the app's settings on https://developer.spotify.com/dashboard have changed: see "Spotify: the first setup" above.
+- If the Client secret ever leaks, open the app's Settings in Spotify's dashboard, rotate the secret, put the new one in `.env` and in Dokploy's Environment tab, then do all the steps above.
+
+### If a widget is missing
+
+| What you see | Likely cause | What to do |
+|---|---|---|
+| No now-playing line, locally | `.env` is missing one of the three Spotify values | Check `.env`; run `npm run spotify` |
+| No now-playing line, after it worked for months | The refresh token is 6 months old | "Spotify: every 6 months" above |
+| No now-playing line, and Premium has lapsed | Spotify switches the app off | Resubscribe |
+| No weather | Open-Meteo is unreachable | Wait; it comes back by itself within a minute of the service returning |
+| Neither, with `npm start` | The site was not built first | `npm run build`, then `npm start` |
+
+To see what the server answers, open http://localhost:3000/api/weather or http://localhost:3000/api/now-playing while `npm start` is running. An empty page means "nothing to show".
+
 ## Fonts
 
 The site uses four licensed font families. Their files are not in this repository.
@@ -494,7 +622,7 @@ Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `s
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -504,7 +632,11 @@ Open a few of the pictures before committing. The same page should look the same
 
 ## Secrets
 
-Secret values (the Spotify keys, once that widget exists) live in a file named `.env`, which git ignores. `.env.example` shows the names with empty values. Copy it to `.env` and fill it in. Never commit `.env`.
+Secret values (the three Spotify values: see "The live widgets") live in a file named `.env`, which git ignores. `.env.example` shows the names with empty values. Copy it to `.env` and fill it in. Never commit `.env`, and never paste its contents into a chat, an issue or a screenshot.
+
+- To confirm git is ignoring it: `git check-ignore -v .env` should print a line naming `.gitignore`, and `git status` should never list `.env`.
+- On the live server the same three values are entered in the host's settings instead of a file.
+- `npm run check` never uses these values: it runs the site against stand-ins for Spotify and Open-Meteo.
 
 ## Node.js version
 
@@ -522,12 +654,13 @@ If your computer has a different Node.js version than `engines` asks for, `npm i
   - Never move to a beta, alpha, RC, canary, nightly or `next` release. Before a new major version, read its upgrade guide first.
 - **GitHub security alerts:** turn on Dependabot alerts in the repository's settings on GitHub, so GitHub emails you when a dependency has a security problem.
 - **Node.js:** move to the new LTS line each October, as described above.
-- **Yearly:** renew the domain, confirm the Spotify and weather widgets still work, and check the expiry date of the Cloudflare origin certificate.
+- **Every 6 months:** renew the Spotify refresh token with `npm run spotify`, and copy the new value into the live site's settings ("Spotify: every 6 months"). The current one lasts until about 2027-04-11.
+- **Yearly:** renew the domain, confirm the weather still shows and that Spotify Premium is still active, and check the expiry date of the Cloudflare origin certificate.
 
 ## Still to come
 
 These parts of the guide are written when the matching part of the site is built:
 
-- Spotify setup for the now-playing widget, and the weather. Both will appear in the status ticker.
 - Deployment with Dokploy, step by step.
+- A page that credits Open-Meteo for the weather ("Weather data by Open-Meteo.com", linking to https://open-meteo.com/). It is owed under Open-Meteo's licence and should exist before the site goes live. See "The live widgets".
 - The resume itself. Until `resume.pdf` exists, the Resume page is a short note.

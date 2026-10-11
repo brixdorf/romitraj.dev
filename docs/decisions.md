@@ -2,6 +2,81 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-11: Weather and now playing
+
+### Sources checked
+
+No package was added or upgraded. These pages were read on 2026-10-11, before any code was written:
+
+| What | Source | What it settled |
+|---|---|---|
+| Spotify redirect addresses | developer.spotify.com, "Redirect URIs" | `localhost` is refused; `http://127.0.0.1:PORT` is the one plain-http form allowed (enforced for new apps since April 2025) |
+| Spotify approval and tokens | "Authorization Code Flow", "Refreshing tokens" | The flow the helper uses; **refresh tokens last 6 months from the approval and refreshing does not extend them** |
+| Spotify development mode | "Quota modes", "February 2026 Migration Guide", changelogs for February, March, May and July 2026 | The owner needs Premium; 5 users per app; 25 apps per account since July 2026; the two player endpoints used here are not among the ones removed in February 2026 |
+| Spotify endpoints | "Get Currently Playing Track", "Get Recently Played Tracks" | Scopes `user-read-currently-playing` and `user-read-recently-played`; the fields used |
+| Spotify design rules | "Design & Branding Guidelines" | Spotify's icon beside its content (at least 21px), a link back to Spotify, titles as Spotify gives them |
+| Open-Meteo | open-meteo.com: docs, terms, licence | No key; free for sites without ads or subscriptions, under 10,000 requests a day; data under CC BY 4.0 with "a link next to any location Open-Meteo data are displayed" |
+| The Spotify icon's drawing | Phosphor Icons 2.1.1, fill weight (`npm view @phosphor-icons/core version`: still 2.1.1) | Same icon set and licence as the other icons |
+
+### How it is built
+
+- **The page asks this site's own server, and the server asks the services.** `/api/weather` and `/api/now-playing` (`server/api.js`) answer with a few facts as JSON. The Spotify keys and tokens stay on the server; the page only ever sees a title, artists and a link.
+- **Answers are kept** (`server/cache.js`): the weather for 15 minutes, the track for 30 seconds, as the brief asks. Visitors arriving while a request is under way share it. After a failure the service is left alone for a minute.
+- **Nothing playing means the last track played.** So does a paused track or a podcast. Spotify answers "204 No Content" when nothing is playing.
+- **Every failure is quiet.** A service that is down, slow (5 seconds), answering errors, missing its keys or refusing the token all lead to the same thing: the server answers 204 with no body, and the page hides that piece. Nothing shows as an error in the page or the browser's console.
+- **The server uses Node's built-in modules only**, as before: `fetch`, `AbortSignal.timeout`, `process.loadEnvFile`.
+- **The local preview answers the same two questions** (`setServerOptions` in `eleventy.config.js`), so the widgets show in `npm run dev`. The brief expected them only under `npm start`.
+- **The page asks again every 30 seconds for the track and every 15 minutes for the weather, only while its tab is in view**, and at once when the tab comes back into view.
+- **The link to Spotify must begin with `https://open.spotify.com/`** or the answer is dropped, and titles are put into the page as plain text, so nothing a service sends can become markup or a script.
+
+### The ticker's line
+
+- **Order, as on the reference:** weather, an "@", the coordinates and city, the time, then the icon, the track's title (underlined, a link) and the artists. The track is in ink and the rest in grey, as measured there.
+- **The weather shows a word for the sky as well as the temperature** ("21°C, clear"). The reference shows the temperature alone. Romit confirmed he wants both (2026-10-11). The wording is one line in `home.json` (`ticker.weather`).
+- **The home page carries no credit for Open-Meteo. Romit's decision (2026-10-11): the credit will go on a separate page, to be built later.** The first version had "(via Open-Meteo)" with a link in the line; he had it removed completely, with no link on the weather either.
+  - What Open-Meteo asks: its data is under CC BY 4.0, and its licence page says "You must include a link next to any location Open-Meteo data are displayed", with the example "Weather data by Open-Meteo.com".
+  - **Still owed:** the page with that credit does not exist yet, so for now the weather is shown without any. It should be built before the site goes live. Whether a credit on another page, and not beside the data, satisfies that sentence is Romit's call.
+  - `npm run check` fails if the home page mentions Open-Meteo, so the words cannot creep back in by accident.
+- **Spotify's icon is 21px across**, the smallest its rules allow, where the reference's icon is a little smaller. The line stays 20px tall.
+- **The title and the artists are written as Spotify gives them** ("Elastic Heart, Sia"), not in the ticker's capitals, and the title links to that track on Spotify in a new tab. Romit's choice (2026-10-11), to follow Spotify's design rules, which say titles and artist names must be shown as Spotify provides them. The first version showed them in capitals to match the reference's look. He named the title; the artists are shown the same way because the rule covers both and a title in its own case beside an artist in capitals read badly.
+### The drawn lines in Firefox
+
+Romit's review of the ticker showed the short drawn lines between its pieces looking heavier in Firefox than in Chrome and Safari. They date from the hero step.
+
+- **Cause.** The line was a filled box 0.075 of the text's height tall, which is 1.19px in the ticker. No screen can show 1.19 pixels. Measured on an ordinary screen: Chrome's and Safari's engines painted one row of pixels, Firefox two.
+- **Fix.** The line is now the box's top border instead of a filled box (`.dash` in `base.css`). All three browsers round a border's thickness down to whole screen pixels in the same way. Measured after the change: one row in all three on an ordinary screen, two rows in all three on a screen with two screen pixels per pixel. The lines in the navigation list, the small row and the project pages use the same rule and are fixed with it.
+- **Not solved:** at 125% display scaling the three engines still differ by a row in the test browsers, as they did before. That is how each treats a pixel grid that does not divide evenly, and it affects every one-pixel line on any site.
+- **New test:** `npm run check` photographs one of the ticker's lines in each browser, at two widths and at two screen densities, counts the rows of ink, and fails if the browsers disagree (`scripts/lib/dashes.mjs`).
+
+### The six-monthly routine in Dokploy
+
+- The guide now has the renewal step by step: `npm run spotify` on the PC, then the new `SPOTIFY_REFRESH_TOKEN` into the application's Environment tab in Dokploy, then deploy again.
+- **Dokploy's documentation was read on 2026-10-11** (docs.dokploy.com: "Applications", "Variables", the API reference). It names the application's tabs (General, Environment, Deployments) and shows that saving the settings and deploying again are separate actions. **It does not name the buttons**, so the guide describes them instead of naming them. They are to be confirmed, and the guide corrected, when the deployment step is done on Romit's own dashboard.
+
+### The Spotify helper and the 6-month token
+
+- **`npm run spotify`** (`scripts/spotify.mjs`) does the one step that needs a browser: it opens Spotify's approval page, receives the answer on `http://127.0.0.1:8888/callback`, swaps the one-time code for a refresh token, writes it into `.env` without printing it, and tests it. Romit asked for it instead of doing the exchange by hand, because it has to be repeated.
+- **The brief assumed a refresh token lasts indefinitely. It does not any more:** 6 months from the approval. The maintenance routine has a six-monthly item for it, the helper writes the end date beside the token in `.env`, and the server logs a plain sentence when Spotify refuses the token.
+- The first token was obtained on 2026-10-11 and lasts until about 2027-04-11.
+
+### Secrets
+
+- `.env` holds the Client ID, the Client secret and the refresh token. It is ignored by git (`.gitignore`), has never been committed, and `git status` was checked for it before every commit of this step.
+- Nothing in the repo, the docs, the logs of the helper or this log contains a secret. The helper and the checks report only whether a value is present and how long it is.
+
+### Tests
+
+- **The whole of `npm run check` now runs against stand-ins** for Open-Meteo and Spotify on the same computer (`scripts/lib/pretend.mjs`). The site's server is started with the stand-ins' addresses and made-up keys, which take precedence over `.env`. So the check's screenshots always show the same weather and track, it never contacts the real services, and it never uses the real keys.
+- **The server's answers** are tested in seven situations: all well, nothing playing, paused, token refused, both services answering errors, both unreachable, and no keys. It also checks that five requests cause one request to each service, and that no key or token appears in an answer.
+- **On the page**, in three browsers: the right words and links in the line and in each of its repeats, nothing outside the ticker moving when the answers arrive, the line staying 20px tall, the pieces reappearing at once after a page change, and with both services down, the two pieces hidden with no error anywhere.
+- For this the server reads three optional settings, `WEATHER_URL`, `SPOTIFY_TOKEN_URL` and `SPOTIFY_API_URL`. They are only ever set by the check.
+
+### Known issues
+
+- **The line disappears every 6 months until the token is renewed.** There is no way around it for an app in development mode.
+- **A newer refresh token that Spotify may hand out is only kept while the server runs.** The live server's settings cannot be rewritten from inside it, so after a restart the saved one is used again. Spotify's docs say to keep using the old one when no new one is sent, so this is expected to be harmless.
+- **The live site's settings are not covered yet.** They come with the deployment step.
+
 ## 2026-10-10: The apostrophe during the headline's animation
 
 Romit noticed that the raised comma in DON'T was cut while the headline slid in, and whole only once the animation ended.

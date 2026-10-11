@@ -1,9 +1,11 @@
-// Production server: serves the built site from _site/. Uses only Node's built-in modules.
+// Production server: serves the built site from _site/, and answers the two small questions the
+// page's widgets ask (the weather and what is playing: see api.js). Uses only Node's built-in modules.
 // Start it with: npm start
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { answerApi } from './api.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteDir = path.join(root, '_site');
@@ -51,7 +53,7 @@ function send(response, status, body) {
   response.end(body);
 }
 
-const server = http.createServer((request, response) => {
+const server = http.createServer(async (request, response) => {
   if (request.method !== 'GET' && request.method !== 'HEAD') return send(response, 405, 'Method not allowed');
 
   let urlPath;
@@ -61,6 +63,9 @@ const server = http.createServer((request, response) => {
     return send(response, 400, 'Bad request');
   }
   if (urlPath.includes('\0')) return send(response, 400, 'Bad request');
+
+  // The widgets' questions come first; everything else is a file from the built site.
+  if (await answerApi(urlPath, request.method, response)) return;
 
   const found = findFile(siteDir, urlPath);
   if (!found) return send(response, 404, 'Not found');

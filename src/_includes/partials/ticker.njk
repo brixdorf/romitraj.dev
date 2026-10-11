@@ -1,14 +1,30 @@
 {#-
   The status ticker: an endless line of small facts that drifts sideways.
-  Pieces that depend on a script (the local time) start hidden and appear only once the script has filled them in.
+  In order: the weather, the coordinates and city, the local time, and what is playing on Spotify.
+  The three pieces that depend on a script start hidden and appear only once the script has filled
+  them in. If the weather or Spotify cannot be reached, that piece simply stays hidden.
+  The small words are in _data/home.json ("ticker").
 -#}
+{%- from "partials/icon.njk" import icon with context -%}
   <div class="ticker" data-ticker data-part="ticker">
     <div class="ticker__group">
+      <span class="ticker__piece" data-widget data-weather data-format="{{ home.ticker.weather }}" hidden>
+        <span class="visually-hidden">{{ home.ticker.weatherLabel | replace("{city}", site.city) }}</span>
+        <span class="ticker__item ticker__item--muted" data-weather-text></span>
+        <span class="ticker__item ticker__item--muted" aria-hidden="true">@</span>
+      </span>
       <span class="ticker__item ticker__item--muted">{{ site | coordinates }} ({{ site.city }}, {{ site.country }})</span>
       <span class="dash" aria-hidden="true"></span>
       <span class="ticker__piece" data-widget hidden>
-        <span class="visually-hidden">Local time:</span>
+        <span class="visually-hidden">{{ home.ticker.timeLabel }}</span>
         <time class="ticker__item ticker__item--muted" data-local-time data-time-zone="{{ site.timeZone }}"></time>
+        <span class="dash" aria-hidden="true"></span>
+      </span>
+      <span class="ticker__piece" data-widget data-now-playing hidden>
+        <span class="visually-hidden" data-now-playing-label data-playing="{{ home.ticker.playingLabel }}" data-played="{{ home.ticker.playedLabel }}"></span>
+        {#- Spotify's rules: its icon beside its content, a link from the title to the track on Spotify, and the title and artists written as Spotify gives them (not in the ticker's capitals). #}
+        <span class="ticker__mark">{{ icon("spotify") }}</span>
+        <span class="ticker__item ticker__item--as-written"><a class="ticker__link" data-now-playing-link href="https://open.spotify.com/"><span data-now-playing-title></span></a><span data-now-playing-artists></span></span>
         <span class="dash" aria-hidden="true"></span>
       </span>
     </div>

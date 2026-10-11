@@ -1,0 +1,35 @@
+{
+  "note": "The words the status ticker uses for the sky. The numbers are the standard weather codes Open-Meteo sends (the WMO list on https://open-meteo.com/en/docs). Change the words freely; keep them short, because they sit in a one-line ticker. A code without a word shows the temperature alone.",
+
+  "conditions": {
+    "0": "clear",
+    "1": "mostly clear",
+    "2": "partly cloudy",
+    "3": "overcast",
+    "45": "foggy",
+    "48": "foggy",
+    "51": "drizzle",
+    "53": "drizzle",
+    "55": "heavy drizzle",
+    "56": "freezing drizzle",
+    "57": "freezing drizzle",
+    "61": "light rain",
+    "63": "rain",
+    "65": "heavy rain",
+    "66": "freezing rain",
+    "67": "freezing rain",
+    "71": "light snow",
+    "73": "snow",
+    "75": "heavy snow",
+    "77": "snow",
+    "80": "showers",
+    "81": "showers",
+    "82": "heavy showers",
+    "85": "snow showers",
+    "86": "snow showers",
+    "95": "thunderstorm",
+    "96": "thunderstorm with hail",
+    "97": "thunderstorm",
+    "99": "thunderstorm with hail"
+  }
+}

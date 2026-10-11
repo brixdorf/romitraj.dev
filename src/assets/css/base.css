@@ -110,12 +110,16 @@ a {
   text-transform: uppercase;
 }
 
-/* A drawn line that stands where a long dash would go between two pieces of text. */
+/* A drawn line that stands where a long dash would go between two pieces of text.
+   The line is the box's top border, not a filled box. Its thickness is rarely a whole number of
+   pixels (1.2px in the ticker), and browsers disagree about how to paint a box that tall: Firefox
+   made it two pixels where Chrome and Safari made it one. A border's thickness is rounded down to
+   whole screen pixels by every browser in the same way. */
 .dash {
   display: inline-block;
   inline-size: 1.08em;
-  block-size: max(1px, 0.075em);
-  background: currentColor;
+  block-size: 0;
+  border-block-start: max(1px, 0.075em) solid currentColor;
   vertical-align: 0.3em;
 }
 

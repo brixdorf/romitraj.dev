@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { convertImages } from './scripts/images.mjs';
+import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
 
@@ -141,6 +142,16 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');
+
+  // The local preview (npm run dev) answers the widgets' two questions the same way the live
+  // server does, so the weather and the now-playing line show while developing too.
+  eleventyConfig.setServerOptions({
+    middleware: [
+      (request, response, next) => {
+        answerApi(new URL(request.url, 'http://localhost').pathname, request.method, response).then((answered) => { if (!answered) next(); }, () => next());
+      },
+    ],
+  });
 
   // Bundle and minify the CSS and JavaScript before every build.
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {

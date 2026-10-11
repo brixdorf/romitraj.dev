@@ -18,8 +18,10 @@ export async function buildSite() {
 }
 
 // Starts the site's own server on the given port. Returns its address and a function that stops it.
-export async function startServer(port) {
-  const server = spawn(process.execPath, ['server/index.js'], { cwd: root, env: { ...process.env, PORT: String(port) }, stdio: 'ignore' });
+// "settings" are extra environment values for it: the check uses them to point the widgets at
+// stand-in services (lib/pretend.mjs) instead of the real ones. Values given here win over .env.
+export async function startServer(port, settings = {}) {
+  const server = spawn(process.execPath, ['server/index.js'], { cwd: root, env: { ...process.env, ...settings, PORT: String(port) }, stdio: 'ignore' });
   const address = `http://localhost:${port}`;
   for (let attempt = 0; attempt < 50; attempt++) {
     try {

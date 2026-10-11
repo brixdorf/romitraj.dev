@@ -7,7 +7,11 @@
 // window it slides in (lib/letters.mjs), confirms that the headline's entrance on the home page
 // is safe (lib/entrance.mjs), and confirms that every picture is described or marked as
 // decoration, stays small, moves nothing as it loads and looks the same in every browser
-// (lib/pictures.mjs).
+// (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
+// facts and hide quietly when a service is down (lib/widgets.mjs). The whole check runs against
+// stand-ins for Open-Meteo and Spotify (lib/pretend.mjs): it never asks the real services and
+// never uses the keys in .env. Last, it compares how thick each browser paints the drawn lines
+// in the ticker (lib/dashes.mjs).
 // Run it with: npm run check
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,6 +21,9 @@ import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
+import { startPretend, unreachable } from './lib/pretend.mjs';
+import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
+import { dashThickness, dashesDiffer } from './lib/dashes.mjs';
 
 const privateDir = path.join(root, '..', 'romitraj-private');
 // Screenshots go next to the reference screenshots when that folder exists, otherwise into this repo (ignored by git).
@@ -110,9 +117,24 @@ if (weights.problems.length) {
 console.log(`Pictures: ${weights.summary}.`);
 
 // ---- 4. Screenshots ----
-// Where every picture ended up in each browser, to compare them at the end.
+// ---- Widgets: what the server answers, in every situation ----
+const answerProblems = await widgetAnswers(4260);
+if (answerProblems.length) {
+  console.log('\nWIDGET ANSWER PROBLEMS:\n  ' + answerProblems.join('\n  '));
+  process.exitCode = 1;
+} else {
+  console.log('Widgets: the server answers correctly, and with nothing when a service is down, expired or missing its keys.');
+}
+
+// Where every picture ended up in each browser, and how thick each browser paints the drawn
+// lines, to compare them at the end.
 const pictureWhere = {};
-const server = await startServer(4173);
+const dashRows = {};
+// Every page below is served with stand-in weather and a stand-in track, the same on every run.
+// A second copy of the site is served with both services unreachable.
+const pretend = await startPretend(4174);
+const server = await startServer(4173, pretend.env);
+const quietServer = await startServer(4176, unreachable(4177));
 try {
   fs.rmSync(shotsDir, { recursive: true, force: true });
   for (const [engineName, engine] of Object.entries(engines)) {
@@ -204,15 +226,22 @@ try {
       console.log(`\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '));
       process.exitCode = 1;
     }
+    // ---- Widgets on the page: shown when all is well, hidden quietly when not ----
+    const widgetProblems = await widgetsOnThePage(browser, server.address, quietServer.address);
+    if (widgetProblems.length) {
+      console.log(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     // ---- 9. Pictures: sized, described, sharp, and moving nothing as they load ----
     const { problems: pictureProblems, where } = await picturesHoldStill(browser, server.address, pages);
     pictureWhere[engineName] = where;
+    dashRows[engineName] = await dashThickness(browser, server.address);
     if (pictureProblems.length) {
       console.log(`\nPICTURE PROBLEMS in ${engineName}:\n  ` + pictureProblems.slice(0, 20).join('\n  ') + (pictureProblems.length > 20 ? `\n  ... and ${pictureProblems.length - 20} more` : ''));
       process.exitCode = 1;
     }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance and pictures: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, widgets and pictures: ${engineName} done.`);
   }
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);
@@ -222,8 +251,18 @@ try {
   } else {
     console.log('Pictures: the same place and size in every browser.');
   }
+  // ---- 11. Are the drawn lines equally thick in every browser? ----
+  const lineProblems = dashesDiffer(dashRows);
+  if (lineProblems.length) {
+    console.log('\nDRAWN LINES THAT DIFFER BETWEEN BROWSERS:\n  ' + lineProblems.join('\n  '));
+    process.exitCode = 1;
+  } else {
+    console.log('Drawn lines: the same thickness in every browser.');
+  }
   console.log(`\nSaved to ${shotsDir}`);
 } finally {
   server.stop();
+  quietServer.stop();
+  await pretend.stop();
 }
 console.log(process.exitCode ? '\nCheck finished with problems.' : '\nCheck passed.');

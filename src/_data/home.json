@@ -2,6 +2,15 @@
   "lead": "The personal site and portfolio of Romit&nbsp;Raj&nbsp;Sahu, a CS student in Bangalore who hasn't picked a specialty yet.",
   "scrollNote": "(Keep scrolling. No rush.)",
 
+  "ticker": {
+    "note": "The small words of the status ticker. The labels are read out by screen readers and are not shown. In 'weather', {temperature} and {condition} are filled in by the page; the words for the sky are in weather.json.",
+    "weatherLabel": "Weather in {city}:",
+    "weather": "{temperature}°C, {condition}",
+    "timeLabel": "Local time:",
+    "playingLabel": "Now playing on Spotify:",
+    "playedLabel": "Last played on Spotify:"
+  },
+
   "letter": {
     "label": "A quick note before you scroll",
     "paragraphs": [
