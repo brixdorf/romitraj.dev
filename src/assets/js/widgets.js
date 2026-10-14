@@ -4,7 +4,8 @@
 // server/api.js).
 // Every widget fails quietly. Its piece of the page stays hidden unless the script can fill it
 // in, and is hidden again if its service stops answering. The blog posts are the exception: the
-// page is built with a list of them, and keeps the last good list it has (see posts.js).
+// home page is built with a list of them and the About page with the latest one, and each keeps
+// the last good one it has (see posts.js).
 import { showPosts } from './posts.js';
 
 // How often the server is asked again, in milliseconds. The server itself keeps each answer
@@ -96,13 +97,15 @@ function keepCurrent(name, address, show, { keepLastGood = false } = {}) {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
 }
 
-// Fills in every widget on the page as it is now. Called again whenever a page change brings new content.
-export function showWidgets() {
+// Fills in every widget on the page as it is now. Called again whenever a page change brings new
+// content, with "arriving" set: that content is not on the screen yet, so the blog's posts can be
+// put in place wherever they are.
+export function showWidgets({ arriving = false } = {}) {
   showLocalTime();
   showCurrentYear();
   showWeather();
   showNowPlaying();
-  showPosts(latest.posts);
+  showPosts(latest.posts, { arriving });
 }
 
 // Fills in the widgets and keeps them current: the time once at the start of the next minute and

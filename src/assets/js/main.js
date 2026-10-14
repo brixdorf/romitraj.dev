@@ -15,8 +15,10 @@ startPageChanges({
     stopAnimations();
   },
   // New content is in the page: fill in its widgets and start its tickers and scroll movement.
+  // It is not on the screen yet (the browser has not drawn since it came in), so the blog's
+  // posts may be brought up to date wherever they are.
   afterSwap(content) {
-    showWidgets();
+    showWidgets({ arriving: true });
     stopAnimations = startAnimations(content);
   },
 });

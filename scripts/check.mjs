@@ -8,9 +8,9 @@
 // is safe (lib/entrance.mjs), and confirms that every picture is described or marked as
 // decoration, stays small, moves nothing as it loads and looks the same in every browser
 // (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
-// facts and hide quietly when a service is down (lib/widgets.mjs), and that the home page's list
-// of blog posts is brought up to date from the server without moving anything in sight
-// (lib/posts.mjs). The whole check, the build included, runs against stand-ins for Open-Meteo,
+// facts and hide quietly when a service is down (lib/widgets.mjs), and that the blog's posts on
+// the home page (the list) and the About page (the latest post) are brought up to date from the
+// server without moving anything in sight (lib/posts.mjs). The whole check, the build included, runs against stand-ins for Open-Meteo,
 // Spotify and the blog's feed (lib/pretend.mjs): it never asks the real services or reads the
 // real blog, and never uses the keys in .env. It confirms that the visitor counter (Rybbit) is not loaded on
 // this computer, and that on the live site it would be loaded once and count each page change
@@ -29,7 +29,7 @@ import { headOfEveryPage, siteIconInBrowser } from './lib/head.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
 import { startPretend, unreachable } from './lib/pretend.mjs';
 import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
-import { postAnswers, postsOnThePage } from './lib/posts.mjs';
+import { postAnswers, postsOnThePage, latestOnTheAboutPage } from './lib/posts.mjs';
 import { dashThickness, dashesDiffer } from './lib/dashes.mjs';
 import { visitorCounting } from './lib/analytics.mjs';
 
@@ -323,8 +323,9 @@ try {
       console.log(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
       process.exitCode = 1;
     }
-    // ---- The blog's posts on the home page: brought up to date, moving nothing in sight ----
-    const postProblems = await postsOnThePage(browser, { sameAddress: server.address, newerAddress: newerServer.address, quietAddress: quietServer.address, shown: postsShown });
+    // ---- The blog's posts on the home page and the About page: brought up to date, moving nothing in sight ----
+    const postAddresses = { sameAddress: server.address, newerAddress: newerServer.address, quietAddress: quietServer.address, shown: postsShown };
+    const postProblems = [...await postsOnThePage(browser, postAddresses), ...await latestOnTheAboutPage(browser, postAddresses)];
     if (postProblems.length) {
       console.log(`\nBLOG POST PROBLEMS in ${engineName}:\n  ` + postProblems.join('\n  '));
       process.exitCode = 1;

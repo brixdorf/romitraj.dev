@@ -15,6 +15,17 @@ description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach 
 -#}
 {%- from "partials/icon.njk" import icon with context -%}
 {%- macro arrow(url) %}<span class="link__arrow" aria-hidden="true">{% if "http" in url or "mailto:" in url %}&nearr;{% else %}&rarr;{% endif %}</span>{% endmacro -%}
+{#- The piece about the latest blog post. The data-... marks are for the script that brings it up to date. #}
+{%- macro latestPost(post) %}
+  <article class="teaser about-page__latest" data-part="card" data-latest-post>
+    <p class="teaser__meta">{{ about.latest.label }}, <time datetime="{{ post.isoDate }}" data-post-date>{{ post.date }}</time></p>
+    <h3 class="teaser__title" data-post-title>{{ post.title }}</h3>
+    {%- if post.description %}
+    <p class="teaser__text" data-post-text>{{ post.description }}</p>
+    {%- endif %}
+    <a class="teaser__link" href="{{ post.url }}" data-post-link>{{ about.latest.link }}{{ arrow(post.url) }}</a>
+  </article>
+{%- endmacro -%}
 <div class="page-grid about-page" data-part="cards">
   <section class="panel about-page__who" data-part="card">
     <h2 class="panel__title">{{ about.who.title }}</h2>
@@ -56,18 +67,15 @@ description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach 
     </div>
   </section>
 
-  {#- The newest post from the blog. Left out when the blog's feed could not be read. #}
-  {%- set post = blog.posts[0] %}
-  {%- if post %}
-  <article class="teaser about-page__latest" data-part="card">
-    <p class="teaser__meta">{{ about.latest.label }}, <time datetime="{{ post.isoDate }}">{{ post.date }}</time></p>
-    <h3 class="teaser__title">{{ post.title }}</h3>
-    {%- if post.description %}
-    <p class="teaser__text">{{ post.description }}</p>
-    {%- endif %}
-    <a class="teaser__link" href="{{ post.url }}">{{ about.latest.link }}{{ arrow(post.url) }}</a>
-  </article>
+  {#- The newest post from the blog, built with the site and brought up to date by the page itself
+      when the server knows of a newer one (assets/js/posts.js). Left out when the blog's feed
+      could not be read during the build; the page can then add it. The blank copy in the
+      <template> (a piece of the page that is never shown, only copied) marks where it goes, and
+      is what a live one is made from, so it matches a built one exactly. #}
+  {%- if blog.posts[0] %}
+  {{- latestPost(blog.posts[0]) }}
   {%- endif %}
+  <template data-latest-post-blank>{{ latestPost({ url: blog.url, isoDate: "", date: "", title: "", description: "-" }) }}</template>
 
   <section class="panel about-page__contact" data-part="card">
     <h2 class="panel__title">{{ about.contact.title }}</h2>

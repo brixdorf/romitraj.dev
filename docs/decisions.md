@@ -2,6 +2,31 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-10-14: The About page's latest post arrives without a deploy too
+
+Romit asked for the About page's piece about the latest post to work like the home page's list: from `/api/posts`, with the built piece as the fallback, the same no-jump rule, and the last good post kept when the feed fails. No package was added.
+
+- **The server sends each post's short description now** (`server/blog.js`), which the piece shows under the title. Nothing else in its answer changed.
+- **One piece, written once.** The piece is a Nunjucks macro in `src/content/about.njk`, used for the built piece and for a blank copy in a `<template>` element right where the piece goes. A live piece is a copy of that blank, so it carries the same classes, the same "card" mark the page change uses to bring it in, and the same new-tab link. When the build could not read the feed, there is no piece, and the `<template>` marks where one is added.
+- **One rule for both pages** (`src/assets/js/posts.js`, rewritten so the list and the piece share it):
+  - A piece is changed only while it is out of sight below the window, as on the home page.
+  - **New: the change is tried and measured first.** Everything the visitor can see is measured, the change is made, and if anything in sight moved, it is undone at once. All of this happens before the browser draws again, so the visitor never sees the try. It was needed on the About page: there the piece shares grid rows with other cards, so a piece just below the window could still stretch a card that is in sight. A test put the piece exactly at the window's edge on a tablet; without the measuring, something in sight moved.
+  - **New: waiting pieces are tried again on every scroll and resize** (once per frame at most), instead of only when the piece leaves the window, so a try that had to be undone gets another chance.
+  - **New: a page arriving through a page change gets the newer posts straight away**, wherever its pieces are. The new content comes in and is announced in the same step, before the browser draws anything (confirmed in Taxi's code), so changing it then cannot be seen. This matters on the About page, whose piece starts near the bottom of a laptop's first screen. The home page's list follows the same rule.
+  - Still: a piece that already says the same is never touched, and the movement tied to scrolling measures its places again after a change.
+- **What stays as built, by the rule:** on a laptop, a visitor who opens the About page directly and can already see the piece when the newer post arrives keeps the built piece for that visit. Arriving from another page of the site, or on a tablet or a phone (where the piece starts below the window), they get the newer one.
+- **The last good post** is kept as before: the server keeps answering with the last list it read, and the page keeps the last answer it had.
+- **The stand-in feed** gives each post a description; the newer post's is much longer, so the piece really changes size in the tests.
+- **Tests** (`latestOnTheAboutPage` in `scripts/lib/posts.mjs`), in each of the three browsers:
+  - below the window at a phone's, a tablet's and a laptop's width, the newer post is put in place with nothing in sight and nothing above it moving, made exactly like a built piece;
+  - on a tablet with the piece exactly at the window's edge, nothing in sight moves, whichever way it goes;
+  - in sight, the piece is left alone until the window is made shorter, then put in place;
+  - after a page change into the About page, the newer post is there at once and nothing moves afterwards;
+  - an unchanged post is not touched; a page built without the piece gets it, in the right place in the grid;
+  - with the feed unreachable or without scripts, the built piece stays.
+
+  The server's answer test now checks the descriptions too. Faults put in on purpose were each reported: changing at once whatever the place, the added piece in the wrong place, the measuring left out, and the page-change exception left out.
+
 ## 2026-10-14: The tab icon follows light and dark; blog posts arrive without a deploy
 
 Romit asked for both. No package was added or upgraded.
@@ -23,7 +48,7 @@ Romit asked for both. No package was added or upgraded.
 - **The last good list.** If the feed fails, the server keeps answering with the last list it read and tries the feed again after 5 minutes (`server/cache.js` has a "keep the last good answer" option for this; the weather and the track still hide when their service fails, as before). Before its first good read, the server answers nothing, and the page keeps its built list. The page likewise keeps the last good list it was given.
 - **Nothing in sight moves.** A newer list can be a line taller or shorter than the old one and push everything under it. So the list is replaced only while it is entirely below the window: at once when the page has just opened or arrived through a page change (the visitor is at the top), or else as soon as the visitor scrolls back above it. A list equal to the one in the page is not touched at all. After a replacement, the movement tied to scrolling (the footer's compass) measures its places again.
 - **One card pattern.** The cards are written once (a Nunjucks macro in `partials/writing.njk`), for the built list and for a blank card kept in a `<template>` element, which the page copies for each new post. A live card is therefore the built card: the same classes, and the same new-tab link and hidden "(opens in a new tab)", which the build adds to the template like any other link. A page built while the blog was unreachable shows a sentence instead of cards; the live list replaces it.
-- **The About page's latest post** is still made at build time and changes at the next deploy. Only the home page's list was asked for.
+- **The About page's latest post** is still made at build time and changes at the next deploy. Only the home page's list was asked for. (Changed later the same day: see the entry above.)
 - **The check reads no real blog any more.** The stand-in services (`scripts/lib/pretend.mjs`) now include a feed with five stand-in posts of different lengths, in four moods (the same posts, one more post on top, an error, and an answer that is not a feed). `npm run check` and `npm run speed` build the site with that feed too, so the built list and the server's list agree and the screenshots no longer change with the real blog. A stand-in feed is never saved in `.cache/`, so `npm run dev` never shows it.
 - **Tests** (`scripts/lib/posts.mjs`). The server: the right posts in the right order and shape, one reading of the feed for five requests, no more posts than the page shows, and an empty answer for a feed that fails, is not a feed or cannot be reached; with short timings, the last good list kept through a failure, the failing feed not asked again at once, and the newer list taken once it answers. In each of the three browsers: a newer list put in place with nothing in sight and nothing above it moving, its cards made exactly like built ones; with the list in sight, nothing replaced and nothing moved until the visitor scrolls back up; the newer list there at once after a page change; an unchanged list left untouched; cards filled in on a page built without them; the built list kept with the feed unreachable and without scripts. Three faults put in on purpose (replacing while in sight, replacing an unchanged list, forgetting the last good list) were each reported, in every browser.
 

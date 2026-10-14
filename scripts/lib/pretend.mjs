@@ -19,8 +19,9 @@ export const pretendTracks = {
   lately: { title: 'Earlier Song', artists: ['Somebody'], url: 'https://open.spotify.com/track/pretend-earlier' },
 };
 // The blog's posts in the "same" feed, newest first, and the one more post of the "newer" feed.
-// Their titles differ in length, so a list that changes can also change height.
-const post = (slug, title, day) => ({ title, url: `https://blog.romitraj.dev/blog/${slug}`, published: day });
+// Their titles differ in length, so a list that changes can also change height, and the new
+// post's description is longer, so the About page's piece about the latest post grows too.
+const post = (slug, title, day, description = 'A stand-in.') => ({ title, url: `https://blog.romitraj.dev/blog/${slug}`, published: day, description });
 export const pretendPosts = [
   post('stand-in-five', 'A stand-in post for the check', '2026-09-14'),
   post('stand-in-four', 'Another stand-in, with a title that runs on for quite a while longer', '2026-07-29'),
@@ -28,10 +29,10 @@ export const pretendPosts = [
   post('stand-in-two', 'A middling stand-in title', '2026-03-18'),
   post('stand-in-one', 'The first stand-in', '2026-03-16'),
 ];
-export const pretendNewPost = post('stand-in-new', 'A brand new stand-in post, long enough to need more lines than the others', '2026-10-01');
+export const pretendNewPost = post('stand-in-new', 'A brand new stand-in post, long enough to need more lines than the others', '2026-10-01', 'A stand-in with a longer description than the others, so that the piece about it on the About page needs more room than the one it replaces, on every width.');
 const feed = (posts) => `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Stand-in blog</title><link>https://blog.romitraj.dev/</link>
-${posts.map(({ title, url, published }) => `<item><title>${title}</title><link>${url}</link><pubDate>${new Date(published + 'T00:00:00Z').toUTCString()}</pubDate><description>A stand-in.</description></item>`).join('')}
+${posts.map(({ title, url, published, description }) => `<item><title>${title}</title><link>${url}</link><pubDate>${new Date(published + 'T00:00:00Z').toUTCString()}</pubDate><description>${description}</description></item>`).join('')}
 </channel></rss>
 `;
 

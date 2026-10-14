@@ -1,5 +1,6 @@
-// Tests used by the check script, about the home page's list of blog posts, which the page brings
-// up to date from the server (/api/posts, server/blog.js; on the page, assets/js/posts.js).
+// Tests used by the check script, about the blog's posts on the home page (the list of cards) and
+// on the About page (the piece about the latest post), which the pages bring up to date from the
+// server (/api/posts, server/blog.js; on the page, assets/js/posts.js).
 // Nothing here reads the real blog: the server and the build are pointed at a stand-in feed
 // (lib/pretend.mjs), whose "same" list is the one the site was built with.
 //
@@ -15,6 +16,14 @@
 // back above it; that arriving through a page change shows the newer list at once; that a list
 // equal to the built one is left alone; that a page built without posts gets them; and that with
 // the feed unreachable or without scripts the built list stays.
+//
+// "latestOnTheAboutPage" checks the same for the About page's piece about the latest post: put in
+// place when it is below the window, with nothing in sight moving, at a phone's, a tablet's and a
+// laptop's width (and, on a tablet, with the piece just below the window, where a card beside it
+// could stretch: whatever happens there, nothing in sight may move); left alone while it is in
+// sight, and put in place once the window leaves it below; there at once after a page change;
+// added to a page built without it; and the built one kept with the feed unreachable or without
+// scripts.
 import { startServer } from './site.mjs';
 import { startPretend, unreachable, pretendPosts, pretendNewPost } from './pretend.mjs';
 
@@ -50,8 +59,8 @@ export async function postAnswers(firstPort, shown) {
       got.value.posts.forEach((post, index) => {
         const wanted = expected[index];
         if (!wanted) return;
-        if (post.url !== wanted.url || post.isoDate !== wanted.published || !/^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(post.date)) report(`post ${index + 1} is ${JSON.stringify(post)}`);
-        if (Object.keys(post).sort().join(',') !== 'date,isoDate,title,url') report(`post ${index + 1} carries more than its title, address and date`);
+        if (post.url !== wanted.url || post.isoDate !== wanted.published || post.description !== wanted.description || !/^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(post.date)) report(`post ${index + 1} is ${JSON.stringify(post)}`);
+        if (Object.keys(post).sort().join(',') !== 'date,description,isoDate,title,url') report(`post ${index + 1} carries more than its title, address, description and date`);
       });
     }
     for (let again = 0; again < 4; again++) await ask();
@@ -114,9 +123,9 @@ const listTitles = () => [...document.querySelectorAll('[data-posts] [data-posts
 // Notes every piece of the page outside the tickers that the visitor can see now, and where it is
 // on the screen: only the part of it inside the window counts, so a box that holds the list (the
 // page's content as a whole) may grow below the window. With "aboveTheList", it notes every piece
-// that comes before the list instead, and where it is on the page.
-function watchPlaces(aboveTheList) {
-  const list = document.querySelector('[data-posts-list]');
+// that comes before the list (or the piece named by "selector") instead, and where it is on the page.
+function watchPlaces([aboveTheList, selector = '[data-posts-list]']) {
+  const list = document.querySelector(selector);
   const watch = (window.watching ??= {})[aboveTheList ? 'above' : 'insight'] = {};
   watch.place = aboveTheList
     ? (element) => { const rect = element.getBoundingClientRect(); return { left: rect.left, top: rect.top + window.scrollY, width: rect.width, height: rect.height }; }
@@ -141,8 +150,9 @@ function movedPlaces(aboveTheList) {
   }).map((element) => `${element.tagName.toLowerCase()}${typeof element.className === 'string' && element.className ? '.' + element.className.split(' ')[0] : ''}`);
 }
 
-// Opens the home page with the answer to /api/posts held back until "release" is called.
-async function openHeld(browser, address, { viewport = { width: 1440, height: 900 }, change } = {}) {
+// Opens a page (the home page unless "path" says otherwise) with the answer to /api/posts held
+// back until "release" is called. "change" can alter the page as it arrives from the server.
+async function openHeld(browser, address, { path = '/', viewport = { width: 1440, height: 900 }, change } = {}) {
   const context = await browser.newContext({ viewport });
   await context.addInitScript(() => { window.steadyMotion = true; });
   const page = await context.newPage();
@@ -151,8 +161,8 @@ async function openHeld(browser, address, { viewport = { width: 1440, height: 90
   let release = () => {};
   const held = new Promise((resolve) => { release = resolve; });
   await page.route(/\/api\/posts/, async (route) => { await held; await route.continue().catch(() => {}); });
-  if (change) await page.route(address + '/', async (route) => { const response = await route.fetch(); await route.fulfill({ response, body: change(await response.text()) }); });
-  await page.goto(address + '/', { waitUntil: 'load' });
+  if (change) await page.route(address + path, async (route) => { const response = await route.fetch(); await route.fulfill({ response, body: change(await response.text()) }); });
+  await page.goto(address + path, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(300);
   return { context, page, release, errors };
@@ -172,8 +182,8 @@ export async function postsOnThePage(browser, { sameAddress, newerAddress, quiet
     const { context, page, release, errors } = await openHeld(browser, newerAddress);
     if (!same(await page.evaluate(listTitles), built)) problems.push(`before the answer, the page's list was not the one it was built with: ${(await page.evaluate(listTitles)).join(' | ')}`);
     const builtCard = await page.evaluate(() => document.querySelector('[data-post-link]').outerHTML);
-    await page.evaluate(watchPlaces, false);
-    const aboveCount = await page.evaluate(watchPlaces, true);
+    await page.evaluate(watchPlaces, [false]);
+    const aboveCount = await page.evaluate(watchPlaces, [true]);
     release();
     const arrived = await page.waitForFunction((wanted) => document.querySelector('[data-posts] [data-post-title]')?.textContent === wanted, newer[0], { timeout: 8000 }).then(() => true).catch(() => false);
     if (!arrived) problems.push('with a newer post on the blog, the home page did not show it');
@@ -201,7 +211,7 @@ export async function postsOnThePage(browser, { sameAddress, newerAddress, quiet
     await page.evaluate(() => document.querySelector('[data-posts-list]').scrollIntoView({ block: 'center' }));
     // Let the movement tied to scrolling settle.
     await page.waitForTimeout(3000);
-    await page.evaluate(watchPlaces, false);
+    await page.evaluate(watchPlaces, [false]);
     release();
     await page.waitForTimeout(1500);
     if (!same(await page.evaluate(listTitles), built)) problems.push('the newer list replaced the list while the visitor was looking at it');
@@ -271,6 +281,143 @@ export async function postsOnThePage(browser, { sameAddress, newerAddress, quiet
     const page = await context.newPage();
     await page.goto(sameAddress + '/', { waitUntil: 'load' });
     if (!same(await page.evaluate(listTitles), built)) problems.push('without scripts, the built list is missing');
+    await context.close();
+  }
+  return [...new Set(problems)];
+}
+
+// ---- The About page's piece about the latest post ----
+
+// What the piece says now, or null if there is none.
+const latestNow = () => {
+  const piece = document.querySelector('[data-latest-post]');
+  if (!piece) return null;
+  return { title: piece.querySelector('[data-post-title]').textContent, text: piece.querySelector('[data-post-text]')?.textContent || '', href: piece.querySelector('[data-post-link]').getAttribute('href'), date: piece.querySelector('[data-post-date]').getAttribute('datetime'), top: piece.getBoundingClientRect().top, part: piece.dataset.part };
+};
+const waitForLatest = (page, title, timeout) => page.waitForFunction((wanted) => document.querySelector('[data-latest-post] [data-post-title]')?.textContent === wanted, title, { timeout }).then(() => true).catch(() => false);
+// The shape of a piece without its words, to compare a piece made on the page with a built one.
+const shapeOf = (html) => html.replace(/href="[^"]*"/, '').replace(/datetime="[^"]*"/, '').replace(/>[^<]*<\/time>/, '></time>').replace(/(data-post-title="?"?>)[^<]*</, '$1<').replace(/(data-post-text="?"?>)[^<]*</, '$1<');
+
+export async function latestOnTheAboutPage(browser, { sameAddress, newerAddress, quietAddress }) {
+  const problems = [];
+  const built = pretendPosts[0];
+  const fresh = pretendNewPost;
+  const about = '/about/';
+
+  // 1. Below the window when the page opens: put in place, nothing in sight or above it moves.
+  //    The tablet's second case puts the piece just below the window: there a card beside it may
+  //    stretch, so the piece may have to wait; either way nothing in sight may move.
+  for (const [name, viewport, justBelow] of [['a phone', { width: 390, height: 844 }], ['a tablet', { width: 768, height: 1024 }], ['a laptop', { width: 1440, height: 800 }], ['a tablet, with the piece just below the window', { width: 768, height: 1024 }, true]]) {
+    const { context, page, release, errors } = await openHeld(browser, newerAddress, { path: about, viewport });
+    const before = await page.evaluate(latestNow);
+    if (before?.title !== built.title) { problems.push(`on ${name}, before the answer the piece was ${before?.title ?? 'missing'} instead of the built one`); await context.close(); continue; }
+    if (justBelow) {
+      await page.setViewportSize({ width: viewport.width, height: Math.floor(before.top) });
+      await page.waitForTimeout(300);
+    }
+    if ((await page.evaluate(latestNow)).top < (await page.evaluate(() => window.innerHeight))) { problems.push(`on ${name}, the piece is in sight when the page opens, so this test cannot run`); await context.close(); continue; }
+    const builtPiece = await page.evaluate(() => document.querySelector('[data-latest-post]').outerHTML);
+    await page.evaluate(watchPlaces, [false]);
+    await page.evaluate(watchPlaces, [true, '[data-latest-post]']);
+    release();
+    const arrived = await waitForLatest(page, fresh.title, justBelow ? 2000 : 8000);
+    if (!arrived && !justBelow) problems.push(`on ${name}, with a newer post on the blog, the About page did not show it`);
+    await page.waitForTimeout(500);
+    const moved = await page.evaluate(movedPlaces, false);
+    if (moved.length) problems.push(`on ${name}, ${moved.length} pieces in sight moved when the newer post arrived, the first being ${moved[0]}`);
+    const movedAbove = await page.evaluate(movedPlaces, true);
+    if (movedAbove.length) problems.push(`on ${name}, ${movedAbove.length} pieces above the piece moved when the newer post arrived, the first being ${movedAbove[0]}`);
+    if (arrived) {
+      const now = await page.evaluate(latestNow);
+      if (now.text !== fresh.description || now.href !== fresh.url || now.date !== fresh.published || now.part !== 'card') problems.push(`on ${name}, the new piece says ${JSON.stringify(now)}`);
+      const madePiece = await page.evaluate(() => document.querySelector('[data-latest-post]').outerHTML);
+      if (shapeOf(madePiece) !== shapeOf(builtPiece)) problems.push(`the piece made on the page differs from the built one:\n      made:  ${madePiece}\n      built: ${builtPiece}`);
+      if (await page.evaluate(() => document.querySelectorAll('[data-latest-post]').length) !== 1) problems.push(`on ${name}, there is more than one piece about the latest post`);
+    }
+    problems.push(...errors);
+    await context.close();
+  }
+
+  // 2. In sight when the answer arrives (on a laptop the piece starts near the bottom of the first
+  //    screen): left alone, nothing moves; once the window is made shorter, so that the piece is
+  //    below it, it is put in place.
+  {
+    const { context, page, release, errors } = await openHeld(browser, newerAddress, { path: about, viewport: { width: 1440, height: 1000 } });
+    await page.evaluate(watchPlaces, [false]);
+    release();
+    await page.waitForResponse(/\/api\/posts/, { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(1000);
+    if ((await page.evaluate(latestNow))?.title !== built.title) problems.push('the newer post replaced the About page\'s piece while the visitor could see it');
+    const moved = await page.evaluate(movedPlaces, false);
+    if (moved.length) problems.push(`with the About page's piece in sight, ${moved.length} pieces moved when the newer post arrived, the first being ${moved[0]}`);
+    await page.setViewportSize({ width: 1440, height: 700 });
+    if (!(await waitForLatest(page, fresh.title, 5000))) problems.push('once the About page\'s piece was below the window, the newer post was still not shown');
+    problems.push(...errors);
+    await context.close();
+  }
+
+  // 3. Arriving at the About page through a page change shows the newer post at once, even where
+  //    the piece is in sight, and nothing moves once the arrival has finished.
+  {
+    const { context, page, release, errors } = await openHeld(browser, newerAddress);
+    release();
+    await page.waitForResponse(/\/api\/posts/, { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(300);
+    await page.locator('.hero__nav a[href="/about/"]').click();
+    await page.waitForFunction(() => location.pathname === '/about/' && document.querySelector('[data-latest-post]') && !document.querySelector('.hero'), null, { timeout: 8000 }).catch(() => {});
+    const first = await page.evaluate(latestNow);
+    if (first?.title !== fresh.title) problems.push(`arriving at the About page through a page change, the piece was ${first?.title ?? 'missing'} instead of the newer post`);
+    await page.waitForTimeout(2500);
+    await page.evaluate(watchPlaces, [false]);
+    await page.waitForTimeout(800);
+    const moved = await page.evaluate(movedPlaces, false);
+    if (moved.length) problems.push(`after arriving at the About page, ${moved.length} pieces moved, the first being ${moved[0]}`);
+    problems.push(...errors);
+    await context.close();
+  }
+
+  // 4. The same post as the built one: the piece is not touched.
+  {
+    const { context, page, release, errors } = await openHeld(browser, sameAddress, { path: about, viewport: { width: 1440, height: 800 } });
+    await page.evaluate(() => { document.querySelector('[data-latest-post]').marked = true; });
+    release();
+    await page.waitForResponse(/\/api\/posts/, { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    if (!(await page.evaluate(() => document.querySelector('[data-latest-post]')?.marked))) problems.push('the About page\'s piece was replaced although the server\'s latest post is the built one');
+    problems.push(...errors);
+    await context.close();
+  }
+
+  // 5. A page built while the feed was down (no piece at all) gets one, in its place in the grid.
+  {
+    const without = (html) => html.replace(/<article class="teaser about-page__latest"[\s\S]*?<\/article>\s*(?=<template data-latest-post-blank>)/, '');
+    const { context, page, release, errors } = await openHeld(browser, sameAddress, { path: about, viewport: { width: 1440, height: 800 }, change: without });
+    if (await page.evaluate(latestNow)) problems.push('could not set up an About page built without the latest post');
+    release();
+    if (!(await waitForLatest(page, built.title, 8000))) problems.push('an About page built without the latest post did not get it from the server');
+    const place = await page.evaluate(() => { const piece = document.querySelector('[data-latest-post]'); return piece ? [piece.previousElementSibling?.className, piece.nextElementSibling?.tagName] : null; });
+    if (place && (!/about-page__tinkering/.test(place[0]) || place[1] !== 'TEMPLATE')) problems.push(`the added piece is in the wrong place (after ${place[0]}, before ${place[1]})`);
+    problems.push(...errors);
+    await context.close();
+  }
+
+  // 6. The feed unreachable: the built piece stays, and nothing complains.
+  {
+    const { context, page, release, errors } = await openHeld(browser, quietAddress, { path: about, viewport: { width: 1440, height: 800 } });
+    page.on('console', (message) => { if (message.type() === 'error') errors.push(`console error: ${message.text()}`); });
+    release();
+    await page.waitForTimeout(1500);
+    if ((await page.evaluate(latestNow))?.title !== built.title) problems.push('with the feed unreachable, the About page\'s built piece did not stay');
+    for (const error of errors) problems.push(`with the feed unreachable, on the About page: ${error}`);
+    await context.close();
+  }
+
+  // 7. Without scripts: the built piece.
+  {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 800 }, javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto(sameAddress + about, { waitUntil: 'load' });
+    if ((await page.evaluate(latestNow))?.title !== built.title) problems.push('without scripts, the About page\'s built piece is missing');
     await context.close();
   }
   return [...new Set(problems)];

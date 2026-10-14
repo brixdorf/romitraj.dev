@@ -1,6 +1,7 @@
 // The latest posts from the blog, read from its feed (https://blog.romitraj.dev/rss.xml).
-// Two users: the build (src/_data/blog.js) writes them into the home page, and the live server
-// answers /api/posts with them (api.js), so the home page can show a new post without a new deploy.
+// Two users: the build (src/_data/blog.js) writes them into the home page and the About page, and
+// the live server answers /api/posts with them (api.js), so both pages can show a new post
+// without a new deploy.
 // The server keeps the list for 30 minutes. If the feed cannot be read, it keeps answering with
 // the last list it did read; before the first good read, it answers with nothing, and the page
 // keeps the list it was built with.
@@ -52,11 +53,12 @@ export const readFeed = (xml) => [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].
 }).filter((post) => post.title && onTheBlog(post.url));
 
 // Reads the feed once. The answer is the posts the home page shows (as many as "writing.count"
-// in home.json), or nothing if the feed cannot be read or holds no posts.
+// in home.json; the About page shows the first), or nothing if the feed cannot be read or holds
+// no posts.
 async function ask() {
   const response = await fetch(feedAddress(), { signal: AbortSignal.timeout(8000) });
   if (!response.ok) return null;
-  const posts = readFeed(await response.text()).slice(0, shown).map(({ title, url, isoDate, date }) => ({ title, url, isoDate, date }));
+  const posts = readFeed(await response.text()).slice(0, shown).map(({ title, url, description, isoDate, date }) => ({ title, url, description, isoDate, date }));
   return posts.length ? { posts } : null;
 }
 
