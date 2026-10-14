@@ -30,7 +30,7 @@ These are the only commands you need. All of them work in Windows PowerShell.
 | `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
 | `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
 | `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
-| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather and music services. |
+| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed. |
 | `npm run share` | Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image". |
 | `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit. |
 
@@ -46,7 +46,7 @@ src/
                 weather.json (the words for the sky in the ticker),
                 images.json (every picture: its source file, alt text and look),
                 image-credits.json (who took each photo),
-                blog.js (fetches the latest blog posts during the build),
+                blog.js (fetches the latest blog posts during the build, with server/blog.js),
                 and three files written by scripts: fontVersions.json, fallbackFonts.json, textWidths.json
   _includes/    layouts/ (base.njk is the page shell, page.njk adds the giant page name for an
                 inner page, project.njk is one project's page)
@@ -54,7 +54,9 @@ src/
                 footer; page-row, page-header and crumb for the inner pages; plus fonts and icon)
   assets/css/   main.css (the list), tokens.css (every value), base.css, components/ (one file per piece)
   assets/js/    main.js (the entry point), motion.js (animation timings),
-                animations.js (tickers and movement tied to scroll), widgets.js (local time, year),
+                animations.js (tickers and movement tied to scroll), widgets.js (local time, year,
+                weather, the track, the blog's posts), posts.js (brings the home page's list of
+                posts up to date),
                 intro.js (the headline's entrance when the home page opens; built into a small
                 script of its own), shapes.js (shapes shared by the animations),
                 transitions.js (page changes without a reload), scroll-memory.js (remembers
@@ -68,17 +70,18 @@ src/
                 resume note, projects.njk the list of projects. projects/ holds one Markdown
                 file per project (its facts on top, its write-up below), plus
                 projects.11tydata.js, the settings those files share.
-server/         index.js: the small server behind npm start. api.js answers the widgets' two
-                questions, weather.js asks Open-Meteo, spotify.js asks Spotify, cache.js
-                keeps their answers for a while
+server/         index.js: the small server behind npm start. api.js answers the page's three
+                questions, weather.js asks Open-Meteo, spotify.js asks Spotify, blog.js reads
+                the blog's feed (for the build too), cache.js keeps their answers for a while
 scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
                 fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers),
                 images.mjs (turns the photos and drawings into the site's pictures, during
                 every build), lib/paint.mjs (paints the texture behind the hero picture),
                 lib/pictures.mjs (the check's tests of the pictures),
                 lib/analytics.mjs (the check's test of the visitor counter),
-                spotify.mjs (npm run spotify), lib/widgets.mjs (the check's tests of the
-                widgets), lib/pretend.mjs (stand-ins for Open-Meteo and Spotify during the check),
+                spotify.mjs (npm run spotify), lib/widgets.mjs and lib/posts.mjs (the check's tests
+                of the widgets and of the list of blog posts), lib/pretend.mjs (stand-ins for
+                Open-Meteo, Spotify and the blog's feed during the check),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
                 letters, the page changes and the headline's entrance), speed.mjs (npm run speed),
                 icons.mjs (makes the site's icon files during every build), share.mjs (npm run share),
@@ -178,7 +181,7 @@ The home page is a stack of sections, listed in order in `src/content/index.njk`
 | Letter | A short signed note on a dark block | `home.json` (`letter`) |
 | About | Sliding heading, quote ticker, bio, card of links, a large drawing behind them | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`diver`) |
 | Projects | One row per project on a dark block | The files in `src/content/projects/`, `home.json` (`projects`) |
-| Writing | The latest blog posts as cards | The blog's own feed, `home.json` (`writing`) |
+| Writing | The latest blog posts as cards, kept up to date by the server | The blog's own feed, `home.json` (`writing`) |
 | Shore | A band of stippled sea that sinks into the footer's dark (`shore.css`) | `images.json` (`swells`) |
 | Footer | Site map, links, email, copyright, sign-off, and a compass half off the edge (on every page) | `navigation.json`, `site.json`, `home.json` (`footer`), `images.json` (`compass`) |
 
@@ -187,7 +190,12 @@ Things to know:
 - **Formatting inside the words.** Some texts in `home.json` use small tags: `<i>` for the italic serif asides, `<del>` for a struck-out word, `<ins>` for the word that replaces it, `<br>` for a line break and `<a href="...">` for a link. `{email}` is replaced by the email address in `site.json`.
 - **Apostrophes in serif text.** The letter, the about heading, project names and post titles are set in Louize, which has only the curly apostrophe (`’`). Blog titles are converted for you. In `home.json`, and in a project's `title`, type the curly one.
 - **Projects.** Each file in `src/content/projects/` becomes a row on the home page, a card on the Projects page and a page of its own. The row's name opens near its middle on hover; where it opens is worked out from the name. See "Adding or changing a project" below.
-- **Blog posts are fetched when the site is built**, not when someone visits. A new post appears on the home page after the next build (on the live site: after the next deploy). If the blog cannot be reached during a build, the section shows one sentence and a link instead, and the build still succeeds. While `npm run dev` is running, the feed is kept for an hour in `.cache/`.
+- **Blog posts: a new post shows up on the home page by itself, with no deploy.** The site is built with the latest posts, and the live server reads the blog's feed again every 30 minutes (`server/blog.js`). The home page asks it for the list (`/api/posts`) and puts a newer one in place. So within about half an hour of publishing, a visitor opening the home page sees the new post.
+  - **Nothing on the page jumps when that happens.** A newer list may be a line taller or shorter, so it is only put in place while it is out of sight below the window: as the page opens, or as soon as the visitor scrolls back up above it. A list that is the same as the one in the page is not touched.
+  - **If the feed cannot be read**, the server keeps answering with the last list it did read, and the page keeps the one it has. If the page's script does not run, the list it was built with stays.
+  - If the blog cannot be reached during a build, the section shows one sentence and a link instead, and the build still succeeds; once the server reads the feed, the page fills in the cards.
+  - The About page's piece about the latest post is still made when the site is built, so it changes at the next deploy.
+  - While `npm run dev` is running, the build keeps the feed for an hour in `.cache/` (the page's live list still asks the blog).
 - **Movement tied to scroll** (the sliding about heading, the bars beside the giant headings, the project rows) runs on tablets and laptops. It is off on phones and for visitors who asked their system for less motion; there, everything sits in its resting place.
 - **Project rows start somewhere new on every page load**, so the section never looks quite the same twice. `npm run check` uses fixed starting places instead, so its screenshots match from one run to the next.
 
@@ -241,7 +249,7 @@ An address that leads nowhere (a mistyped address, an old link from another site
 
 ### The About page
 
-Its three framed pictures are named in `src/content/about.njk` (`bust`, `jellyfish`, `swells`) and described in `images.json`. All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering`, `contact`, `toolbox`) and the labels for the latest blog post. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is left out if the feed could not be read. The picture frames are empty until the images are built.
+Its three framed pictures are named in `src/content/about.njk` (`bust`, `jellyfish`, `swells`) and described in `images.json`. All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering`, `contact`, `toolbox`) and the labels for the latest blog post. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed when the site is built (so it changes at the next deploy) and is left out if the feed could not be read. The picture frames are empty until the images are built.
 
 The text there now is placeholder text. `<a href="...">` and `{email}` work as in `home.json`.
 
@@ -460,14 +468,17 @@ The small picture in a browser tab, in bookmarks and on a phone's home screen is
 
   | File | What it is | Who uses it |
   |---|---|---|
-  | `favicon.svg` | The compass as a drawing. It is ink on a light tab and paper on a dark one: the file switches by itself | Chrome, Edge, Firefox, and Safari from version 26 |
+  | `favicon-light.svg` | The ink compass as a drawing | Light tabs in Chrome, Edge, Firefox, and Safari from version 26 |
+  | `favicon-dark.svg` | The paper compass as a drawing | Dark tabs in the same browsers |
   | `favicon.ico` | The ink compass at 16 and 32 pixels, in the old icon format | Older Safari, and anything that looks for an icon without reading the page |
   | `apple-touch-icon.png` | A paper compass on an ink square, 180 pixels | An iPhone or iPad home screen |
   | `icon-192.png`, `icon-512.png`, `site.webmanifest` | The same square at two sizes, and the small file that names them | An Android home screen |
 
+- **How the tab icon follows light and dark** (the way GitHub does it): every page names `favicon-light.svg`, and a short script in its head (`src/_includes/layouts/base.njk`) asks the browser whether it is set to light or dark ("prefers-color-scheme"). In dark it puts `favicon-dark.svg` in its place, and it swaps them again the moment you switch, with no reload. Without scripts the ink compass stays. The script follows the browser's light or dark setting (or the system's, when the browser follows the system); a custom-colored browser theme is not something a page can see.
+- **Why the first version did not switch:** it was one drawing with a rule inside it for dark tabs. Chrome and Edge draw a tab icon once, when the page loads, and keep that picture: the rule is only looked at again after a reload, and their store of icons can keep the old picture even then. Safari ignores such a rule altogether. A script that changes the page's icon line is something all of them notice at once.
 - **To change the icon**, edit or replace `site-icon.svg` (keep the 64 by 64 grid and the three class names: anything marked `ring` or `mark` takes the main color, anything marked `hub` the other) and rebuild. The README's title icon (`docs/readme/compass-light.svg` and `compass-dark.svg`) is a copy of the same drawing in each color and has to be changed by hand. To change its colors, change the ink and paper colors in `tokens.css`; the whole site follows.
 - **Browsers keep icons for a long time.** Each icon's address carries a fingerprint, so a new icon is fetched at once, but a tab that is already open may show the old one until it is reloaded.
-- **To see it**, look at the tab of http://localhost:8080 while `npm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance.
+- **To see it**, look at the tab of http://localhost:8080 while `npm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance: the tab changes at once.
 
 ### The share image
 
@@ -487,7 +498,7 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
 - **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
 - **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
 
-`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the tab icon is the ink compass on a light tab and the paper compass on a dark one.
+`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the page names the ink compass while the browser is light and the paper compass while it is dark, that it swaps them as soon as the browser changes (with no reload), that the right one stays after a page change and the ink one without scripts, and that each drawing is what it should be.
 
 ## Links that leave the site
 
@@ -593,14 +604,15 @@ The status ticker in the hero shows four things: the weather in Bangalore, the c
 | Local time | Worked out in the visitor's browser | Every minute |
 | Weather | The site's server asks Open-Meteo (`server/weather.js`) | The server keeps an answer for 15 minutes |
 | Now playing | The site's server asks Spotify (`server/spotify.js`) | The server keeps an answer for 30 seconds |
+| The home page's blog posts | The site's server reads the blog's feed (`server/blog.js`) | The server keeps the list for 30 minutes; see "Blog posts" under "The home page sections" |
 
 How it fits together:
 
-- The page never talks to Open-Meteo or Spotify itself. It asks this site's own server two small questions, `/api/weather` and `/api/now-playing` (`server/api.js`), and the server asks the services. That is what keeps the Spotify keys out of the page.
+- The page never talks to Open-Meteo, Spotify or the blog itself. It asks this site's own server three small questions, `/api/weather`, `/api/now-playing` and `/api/posts` (`server/api.js`), and the server asks the services. That is what keeps the Spotify keys out of the page.
 - Because the server keeps each answer for a while, a thousand visitors cause the same handful of requests as one.
 - **Every piece fails quietly.** If a service is down, slow (more than 5 seconds), or its keys are missing or expired, the server answers "nothing" and the page hides that piece. The rest of the ticker carries on. Nothing is shown as an error.
 - When nothing is playing (or it is paused, or it is a podcast), the last track played is shown instead. Screen readers hear "Now playing on Spotify:" or "Last played on Spotify:" before it.
-- **Both work in `npm run dev` too**, as well as with `npm run build` and `npm start`.
+- **All three work in `npm run dev` too**, as well as with `npm run build` and `npm start`.
 - The weather needs no key and no account. Open-Meteo is free for sites without ads or subscriptions, up to 10,000 requests a day; this site makes at most 96.
 
 These are there because Spotify's terms ask for them. Do not remove them:
@@ -692,8 +704,9 @@ Notes:
 | No now-playing line, and Premium has lapsed | Spotify switches the app off | Resubscribe |
 | No weather | Open-Meteo is unreachable | Wait; it comes back by itself within a minute of the service returning |
 | Neither, with `npm start` | The site was not built first | `npm run build`, then `npm start` |
+| A new blog post is not on the home page after half an hour | The server could not read the feed, and keeps showing the last list it read | Open https://blog.romitraj.dev/rss.xml: the post must be in it. The server tries again every 5 minutes. |
 
-To see what the server answers, open http://localhost:3000/api/weather or http://localhost:3000/api/now-playing while `npm start` is running. An empty page means "nothing to show".
+To see what the server answers, open http://localhost:3000/api/weather, http://localhost:3000/api/now-playing or http://localhost:3000/api/posts while `npm start` is running. An empty page means "nothing to show".
 
 ## Fonts
 
@@ -776,7 +789,7 @@ node compare-report.mjs out/compare
 npm run check
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check runs against stand-ins for Open-Meteo and Spotify on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy" and "Pretend Song", it works without an internet connection for those two, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a list of blog posts that is not brought up to date, moves anything in sight when it is, forgets the last good list while the feed is failing, or is replaced when nothing changed, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check, the build included, runs against stand-ins for Open-Meteo, Spotify and the blog's feed on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy", "Pretend Song" and five stand-in blog posts, it works without an internet connection for those three, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
@@ -812,7 +825,7 @@ Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) an
 
 - **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
 - **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
-- **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog.
+- **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog, until the running server reads the feed and the page fills in the cards. A new post needs no deploy: see "Blog posts" under "The home page sections".
 - **On the server the pages load the fonts from https://fonts.romitraj.dev.** That is why the fonts application comes first below.
 - **The fonts go to romitraj.dev only.** A page on any other website that asks for one is refused, and browsers will not use a font for another site even if they get it. The server answers nothing but the seven font files: not the brief, not the original font files, not its own code.
 
@@ -928,6 +941,7 @@ If Dokploy can already see both repositories, skip this step.
 | Wait two seconds and look at the ticker | The weather, the coordinates, the time, and Spotify's icon with a track |
 | Open https://romitraj.dev/api/weather | One short line with a temperature and a word for the sky |
 | Open https://romitraj.dev/api/now-playing | One short line with a track's title. An empty page means the three settings are missing or wrong: check step 5.5, save, and deploy again. |
+| Open https://romitraj.dev/api/posts | A line listing your latest blog posts |
 | Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload |
 | Open https://www.romitraj.dev | You end up on https://romitraj.dev |
 | Open https://romitraj.dev/nothing-here/ | The "Lost at sea" page, its name sliding in |
@@ -971,7 +985,7 @@ Secret values (the three Spotify values: see "The live widgets") live in a file 
 
 - To confirm git is ignoring it: `git check-ignore -v .env` should print a line naming `.gitignore`, and `git status` should never list `.env`.
 - On the live server the same three values are entered in the host's settings instead of a file.
-- `npm run check` never uses these values: it runs the site against stand-ins for Spotify and Open-Meteo.
+- `npm run check` never uses these values: it runs the site against stand-ins for Spotify, Open-Meteo and the blog's feed.
 
 ## Node.js version
 

@@ -1,14 +1,17 @@
-// The two small questions the page's widgets ask the server: /api/weather and /api/now-playing.
-// Each answers with a little JSON, or with "204 No Content" when there is nothing to show (the
-// service behind it is down, or its keys are missing). The page hides that widget in that case.
+// The small questions the page's widgets ask the server: /api/weather, /api/now-playing and
+// /api/posts (the latest blog posts). Each answers with a little JSON, or with "204 No Content"
+// when there is nothing to show (the service behind it is down, or its keys are missing). The page
+// then hides that widget, or, for the posts, keeps the list it already shows.
 // Used by the live server (index.js) and by the local preview (eleventy.config.js).
 import { weather } from './weather.js';
 import { nowPlaying } from './spotify.js';
+import { latestPosts } from './blog.js';
 
 // "browserKeeps" is how many seconds a visitor's browser may reuse an answer.
 const questions = {
   '/api/weather': { ask: weather, browserKeeps: 300 },
   '/api/now-playing': { ask: nowPlaying, browserKeeps: 30 },
+  '/api/posts': { ask: latestPosts, browserKeeps: 300 },
 };
 
 // Answers the request if it is one of the questions above. Returns whether it did.

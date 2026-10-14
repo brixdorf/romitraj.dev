@@ -8,9 +8,11 @@
 // is safe (lib/entrance.mjs), and confirms that every picture is described or marked as
 // decoration, stays small, moves nothing as it loads and looks the same in every browser
 // (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
-// facts and hide quietly when a service is down (lib/widgets.mjs). The whole check runs against
-// stand-ins for Open-Meteo and Spotify (lib/pretend.mjs): it never asks the real services and
-// never uses the keys in .env. It confirms that the visitor counter (Rybbit) is not loaded on
+// facts and hide quietly when a service is down (lib/widgets.mjs), and that the home page's list
+// of blog posts is brought up to date from the server without moving anything in sight
+// (lib/posts.mjs). The whole check, the build included, runs against stand-ins for Open-Meteo,
+// Spotify and the blog's feed (lib/pretend.mjs): it never asks the real services or reads the
+// real blog, and never uses the keys in .env. It confirms that the visitor counter (Rybbit) is not loaded on
 // this computer, and that on the live site it would be loaded once and count each page change
 // once (lib/analytics.mjs); the real counter is never contacted. Last, it compares how thick each browser paints the drawn lines
 // in the ticker (lib/dashes.mjs).
@@ -27,6 +29,7 @@ import { headOfEveryPage, siteIconInBrowser } from './lib/head.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
 import { startPretend, unreachable } from './lib/pretend.mjs';
 import { widgetAnswers, widgetsOnThePage } from './lib/widgets.mjs';
+import { postAnswers, postsOnThePage } from './lib/posts.mjs';
 import { dashThickness, dashesDiffer } from './lib/dashes.mjs';
 import { visitorCounting } from './lib/analytics.mjs';
 
@@ -78,8 +81,15 @@ async function wholeLettersOnEveryPage(browser, address, pagePaths) {
 }
 
 // ---- 1. Build ----
+// Every page below is served with stand-in weather, a stand-in track and stand-in blog posts, the
+// same on every run. The site is built with the same stand-in posts, so the list the server
+// gives the page is the list the page was built with.
+const pretend = await startPretend(4174);
+process.env.BLOG_FEED_URL = pretend.env.BLOG_FEED_URL;
 console.log('Building the site...');
 await buildSite();
+// How many posts the home page shows.
+const postsShown = JSON.parse(fs.readFileSync(path.join(root, 'src', '_data', 'home.json'), 'utf8')).writing.count;
 
 const htmlFiles = walk(siteDir).filter((file) => file.endsWith('.html'));
 // "/", "/about/" and so on, from the built files.
@@ -170,6 +180,15 @@ if (answerProblems.length) {
   console.log('Widgets: the server answers correctly, and with nothing when a service is down, expired or missing its keys.');
 }
 
+// ---- The blog's posts: what the server answers, in every situation ----
+const postAnswerProblems = await postAnswers(4300, postsShown);
+if (postAnswerProblems.length) {
+  console.log('\nBLOG POST ANSWER PROBLEMS:\n  ' + postAnswerProblems.join('\n  '));
+  process.exitCode = 1;
+} else {
+  console.log('Blog posts: the server answers with the latest posts, reads the feed once for many requests, keeps the last good list while the feed fails, and answers nothing before it has one.');
+}
+
 // The address of the visitor counter, which nothing in this check may contact.
 const counterHost = new URL(JSON.parse(fs.readFileSync(path.join(root, 'src', '_data', 'site.json'), 'utf8')).analytics.script).hostname;
 
@@ -177,11 +196,12 @@ const counterHost = new URL(JSON.parse(fs.readFileSync(path.join(root, 'src', '_
 // lines, to compare them at the end.
 const pictureWhere = {};
 const dashRows = {};
-// Every page below is served with stand-in weather and a stand-in track, the same on every run.
-// A second copy of the site is served with both services unreachable.
-const pretend = await startPretend(4174);
+// A second copy of the site is served with every service unreachable, and a third with one more
+// post on the blog than the site was built with.
 const server = await startServer(4173, pretend.env);
 const quietServer = await startServer(4176, unreachable(4177));
+const newerPretend = await startPretend(4178, { blog: 'newer' });
+const newerServer = await startServer(4179, newerPretend.env);
 try {
   // ---- A missing address: is it answered with a real 404 and the "Lost at sea" page? ----
   const lostAnswerProblems = await lostAnswers(server.address);
@@ -303,6 +323,12 @@ try {
       console.log(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
       process.exitCode = 1;
     }
+    // ---- The blog's posts on the home page: brought up to date, moving nothing in sight ----
+    const postProblems = await postsOnThePage(browser, { sameAddress: server.address, newerAddress: newerServer.address, quietAddress: quietServer.address, shown: postsShown });
+    if (postProblems.length) {
+      console.log(`\nBLOG POST PROBLEMS in ${engineName}:\n  ` + postProblems.join('\n  '));
+      process.exitCode = 1;
+    }
     // ---- The visitor counter: absent here, loaded once and counting once on the live site ----
     const countingProblems = await visitorCounting(browser, server.address);
     if (countingProblems.length) {
@@ -318,7 +344,7 @@ try {
       process.exitCode = 1;
     }
     await browser.close();
-    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, visitor counter and pictures: ${engineName} done.`);
+    console.log(`Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, blog posts, visitor counter and pictures: ${engineName} done.`);
   }
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);
@@ -340,6 +366,8 @@ try {
 } finally {
   server.stop();
   quietServer.stop();
+  newerServer.stop();
   await pretend.stop();
+  await newerPretend.stop();
 }
 console.log(process.exitCode ? '\nCheck finished with problems.' : '\nCheck passed.');

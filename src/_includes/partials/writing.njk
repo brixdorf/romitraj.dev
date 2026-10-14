@@ -1,24 +1,33 @@
-{#- Latest writing: the newest posts from the blog as cards. If the blog's feed could not be read, a plain sentence and link instead. -#}
-<section class="writing" data-part="section">
+{#- Latest writing: the newest posts from the blog as cards. If the blog's feed could not be read
+    during the build, a plain sentence and link instead.
+    The list is built with the site, and brought up to date by the page itself when the server
+    knows of newer posts (assets/js/posts.js). For that the section is marked "data-posts", the
+    list or the sentence "data-posts-list", and a blank card waits in a <template> (a piece of the
+    page that is never shown, only copied), so a live card is made exactly like a built one. -#}
+{%- macro card(post) %}
+    <li class="card-grid__item">
+      <a class="card" href="{{ post.url }}" data-post-link>
+        <span class="card__meta">{{ home.writing.label }}<br><time datetime="{{ post.isoDate }}" data-post-date>{{ post.date }}</time></span>
+        <h3 class="card__title" data-post-title>{{ post.title }}</h3>
+        <span class="card__more" aria-hidden="true">{{ home.writing.readMore }} &rarr;</span>
+      </a>
+    </li>
+{%- endmacro %}
+<section class="writing" data-part="section" data-posts data-count="{{ home.writing.count }}">
   <h2 class="section-heading section-heading--end" data-bar>
     <span class="section-heading__word">{{ home.writing.heading }}</span>
   </h2>
 
   {%- if blog.posts.length %}
-  <ul class="card-grid">
+  <ul class="card-grid" data-posts-list>
     {%- for post in blog.posts.slice(0, home.writing.count) %}
-    <li class="card-grid__item">
-      <a class="card" href="{{ post.url }}">
-        <span class="card__meta">{{ home.writing.label }}<br><time datetime="{{ post.isoDate }}">{{ post.date }}</time></span>
-        <h3 class="card__title">{{ post.title }}</h3>
-        <span class="card__more" aria-hidden="true">{{ home.writing.readMore }} &rarr;</span>
-      </a>
-    </li>
+    {{- card(post) }}
     {%- endfor %}
   </ul>
   {%- else %}
-  <p class="writing__fallback">{{ home.writing.fallback }}</p>
+  <p class="writing__fallback" data-posts-list>{{ home.writing.fallback }}</p>
   {%- endif %}
+  <template data-post-card>{{ card({ url: blog.url, isoDate: "", date: "", title: "" }) }}</template>
 
   <a class="section-link" href="{{ blog.url }}">{{ home.writing.viewAll }} &rarr;</a>
 </section>

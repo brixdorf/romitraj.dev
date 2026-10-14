@@ -1,8 +1,9 @@
 // Remembers an answer for a while, so that many visitors cause only a few requests to the
 // service behind it. "ask" fetches a fresh answer (or nothing, if the service is down).
-// A good answer is kept for "goodFor" milliseconds. After a failure nothing is shown, and the
-// service is left alone for "retryAfter" milliseconds before it is asked again.
-export function remembered(ask, { goodFor, retryAfter }) {
+// A good answer is kept for "goodFor" milliseconds. After a failure the service is left alone for
+// "retryAfter" milliseconds before it is asked again. Meanwhile nothing is shown, or, with
+// "keepLastGood", the last good answer is shown again.
+export function remembered(ask, { goodFor, retryAfter, keepLastGood = false }) {
   let value = null;
   let until = 0;
   let pending = null;
@@ -12,8 +13,9 @@ export function remembered(ask, { goodFor, retryAfter }) {
     pending ??= ask()
       .catch(() => null)
       .then((answer) => {
-        value = answer || null;
-        until = Date.now() + (value ? goodFor : retryAfter);
+        if (answer) value = answer;
+        else if (!keepLastGood) value = null;
+        until = Date.now() + (answer ? goodFor : retryAfter);
         pending = null;
         return value;
       });

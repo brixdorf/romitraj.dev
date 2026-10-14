@@ -183,9 +183,10 @@ export default function (eleventyConfig) {
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');
 
-  // The site's own icon: a compass, made before every build by scripts/icons.mjs as a drawing
-  // for browser tabs, an old-style .ico, and squares for phone home screens. A template writes a
-  // file's address, with its fingerprint, with {% siteIcon "svg" %} ("svg", "ico", "touch" or "manifest").
+  // The site's own icon: a compass, made before every build by scripts/icons.mjs as two drawings
+  // for browser tabs (light and dark), an old-style .ico, and squares for phone home screens. A
+  // template writes a file's address, with its fingerprint, with {% siteIcon "light" %} ("light",
+  // "dark", "ico", "touch" or "manifest").
   let siteIcons = {};
   eleventyConfig.on('eleventy.before', async ({ directories }) => {
     siteIcons = await makeSiteIcons(directories.output);
@@ -196,8 +197,8 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addWatchTarget('./scripts/icons.mjs');
 
-  // The local preview (npm run dev) answers the widgets' two questions the same way the live
-  // server does, so the weather and the now-playing line show while developing too.
+  // The local preview (npm run dev) answers the widgets' questions the same way the live
+  // server does, so the weather, the now-playing line and the latest posts show while developing too.
   eleventyConfig.setServerOptions({
     middleware: [
       (request, response, next) => {

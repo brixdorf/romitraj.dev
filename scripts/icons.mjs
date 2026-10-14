@@ -7,9 +7,13 @@
 // the site if they ever change.
 //
 // What it writes into the built site, and who uses each file:
-//   favicon.svg            The compass as a drawing, sharp at any size. Ink on a light tab, paper
-//                          on a dark one: the file itself switches. Chrome, Edge, Firefox and
-//                          Safari from version 26 use this one.
+//   favicon-light.svg      The ink compass as a drawing, sharp at any size, for a light tab.
+//   favicon-dark.svg       The paper compass, for a dark tab. Each page names the light one; a
+//                          small script in its head (layouts/base.njk) swaps in the dark one while
+//                          the browser is dark, and back again as soon as the browser changes.
+//                          Chrome, Edge, Firefox and Safari from version 26 use these two. (One
+//                          drawing that switches by itself is not enough: Chrome draws it once and
+//                          switches only on a reload, and Safari ignores the switch altogether.)
 //   favicon.ico            The ink compass as two small pictures (16 and 32 pixels) in the old
 //                          icon format, for older Safari and for anything that looks for an icon
 //                          at this fixed address without reading the page.
@@ -72,9 +76,8 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
   // The ring and the points in one color, the hub in the other.
   const colors = (main, other) => `.ring{fill:none;stroke:${main};stroke-width:4}.mark{fill:${main}}.hub{fill:${other}}`;
 
-  // The drawing for browser tabs. The style inside it picks the colors: ink, or paper when the
-  // browser's tabs are dark.
-  const tabIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}"><style>${colors(ink, paper)}@media (prefers-color-scheme:dark){${colors(paper, ink)}}</style>${shapes}</svg>\n`;
+  // The two drawings for browser tabs: the ink compass for a light tab, the paper one for a dark tab.
+  const tabIcon = (main, other) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}"><style>${colors(main, other)}</style>${shapes}</svg>\n`;
   // The same compass in ink only, and the paper compass on an ink square, for the files that cannot switch.
   const inkOnly = (size) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}" width="${size}" height="${size}"><style>${colors(ink, paper)}</style>${shapes}</svg>`;
   const square = (size) => {
@@ -85,7 +88,8 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
   const png = (drawing) => sharp(Buffer.from(drawing)).png({ compressionLevel: 9 }).toBuffer();
 
   const files = {
-    'favicon.svg': Buffer.from(tabIcon),
+    'favicon-light.svg': Buffer.from(tabIcon(ink, paper)),
+    'favicon-dark.svg': Buffer.from(tabIcon(paper, ink)),
     'favicon.ico': wrapAsIco([{ size: 16, data: await png(inkOnly(16)) }, { size: 32, data: await png(inkOnly(32)) }]),
     'apple-touch-icon.png': await png(square(180)),
     'icon-192.png': await png(square(192)),
@@ -105,5 +109,5 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
 
   fs.mkdirSync(outputDir, { recursive: true });
   for (const [name, data] of Object.entries(files)) fs.writeFileSync(path.join(outputDir, name), data);
-  return { svg: address('favicon.svg'), ico: address('favicon.ico'), touch: address('apple-touch-icon.png'), manifest: address('site.webmanifest') };
+  return { light: address('favicon-light.svg'), dark: address('favicon-dark.svg'), ico: address('favicon.ico'), touch: address('apple-touch-icon.png'), manifest: address('site.webmanifest') };
 }

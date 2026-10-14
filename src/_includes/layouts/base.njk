@@ -9,6 +9,8 @@
   The first script in the head adds the visitor counter (Rybbit), and only on the live site. It
   also keeps jumps within a page (to a "#section") from being counted as page views; for that the
   content slot says which page it holds ("data-path").
+  The script after the icon lines picks the ink or the paper compass for the tab, to match the
+  browser's light or dark look.
 -#}
 <!doctype html>
 <html lang="{{ site.language }}">
@@ -44,12 +46,31 @@
   {%- endif %}
   <meta name="theme-color" content="{{ site.themeColor }}">
   {#- The site's icon, a compass (scripts/icons.mjs makes the files). The .ico is for older
-      browsers and comes first; browsers that can use the drawing take that one, which switches
-      between ink and paper with the color of the browser's tabs. The last two are for phones. #}
+      browsers and comes first; browsers that can use a drawing take the second line, the ink
+      compass for a light tab. It names the paper compass for a dark tab too ("data-dark"), and
+      the script after it picks between the two. The last two are for phones. #}
   <link rel="icon" href="{% siteIcon "ico" %}" sizes="32x32">
-  <link rel="icon" href="{% siteIcon "svg" %}" type="image/svg+xml">
+  <link rel="icon" href="{% siteIcon "light" %}" type="image/svg+xml" data-light="{% siteIcon "light" %}" data-dark="{% siteIcon "dark" %}">
   <link rel="apple-touch-icon" href="{% siteIcon "touch" %}">
   <link rel="manifest" href="{% siteIcon "manifest" %}">
+  <script>
+    /* The tab icon follows the browser's light or dark look: the ink compass on a light tab, the paper compass on a dark one. The browser says which look it has through "prefers-color-scheme". This picks the right drawing before the browser fetches an icon, and swaps it as soon as the look changes, with no reload. The icon's line is replaced by a fresh copy instead of only having its address changed, because some browsers only notice a new line. Without scripts the ink compass stays. */
+    (function () {
+      var dark = matchMedia("(prefers-color-scheme: dark)");
+      function pick() {
+        var icon = document.querySelector("link[data-dark]");
+        if (!icon) return;
+        var wanted = icon.getAttribute(dark.matches ? "data-dark" : "data-light");
+        if (icon.getAttribute("href") === wanted) return;
+        var fresh = icon.cloneNode(false);
+        fresh.setAttribute("href", wanted);
+        icon.parentNode.replaceChild(fresh, icon);
+      }
+      pick();
+      if (dark.addEventListener) dark.addEventListener("change", pick);
+      else if (dark.addListener) dark.addListener(pick);
+    })();
+  </script>
   {%- include "partials/fonts.njk" %}
   {%- if site.analytics %}
   <script>

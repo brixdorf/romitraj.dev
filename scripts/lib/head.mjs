@@ -3,14 +3,18 @@
 // preview card (layouts/base.njk, with the share image made by "npm run share").
 //
 // "headOfEveryPage" reads the built pages and files and confirms that
-//   - every page names the four icon files, and each exists and is what it should be: a drawing
-//     that switches between ink and paper, an .ico holding a 16 and a 32 pixel picture, a 180
-//     pixel square with no transparent parts, and a small file for Android naming two squares;
+//   - every page names the icon files, and each exists and is what it should be: the ink compass
+//     for a light tab and the paper compass for a dark tab (two drawings, neither switching by
+//     itself), an .ico holding a 16 and a 32 pixel picture, a 180 pixel square with no
+//     transparent parts, and a small file for Android naming two squares;
 //   - every page has the Open Graph tags and the X card tags, with the page's own title and
 //     description, the page's full address, and the full address of the share image;
 //   - the share image exists, is 1200 by 630 pixels and is light enough for every app.
-// "siteIconInBrowser" asks a browser for the icon files and draws the tab icon on a light and on
-// a dark background: it must be the ink compass on light and the paper compass on dark.
+// "siteIconInBrowser" asks a browser for the icon files, opens the home page with the browser set
+// to light and to dark, and confirms that the page names the ink compass while light and the
+// paper compass while dark, that it swaps them the moment the browser changes (with no reload),
+// that the ink compass stays without scripts and after a page change the right one is kept, and
+// draws each on a tab-colored background to confirm what it shows.
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -45,6 +49,14 @@ export async function headOfEveryPage(siteDir, root) {
       'the Apple touch icon': icon((tag) => attribute(tag, 'rel') === 'apple-touch-icon'),
       'the manifest': icon((tag) => attribute(tag, 'rel') === 'manifest'),
     };
+    // The drawn icon's line also names both drawings, for the script that picks between them.
+    const drawnTag = links.find((tag) => attribute(tag, 'rel') === 'icon' && attribute(tag, 'type') === 'image/svg+xml');
+    icons['the ink compass for a light tab'] = drawnTag ? attribute(drawnTag, 'data-light') : null;
+    icons['the paper compass for a dark tab'] = drawnTag ? attribute(drawnTag, 'data-dark') : null;
+    if (drawnTag && attribute(drawnTag, 'href') !== attribute(drawnTag, 'data-light')) problems.push(`${pagePath}: the drawn icon's line does not start with the ink compass, which is what browsers without scripts should get`);
+    if (drawnTag && !/favicon-light\.svg/.test(attribute(drawnTag, 'data-light') || '')) problems.push(`${pagePath}: the light tab's icon is not favicon-light.svg`);
+    if (drawnTag && !/favicon-dark\.svg/.test(attribute(drawnTag, 'data-dark') || '')) problems.push(`${pagePath}: the dark tab's icon is not favicon-dark.svg`);
+    if (!/matchMedia\("\(prefers-color-scheme: dark\)"\)/.test(head)) problems.push(`${pagePath} has no script that picks the tab icon for a light or dark browser`);
     for (const [what, address] of Object.entries(icons)) {
       if (!address) problems.push(`${pagePath} does not name ${what} in its head`);
       else if (!address.startsWith('/') || !/\?v=\w+/.test(address)) problems.push(`${pagePath}: ${what} is at ${address}, which should start at the site's root and carry a fingerprint`);
@@ -86,8 +98,14 @@ export async function headOfEveryPage(siteDir, root) {
   // ---- The files themselves ----
   const ink = color('color-ink');
   const paper = color('color-paper');
-  const drawing = fs.existsSync(path.join(siteDir, 'favicon.svg')) ? fs.readFileSync(path.join(siteDir, 'favicon.svg'), 'utf8') : '';
-  if (!drawing.includes(ink) || !drawing.includes(paper) || !drawing.includes('prefers-color-scheme')) problems.push('favicon.svg does not switch between the ink and the paper color');
+  // Each drawing has one color for its ring and points: ink for a light tab, paper for a dark one.
+  for (const [name, main, word] of [['favicon-light.svg', ink, 'ink'], ['favicon-dark.svg', paper, 'paper']]) {
+    const drawing = fs.existsSync(path.join(siteDir, name)) ? fs.readFileSync(path.join(siteDir, name), 'utf8') : '';
+    if (!drawing) { problems.push(`${name} was not made`); continue; }
+    if (!drawing.includes(`.ring{fill:none;stroke:${main}`) || !drawing.includes(`.mark{fill:${main}}`)) problems.push(`${name} is not the ${word} compass`);
+    if (drawing.includes('prefers-color-scheme')) problems.push(`${name} switches colors by itself; the page's script does that`);
+  }
+  if (fs.existsSync(path.join(siteDir, 'favicon.svg'))) problems.push('favicon.svg, the old drawing that switched by itself, is still in the built site');
   const ico = fs.existsSync(path.join(siteDir, 'favicon.ico')) ? fs.readFileSync(path.join(siteDir, 'favicon.ico')) : Buffer.alloc(6);
   const icoSizes = Array.from({ length: ico.readUInt16LE(4) }, (_, index) => ico.readUInt8(6 + 16 * index));
   if (ico.readUInt16LE(2) !== 1 || icoSizes.join(',') !== '16,32') problems.push(`favicon.ico should hold a 16 and a 32 pixel picture; it holds ${icoSizes.join(', ') || 'none'}`);
@@ -125,12 +143,41 @@ export async function headOfEveryPage(siteDir, root) {
   return { problems, summary: `${pages.length} pages name the icon and carry their own preview tags; ${share}` };
 }
 
+// Draws one tab icon file at tab size and larger on a tab-colored background, and reports whether
+// it is the compass in the expected tone ("ink" or "paper") on a clear background.
+async function drawnIcon(browser, address, href, scheme) {
+  const problems = [];
+  const [background, tone] = scheme === 'light' ? ['#f1f3f4', 'ink'] : ['#202124', 'paper'];
+  const tab = await browser.newContext({ viewport: { width: 200, height: 120 }, colorScheme: scheme, deviceScaleFactor: 1 });
+  const sheet = await tab.newPage();
+  await sheet.route(address + '/icon-sheet', (route) => route.fulfill({ contentType: 'text/html', body: `<body style="margin:0;background:${background}"><img src="${href}" width="16" height="16" style="position:absolute;left:20px;top:20px"><img src="${href}" width="64" height="64" style="position:absolute;left:80px;top:20px"></body>` }));
+  await sheet.goto(address + '/icon-sheet', { waitUntil: 'load' });
+  await sheet.waitForTimeout(200);
+  const { data, info } = await sharp(await sheet.screenshot()).greyscale().raw().toBuffer({ resolveWithObject: true });
+  const grey = (x, y) => data[y * info.width + x];
+  // A spot on the compass (on its south point, a little below the middle of its box), and a corner of each box, which the round compass leaves clear.
+  for (const [name, left, size] of [['16 pixels', 20, 16], ['64 pixels', 80, 64]]) {
+    const middle = grey(left + Math.floor(size / 2), 20 + Math.floor(size * 0.62));
+    const corner = grey(left + 1, 20 + 1);
+    const isIcon = tone === 'ink' ? middle < 90 : middle > 200;
+    const cornerIsBackground = tone === 'ink' ? corner > 200 : corner < 90;
+    if (!isIcon) problems.push(`on a ${scheme} tab the icon at ${name} is not the ${tone} compass (its south point is grey level ${middle} of 255)`);
+    if (!cornerIsBackground) problems.push(`on a ${scheme} tab the icon at ${name} is not a compass on a clear background (its corner is grey level ${corner} of 255)`);
+  }
+  await tab.close();
+  return problems;
+}
+
 export async function siteIconInBrowser(browser, address) {
   const problems = [];
   const context = await browser.newContext({ viewport: { width: 200, height: 120 } });
   const page = await context.newPage();
   const home = await (await page.request.get(address + '/')).text();
-  const hrefs = [...home.split('</head>')[0].matchAll(/<link rel="(?:icon|apple-touch-icon|manifest)"[^>]*href="([^"]+)"/g)].map((match) => match[1]);
+  const head = home.split('</head>')[0];
+  const hrefs = [
+    ...[...head.matchAll(/<link rel="(?:icon|apple-touch-icon|manifest)"[^>]*href="([^"]+)"/g)].map((match) => match[1]),
+    ...[...head.matchAll(/\sdata-dark="([^"]+)"/g)].map((match) => match[1]),
+  ];
   const types = { ico: 'image/x-icon', svg: 'image/svg+xml', png: 'image/png', webmanifest: 'application/manifest+json' };
   for (const href of hrefs) {
     const response = await page.request.get(address + href);
@@ -138,28 +185,51 @@ export async function siteIconInBrowser(browser, address) {
     if (response.status() !== 200) problems.push(`${href} was answered with status ${response.status()}`);
     if (!(response.headers()['content-type'] || '').startsWith(types[kind])) problems.push(`${href} was sent as "${response.headers()['content-type']}" instead of ${types[kind]}`);
   }
-  if (hrefs.length !== 4) problems.push(`the home page names ${hrefs.length} icon files instead of 4`);
+  if (hrefs.length !== 5) problems.push(`the home page names ${hrefs.length} icon files instead of 5`);
   await context.close();
 
-  // The tab icon, drawn at tab size and larger, on a light and on a dark background.
-  for (const [scheme, background, tone] of [['light', '#f1f3f4', 'dark'], ['dark', '#202124', 'light']]) {
-    const tab = await browser.newContext({ viewport: { width: 200, height: 120 }, colorScheme: scheme, deviceScaleFactor: 1 });
-    const sheet = await tab.newPage();
-    await sheet.route(address + '/icon-sheet', (route) => route.fulfill({ contentType: 'text/html', body: `<body style="margin:0;background:${background}"><img id="small" src="/favicon.svg" width="16" height="16" style="position:absolute;left:20px;top:20px"><img id="large" src="/favicon.svg" width="64" height="64" style="position:absolute;left:80px;top:20px"></body>` }));
-    await sheet.goto(address + '/icon-sheet', { waitUntil: 'load' });
-    await sheet.waitForTimeout(200);
-    const { data, info } = await sharp(await sheet.screenshot()).greyscale().raw().toBuffer({ resolveWithObject: true });
-    const grey = (x, y) => data[y * info.width + x];
-    // A spot on the compass (on its south point, a little below the middle of its box), and a corner of each box, which the round compass leaves clear.
-    for (const [name, left, size] of [['16 pixels', 20, 16], ['64 pixels', 80, 64]]) {
-      const middle = grey(left + Math.floor(size / 2), 20 + Math.floor(size * 0.62));
-      const corner = grey(left + 1, 20 + 1);
-      const isIcon = tone === 'dark' ? middle < 90 : middle > 200;
-      const cornerIsBackground = tone === 'dark' ? corner > 200 : corner < 90;
-      if (!isIcon) problems.push(`on a ${scheme} tab the icon at ${name} is not the ${tone === 'dark' ? 'ink' : 'paper'} compass (its south point is grey level ${middle} of 255)`);
-      if (!cornerIsBackground) problems.push(`on a ${scheme} tab the icon at ${name} is not a compass on a clear background (its corner is grey level ${corner} of 255)`);
-    }
+  // The drawn icons the page names: [what its line points at, how many such lines there are].
+  const named = () => {
+    const lines = [...document.querySelectorAll('link[rel="icon"][type="image/svg+xml"]')];
+    return { href: lines[0]?.getAttribute('href') || '', lines: lines.length, ico: document.querySelectorAll('link[rel="icon"][href*=".ico"]').length };
+  };
+  const which = (href) => (/favicon-light\.svg/.test(href) ? 'light' : /favicon-dark\.svg/.test(href) ? 'dark' : `"${href}"`);
+
+  for (const start of ['light', 'dark']) {
+    const other = start === 'light' ? 'dark' : 'light';
+    const tab = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: start });
+    await tab.addInitScript(() => { window.steadyMotion = true; });
+    const home = await tab.newPage();
+    home.on('pageerror', (error) => problems.push(`script error while picking the tab icon: ${error.message}`));
+    await home.goto(address + '/', { waitUntil: 'load' });
+    let now = await home.evaluate(named);
+    if (which(now.href) !== start) problems.push(`with the browser set to ${start}, the page names the ${which(now.href)} tab icon`);
+    if (now.lines !== 1 || now.ico !== 1) problems.push(`with the browser set to ${start}, the page names ${now.lines} drawn icons and ${now.ico} .ico icons instead of one each`);
+    else problems.push(...await drawnIcon(browser, address, now.href, start));
+
+    // The browser changes its look while the page is open: the icon follows at once, with no reload.
+    await home.evaluate(() => { window.notReloaded = true; });
+    await home.emulateMedia({ colorScheme: other });
+    await home.waitForFunction((wanted) => (document.querySelector('link[rel="icon"][type="image/svg+xml"]')?.getAttribute('href') || '').includes(`favicon-${wanted}.svg`), other, { timeout: 2000 }).catch(() => {});
+    now = await home.evaluate(named);
+    if (which(now.href) !== other) problems.push(`after the browser changed from ${start} to ${other}, the page still names the ${which(now.href)} tab icon`);
+    if (now.lines !== 1) problems.push(`after the browser changed from ${start} to ${other}, the page names ${now.lines} drawn icons`);
+    if (!(await home.evaluate(() => window.notReloaded))) problems.push(`the page reloaded when the browser changed from ${start} to ${other}`);
+
+    // A page change keeps the icon that matches.
+    await home.locator('.hero__nav a[href="/about/"]').click();
+    await home.waitForFunction(() => location.pathname === '/about/' && !document.querySelector('.hero'), null, { timeout: 8000 }).catch(() => {});
+    now = await home.evaluate(named);
+    if (which(now.href) !== other || now.lines !== 1) problems.push(`after a page change in a ${other} browser, the page names the ${which(now.href)} tab icon (${now.lines} lines)`);
     await tab.close();
   }
+
+  // Without scripts the ink compass stays, whatever the browser's look.
+  const still = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark', javaScriptEnabled: false });
+  const plain = await still.newPage();
+  await plain.goto(address + '/', { waitUntil: 'load' });
+  const without = await plain.evaluate(named);
+  if (which(without.href) !== 'light') problems.push(`without scripts, the page names the ${which(without.href)} tab icon instead of the ink compass`);
+  await still.close();
   return [...new Set(problems)];
 }
