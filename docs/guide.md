@@ -690,7 +690,7 @@ The current token was obtained on 2026-10-11 and lasts until about **2027-04-11*
 
 Notes:
 
-- The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. It names the **Deploy** button but not the save button on the Environment tab: see "What Dokploy's documentation did not confirm" under "Deploying with Dokploy".
+- The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. The save button on the Environment tab is easy to find (see "What your dashboard showed" under "Deploying with Dokploy").
 - The Client ID and Client secret do not change. Only the refresh token is renewed.
 - If `npm run spotify` says the Client ID or secret is wrong, or Spotify's page shows an error about the redirect address, the app's settings on https://developer.spotify.com/dashboard have changed: see "Spotify: the first setup" above.
 - If the Client secret ever leaks, open the app's Settings in Spotify's dashboard, rotate the secret, put the new one in `.env` and in Dokploy's Environment tab, then do all the steps above.
@@ -704,7 +704,7 @@ Notes:
 | No now-playing line, and Premium has lapsed | Spotify switches the app off | Resubscribe |
 | No weather | Open-Meteo is unreachable | Wait; it comes back by itself within a minute of the service returning |
 | Neither, with `npm start` | The site was not built first | `npm run build`, then `npm start` |
-| A new blog post is not on the home page or the About page after half an hour | The server could not read the feed, and keeps showing the last list it read | Open https://blog.romitraj.dev/rss.xml: the post must be in it. The server tries again every 5 minutes. |
+| A new blog post is not on the home page or the About page after half an hour | The server could not read the feed, and keeps showing the last list it read | Open https://blog.romitraj.dev/rss.xml: the post must be in it. The server tries again every 5 minutes. If the post is there, check Cloudflare's IP Access rule for your server ("Deploying with Dokploy", step 1.5): without it Bot Fight Mode blocks the server, for example after its IP address changed. |
 
 To see what the server answers, open http://localhost:3000/api/weather, http://localhost:3000/api/now-playing or http://localhost:3000/api/posts while `npm start` is running. An empty page means "nothing to show".
 
@@ -808,7 +808,7 @@ The live site is two applications on your own server, both set up in Dokploy's d
 
 Both are built by Railpack, Dokploy's builder that reads `package.json` and works out the rest. There is no Dockerfile and nothing to type on the server: every step below is a click in a dashboard.
 
-**Nothing here has been done yet.** These are the steps for the first deployment, and for doing it again on a new server.
+**Both applications are live** (checked 2026-11-06). These are the steps they were set up with, for doing it again on a new server.
 
 ### What the server will do
 
@@ -825,7 +825,7 @@ Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) an
 
 - **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
 - **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
-- **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog, until the running server reads the feed and the page fills in the cards. A new post needs no deploy: see "Blog posts" under "The home page sections".
+- **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog, until the running server reads the feed and the page fills in the cards. A new post needs no deploy: see "Blog posts" under "The home page sections". Cloudflare must let your server read the feed: see step 1.5.
 - **On the server the pages load the fonts from https://fonts.romitraj.dev.** That is why the fonts application comes first below.
 - **The fonts go to romitraj.dev only.** A page on any other website that asks for one is refused, and browsers will not use a font for another site even if they get it. The server answers nothing but the seven font files: not the brief, not the original font files, not its own code.
 
@@ -847,6 +847,10 @@ Skip any part that is already as described. On 2026-10-11 both names already poi
    - **If you still have both** from when you set up the blog or the visitor counter, and the certificate covers `romitraj.dev` and `*.romitraj.dev`, use them.
    - **If you no longer have the private key** (Cloudflare shows it only once), make a new certificate: **SSL/TLS**, **Origin Server**, **Create Certificate**. Keep the option that lets Cloudflare generate the private key, make sure the hostnames are `romitraj.dev` and `*.romitraj.dev`, choose how long it is valid, and click **Create**. Copy the **Origin Certificate** and the **Private Key** (PEM format) into your password manager before closing the page.
    - Never put either block in a repository, a chat or a screenshot.
+5. **Let your server read the blog's feed.** Bot Fight Mode is on for the domain, and it blocks programs that are not browsers, including your own server when it reads `https://blog.romitraj.dev/rss.xml` for the build and for the live posts. Custom rules and WAF skip rules cannot get past Bot Fight Mode; an IP Access rule can.
+   - Open the **Security rules** page (under **Security**). The IP Access rules page is hidden in the new dashboard: add `/ip-access-rules` to the end of that page's address in the address bar and press Enter.
+   - Add a rule for your server's IP address (the one the DNS records point at) with the action **Allow**.
+   - **If your server's IP address ever changes, update this rule.** Otherwise the posts stop updating, and since the site quietly keeps the last list it read, nothing looks broken.
 
 ### Step 2: the certificate in Dokploy
 
@@ -879,7 +883,7 @@ If Dokploy can already see both repositories, skip this step.
    
    Save the source settings.
 4. Still on **General**, choose **Railpack** as the build type and save. Leave the **Railpack Version** field as it is.
-5. Turn on **Auto Deploy** on the **General** tab, if it is not on already.
+5. Check that **Auto Deploy** on the **General** tab is on. It starts switched on for a new application.
 6. The **Environment** tab stays empty for this application.
 7. Click **Deploy**.
 8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 24, `npm install` and `npm run start`, and end without an error. This takes a minute or two.
@@ -911,7 +915,7 @@ If Dokploy can already see both repositories, skip this step.
    
    Save.
 3. Choose **Railpack** as the build type and save.
-4. Turn on **Auto Deploy**.
+4. Check that **Auto Deploy** is on (it starts switched on).
 5. Open the **Environment** tab. Type these three lines, each followed by its value from the `.env` file on your PC (open it with `notepad .env` in the site's folder). No spaces around the `=`, no quotes:
 
    ```
@@ -955,29 +959,26 @@ If Dokploy can already see both repositories, skip this step.
 | The newest entry on **Deployments** ends in an error | The build failed | Read the last lines of that entry. A wrong Node version there (not 24) means an old Railpack: type `0.40.1` into **Railpack Version** on **General**, save, deploy again. |
 | `404 page not found` | The server has no application for that address | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://` |
 | Cloudflare's page "Bad gateway" (502) | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains** |
-| Cloudflare's page "Invalid SSL certificate" (526) | The server is not presenting the origin certificate | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. If it still shows, tell me: one page of Dokploy's documentation says its proxy may need pointing at a new certificate by hand. |
+| Cloudflare's page "Invalid SSL certificate" (526) | The server is not presenting the origin certificate | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.) |
 | Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all | The DNS record's address in Cloudflare, and that the server is running |
 | The site shows but the ticker has no track | The Spotify settings | **Environment**, then deploy again. See "If a widget is missing". |
 
 ### After the first deployment
 
 - **Every `git push` to `main` deploys.** Push the site's repository and the site is rebuilt and restarted, usually within two minutes. Push the private repository and the fonts application restarts too, even when only the brief changed. That is harmless: browsers and Cloudflare keep the fonts for a year.
-  - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json` and `package-lock.json`. Its documentation does not say where the field is, so this is left for when we look at your dashboard together.
+  - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json` and `package-lock.json`. It is not set (your choice, 2026-11-06), and where the field is has not been checked.
 - **A changed setting does nothing until the next deploy.** After saving anything on the **Environment** tab, click **Deploy** on **General**.
 - **Visitors get new files at once.** Pages are never kept by browsers or by Cloudflare. The stylesheet, the script, the pictures and the fonts may be kept, and each carries a fingerprint in its address (`main.css?v=...`) that changes when the file changes.
 - **Push only what you have checked.** There is no test on the server: `npm run check` on your PC is the test.
 
-### What Dokploy's documentation did not confirm
+### What your dashboard showed
 
-The steps above use the names in Dokploy's documentation as read on 2026-10-11 (Dokploy 0.30.8). Where it gives no name, the step describes the thing instead. These are the places to compare with your dashboard, so the wording here can be corrected:
+The steps above use the names in Dokploy's documentation as read on 2026-10-11 (Dokploy 0.30.8). Where it gives no name, the step describes the thing instead. On the first deployment (reported 2026-11-06) your dashboard matched:
 
-1. **Creating a project and an application** (steps 4.1, 4.2, 5.1): the documentation does not name the buttons.
-2. **Choosing the source and the build type** (steps 4.3, 4.4, 5.2, 5.3): it names the fields (Repository, Branch, Build path, Railpack Version) and that they are on **General**, but not the buttons that save them.
-3. **The save button on the Environment tab** (step 5.5).
-4. **Whether Auto Deploy is already on** for a new application (steps 4.5, 5.4). The documentation says it is a button on **General**.
-5. **The certificate form** (step 2): the name of the certificate field and of its save button.
-6. **Whether a certificate added in step 2 is used at once.** The Cloudflare page of the documentation says to add it and choose **None**; the certificates page says the proxy's configuration may need adjusting. The 526 line in the table above is how you would notice.
-7. **Where Watch Paths is.**
+1. **The buttons** that create a project and an application, save the source and the build type on **General**, and save the **Environment** tab were easy to find, so the steps do not name them.
+2. **Auto Deploy** starts switched on for a new application.
+3. **The certificate** added in step 2 worked as described and was used at once, with **None** chosen on each domain and no extra step.
+4. **Watch Paths** is not set, and where its field is has not been checked (see "After the first deployment").
 
 ## Secrets
 
