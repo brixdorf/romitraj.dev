@@ -2,6 +2,16 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-06: The site is live; Cloudflare lets the server read the blog's feed
+
+Romit deployed both applications himself in the Dokploy dashboard, following "Deploying with Dokploy" in the guide: the site at https://romitraj.dev and the fonts at https://fonts.romitraj.dev. Nothing in the code changed for it.
+
+- **What his dashboard showed**, now written into the guide: the buttons that create a project and an application and save the source, the build type and the Environment tab were easy to find, so the steps describe them without names; Auto Deploy starts switched on; the origin certificate added in Dokploy was used at once, with the certificate provider set to None on each domain. Watch Paths is not set (his choice), so the fonts application still restarts on every push to the private repository, which is harmless.
+- **Cloudflare's Bot Fight Mode is on, and it would block the server from reading the blog's feed** (`https://blog.romitraj.dev/rss.xml`), which the build and `/api/posts` both need: the server is a program, not a browser. Custom rules and WAF skip rules cannot get past Bot Fight Mode, so an **IP Access rule (Allow) for the server's IP address** lets it through instead.
+  - The IP Access rules page is hidden in Cloudflare's new dashboard: open the Security rules page and add `/ip-access-rules` to the end of its address.
+  - **If the server's IP address changes, the rule must be updated.** Otherwise new posts stop arriving, and because the server keeps answering with the last good list, the site does not look broken. The guide's trouble table points to this.
+  - The address itself is not written in this repository.
+
 ## 2026-10-14: The About page's latest post arrives without a deploy too
 
 Romit asked for the About page's piece about the latest post to work like the home page's list: from `/api/posts`, with the built piece as the fallback, the same no-jump rule, and the last good post kept when the feed fails. No package was added.
