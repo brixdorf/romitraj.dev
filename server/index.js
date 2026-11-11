@@ -46,7 +46,9 @@ function findFile(baseDir, urlPath) {
   if (stats.isFile()) return { filePath, size: stats.size };
   const indexPath = path.join(filePath, 'index.html');
   const indexStats = fs.statSync(indexPath, { throwIfNoEntry: false });
-  return indexStats?.isFile() ? { filePath: indexPath, size: indexStats.size, isIndex: true } : null;
+  return indexStats?.isFile()
+    ? { filePath: indexPath, size: indexStats.size, isIndex: true }
+    : null;
 }
 
 function send(response, status, body) {
@@ -62,7 +64,8 @@ const lostPage = path.join(siteDir, '404.html');
 function sendNotFound(request, response, urlPath) {
   const extension = path.extname(urlPath).toLowerCase();
   const stats = fs.statSync(lostPage, { throwIfNoEntry: false });
-  if (!stats?.isFile() || (extension && extension !== '.html')) return send(response, 404, 'Not found');
+  if (!stats?.isFile() || (extension && extension !== '.html'))
+    return send(response, 404, 'Not found');
   response.writeHead(404, {
     'Content-Type': types['.html'],
     'Content-Length': stats.size,
@@ -74,7 +77,8 @@ function sendNotFound(request, response, urlPath) {
 }
 
 const server = http.createServer(async (request, response) => {
-  if (request.method !== 'GET' && request.method !== 'HEAD') return send(response, 405, 'Method not allowed');
+  if (request.method !== 'GET' && request.method !== 'HEAD')
+    return send(response, 405, 'Method not allowed');
 
   let urlPath;
   try {

@@ -13,7 +13,11 @@ const cacheMinutes = 60;
 export default async function () {
   // Only the real feed is kept, and only while developing: a stand-in feed (pnpm run check) is never saved.
   const keeping = process.env.ELEVENTY_RUN_MODE === 'serve' && !process.env.BLOG_FEED_URL;
-  if (keeping && fs.existsSync(cacheFile) && Date.now() - fs.statSync(cacheFile).mtimeMs < cacheMinutes * 60000) {
+  if (
+    keeping &&
+    fs.existsSync(cacheFile) &&
+    Date.now() - fs.statSync(cacheFile).mtimeMs < cacheMinutes * 60000
+  ) {
     return JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
   }
   // Two tries, in case the blog is slow to answer the first time.
@@ -32,6 +36,8 @@ export default async function () {
       problem = error.message;
     }
   }
-  console.warn(`[blog] Could not load ${feedAddress()} (${problem}). The page will link to the blog instead.`);
+  console.warn(
+    `[blog] Could not load ${feedAddress()} (${problem}). The page will link to the blog instead.`,
+  );
   return { posts: [], url: site.blogUrl };
 }

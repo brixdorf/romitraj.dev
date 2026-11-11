@@ -39,11 +39,17 @@ const standIn = `(function () {
   view();
 })();`;
 
-const notesNow = (page) => page.evaluate((origin) => ({
-  notes: window.counterNotes || null,
-  tags: [...document.querySelectorAll('script[src]')].filter((script) => script.src.startsWith(origin)).length,
-  path: location.pathname,
-}), counterOrigin);
+const notesNow = (page) =>
+  page.evaluate(
+    (origin) => ({
+      notes: window.counterNotes || null,
+      tags: [...document.querySelectorAll('script[src]')].filter((script) =>
+        script.src.startsWith(origin),
+      ).length,
+      path: location.pathname,
+    }),
+    counterOrigin,
+  );
 
 export async function visitorCounting(browser, address) {
   const problems = [];
@@ -51,22 +57,32 @@ export async function visitorCounting(browser, address) {
 
   // 1. On this computer: no tag, and nothing asked of the counter.
   let context = await browser.newContext({ viewport: size });
-  await context.addInitScript(() => { window.steadyMotion = true; });
+  await context.addInitScript(() => {
+    window.steadyMotion = true;
+  });
   const asked = [];
-  await context.route(`${counterOrigin}/**`, (route) => { asked.push(route.request().url()); return route.abort(); });
+  await context.route(`${counterOrigin}/**`, (route) => {
+    asked.push(route.request().url());
+    return route.abort();
+  });
   let page = await context.newPage();
   await page.goto(address + '/', { waitUntil: 'load' });
   await page.locator('.hero__nav a[href="/about/"]').click();
-  await page.waitForFunction(() => location.pathname === '/about/', null, { timeout: 8000 }).catch(() => {});
+  await page
+    .waitForFunction(() => location.pathname === '/about/', null, { timeout: 8000 })
+    .catch(() => {});
   await page.waitForTimeout(1500);
   const local = await notesNow(page);
-  if (local.tags) problems.push('on this computer the visitor counter\'s tag was added to the page');
-  if (asked.length) problems.push(`on this computer the page asked the visitor counter for ${asked[0]}`);
+  if (local.tags) problems.push("on this computer the visitor counter's tag was added to the page");
+  if (asked.length)
+    problems.push(`on this computer the page asked the visitor counter for ${asked[0]}`);
   await context.close();
 
   // 2. Seen as the live site.
   context = await browser.newContext({ viewport: size });
-  await context.addInitScript(() => { window.steadyMotion = true; });
+  await context.addInitScript(() => {
+    window.steadyMotion = true;
+  });
   const sent = [];
   // The live address is answered by the site on this computer...
   await context.route(`${liveAddress}/**`, async (route) => {
@@ -77,39 +93,92 @@ export async function visitorCounting(browser, address) {
   // ...and the counter's address by the stand-in. Anything else it is asked is noted and dropped.
   await context.route(`${counterOrigin}/**`, (route) => {
     const url = route.request().url();
-    if (url === site.analytics.script) return route.fulfill({ status: 200, contentType: 'application/javascript', body: standIn });
+    if (url === site.analytics.script)
+      return route.fulfill({ status: 200, contentType: 'application/javascript', body: standIn });
     sent.push(url);
     return route.abort();
   });
   page = await context.newPage();
-  page.on('pageerror', (error) => problems.push(`script error with the visitor counter: ${error.message}`));
+  page.on('pageerror', (error) =>
+    problems.push(`script error with the visitor counter: ${error.message}`),
+  );
   await page.goto(liveAddress + '/', { waitUntil: 'load' });
   await page.waitForFunction(() => window.counterNotes, null, { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(900);
 
   let seen = await notesNow(page);
   if (!seen.notes) {
-    problems.push('seen as the live site, the visitor counter\'s script did not run');
+    problems.push("seen as the live site, the visitor counter's script did not run");
     await context.close();
     return problems;
   }
   const tag = seen.notes.tag;
-  if (!tag || tag.src !== site.analytics.script || tag.siteId !== site.analytics.siteId || !tag.defer || !tag.inHead) problems.push(`the visitor counter's tag is not as Rybbit gives it (in the head, src ${site.analytics.script}, data-site-id ${site.analytics.siteId}, defer): ${JSON.stringify(tag)}`);
-  if (seen.notes.views.length !== 1) problems.push(`opening the home page counted ${seen.notes.views.length} views instead of 1 (${seen.notes.calls.join('; ') || 'no history calls'})`);
+  if (
+    !tag ||
+    tag.src !== site.analytics.script ||
+    tag.siteId !== site.analytics.siteId ||
+    !tag.defer ||
+    !tag.inHead
+  )
+    problems.push(
+      `the visitor counter's tag is not as Rybbit gives it (in the head, src ${site.analytics.script}, data-site-id ${site.analytics.siteId}, defer): ${JSON.stringify(tag)}`,
+    );
+  if (seen.notes.views.length !== 1)
+    problems.push(
+      `opening the home page counted ${seen.notes.views.length} views instead of 1 (${seen.notes.calls.join('; ') || 'no history calls'})`,
+    );
 
   // Page changes (two by a link, one with the back button, one more by a link) each count once.
   // In between, on a project's page: a jump to a section, back out of it and forward into it
   // again count nothing. "views" is how many views the step should add; "section" says whether
   // the address should end in "#something" afterwards.
   const steps = [
-    { name: 'home to Projects', act: () => page.locator('.hero__nav a[href="/projects/"]').click(), path: '/projects/', views: 1 },
-    { name: 'Projects to a project', act: () => page.locator('.project-card__more').first().click(), views: 1 },
-    { name: 'a jump to a section of the project\'s page', act: () => page.locator('.study__contents-list a').first().click(), views: 0, section: true },
+    {
+      name: 'home to Projects',
+      act: () => page.locator('.hero__nav a[href="/projects/"]').click(),
+      path: '/projects/',
+      views: 1,
+    },
+    {
+      name: 'Projects to a project',
+      act: () => page.locator('.project-card__more').first().click(),
+      views: 1,
+    },
+    {
+      name: "a jump to a section of the project's page",
+      act: () => page.locator('.study__contents-list a').first().click(),
+      views: 0,
+      section: true,
+    },
     { name: 'back out of the section', act: () => page.goBack(), views: 0, section: false },
-    { name: 'forward into the section again', act: () => page.goForward(), views: 0, section: true },
-    { name: 'a jump to another section', act: () => page.locator('.study__contents-list a').nth(1).click(), views: 0, section: true },
-    { name: 'back to Projects with the back button (past the section jumps)', act: async () => { await page.goBack(); await page.goBack(); await page.goBack(); }, path: '/projects/', views: 1 },
-    { name: 'Projects to home', act: () => page.locator('[data-row-back]').click(), path: '/', views: 1 },
+    {
+      name: 'forward into the section again',
+      act: () => page.goForward(),
+      views: 0,
+      section: true,
+    },
+    {
+      name: 'a jump to another section',
+      act: () => page.locator('.study__contents-list a').nth(1).click(),
+      views: 0,
+      section: true,
+    },
+    {
+      name: 'back to Projects with the back button (past the section jumps)',
+      act: async () => {
+        await page.goBack();
+        await page.goBack();
+        await page.goBack();
+      },
+      path: '/projects/',
+      views: 1,
+    },
+    {
+      name: 'Projects to home',
+      act: () => page.locator('[data-row-back]').click(),
+      path: '/',
+      views: 1,
+    },
   ];
   for (const { name, act, path: expectedPath, views: expectedViews, section } of steps) {
     const hashBefore = await page.evaluate(() => location.hash);
@@ -125,24 +194,39 @@ export async function visitorCounting(browser, address) {
     if (expectedPath && seen.path !== expectedPath) problems.push(`${name}: ended at ${seen.path}`);
     if (section !== undefined) {
       const hashNow = await page.evaluate(() => location.hash);
-      if (section && hashNow.length < 2) problems.push(`${name}: the address does not show the section (it ends in "${hashNow}")`);
+      if (section && hashNow.length < 2)
+        problems.push(`${name}: the address does not show the section (it ends in "${hashNow}")`);
       if (section && hashNow === hashBefore) problems.push(`${name}: the address did not change`);
       if (!section && hashNow) problems.push(`${name}: the address still ends in ${hashNow}`);
-      if (section && !(await page.evaluate(() => window.scrollY > 0))) problems.push(`${name}: the page did not move to the section`);
+      if (section && !(await page.evaluate(() => window.scrollY > 0)))
+        problems.push(`${name}: the page did not move to the section`);
     }
     if (expectedViews === 0) {
       // Not a page change: the counter must hear nothing at all.
-      if (views.length || calls.length) problems.push(`${name}: counted ${views.length} view${views.length === 1 ? '' : 's'}, where a jump within a page should count none (the counter heard: ${calls.join('; ') || 'nothing'})`);
+      if (views.length || calls.length)
+        problems.push(
+          `${name}: counted ${views.length} view${views.length === 1 ? '' : 's'}, where a jump within a page should count none (the counter heard: ${calls.join('; ') || 'nothing'})`,
+        );
       continue;
     }
-    if (views.length !== 1) problems.push(`${name}: counted ${views.length} views instead of 1 (${calls.join('; ') || 'no history calls'})`);
-    else if (views[0] !== seen.path) problems.push(`${name}: the view was counted for ${views[0]} instead of ${seen.path}`);
+    if (views.length !== 1)
+      problems.push(
+        `${name}: counted ${views.length} views instead of 1 (${calls.join('; ') || 'no history calls'})`,
+      );
+    else if (views[0] !== seen.path)
+      problems.push(`${name}: the view was counted for ${views[0]} instead of ${seen.path}`);
     // One write to the history per change, whatever the counter's waiting time: nothing else may touch it.
-    if (calls.length !== 1) problems.push(`${name}: the browser's history was written to or stepped through ${calls.length} times instead of once (${calls.join('; ')}), which a counter without a waiting time would count ${calls.length} times`);
-    if (seen.notes.runs !== 1) problems.push(`${name}: the visitor counter's script has run ${seen.notes.runs} times`);
-    if (seen.tags !== 1) problems.push(`${name}: the page now has ${seen.tags} visitor counter tags instead of 1`);
+    if (calls.length !== 1)
+      problems.push(
+        `${name}: the browser's history was written to or stepped through ${calls.length} times instead of once (${calls.join('; ')}), which a counter without a waiting time would count ${calls.length} times`,
+      );
+    if (seen.notes.runs !== 1)
+      problems.push(`${name}: the visitor counter's script has run ${seen.notes.runs} times`);
+    if (seen.tags !== 1)
+      problems.push(`${name}: the page now has ${seen.tags} visitor counter tags instead of 1`);
   }
-  if (sent.length) problems.push(`the stand-in counter should send nothing, but the page asked for ${sent[0]}`);
+  if (sent.length)
+    problems.push(`the stand-in counter should send nothing, but the page asked for ${sent[0]}`);
   await context.close();
   return [...new Set(problems)];
 }

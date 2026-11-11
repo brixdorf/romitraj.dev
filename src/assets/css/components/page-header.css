@@ -26,7 +26,10 @@
   font-weight: 400;
   /* On a narrow window the letters shrink until the longest word fits. A letter of this font is
      about 0.37 of the type size wide, and the template passes in the longest word's letter count. */
-  font-size: min(var(--type-page-heading), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37));
+  font-size: min(
+    var(--type-page-heading),
+    (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37)
+  );
   line-height: 0.8;
   letter-spacing: -0.002em;
   text-transform: uppercase;
@@ -39,7 +42,10 @@
 }
 
 .page-header__title--long {
-  font-size: min(var(--type-page-heading-long), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37));
+  font-size: min(
+    var(--type-page-heading-long),
+    (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.37)
+  );
 }
 
 .page-header__frame {

@@ -25,38 +25,63 @@ let refusedUntil = 0;
 
 async function accessToken() {
   if (Date.now() < access.until) return access.token;
-  const { SPOTIFY_CLIENT_ID: id, SPOTIFY_CLIENT_SECRET: secret, SPOTIFY_REFRESH_TOKEN: saved } = process.env;
+  const {
+    SPOTIFY_CLIENT_ID: id,
+    SPOTIFY_CLIENT_SECRET: secret,
+    SPOTIFY_REFRESH_TOKEN: saved,
+  } = process.env;
   if (!id || !secret || !saved || Date.now() < refusedUntil) return null;
   const response = await fetch(tokenUrl(), {
     method: 'POST',
-    headers: { Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: newerRefreshToken || saved }),
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString('base64')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: newerRefreshToken || saved,
+    }),
     signal: patience(),
   });
   const answer = await response.json().catch(() => ({}));
   if (!response.ok || !answer.access_token) {
     if (answer.error === 'invalid_grant') {
       refusedUntil = Date.now() + 60 * 60 * 1000;
-      console.error('Spotify no longer accepts the refresh token (they stop working after 6 months). Run "pnpm run spotify" and update SPOTIFY_REFRESH_TOKEN. The now-playing line stays hidden until then.');
+      console.error(
+        'Spotify no longer accepts the refresh token (they stop working after 6 months). Run "pnpm run spotify" and update SPOTIFY_REFRESH_TOKEN. The now-playing line stays hidden until then.',
+      );
     }
     return null;
   }
   if (answer.refresh_token) newerRefreshToken = answer.refresh_token;
-  access = { token: answer.access_token, until: Date.now() + (Number(answer.expires_in || 3600) - 60) * 1000 };
+  access = {
+    token: answer.access_token,
+    until: Date.now() + (Number(answer.expires_in || 3600) - 60) * 1000,
+  };
   return access.token;
 }
 
 // The few facts the ticker shows about a track. The link must be a real Spotify address.
 function describe(track, playing) {
   const url = track?.external_urls?.spotify;
-  if (!track?.name || typeof url !== 'string' || !url.startsWith('https://open.spotify.com/')) return null;
-  return { playing, title: track.name, artists: (track.artists || []).map((artist) => artist.name).filter(Boolean), url };
+  if (!track?.name || typeof url !== 'string' || !url.startsWith('https://open.spotify.com/'))
+    return null;
+  return {
+    playing,
+    title: track.name,
+    artists: (track.artists || []).map((artist) => artist.name).filter(Boolean),
+    url,
+  };
 }
 
 async function ask() {
   const token = await accessToken();
   if (!token) return null;
-  const get = (question) => fetch(apiUrl() + question, { headers: { Authorization: `Bearer ${token}` }, signal: patience() });
+  const get = (question) =>
+    fetch(apiUrl() + question, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: patience(),
+    });
 
   const now = await get('/me/player/currently-playing');
   if (now.status === 401) access.until = 0;

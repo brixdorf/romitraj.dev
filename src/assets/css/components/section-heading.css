@@ -31,7 +31,7 @@
 
   .section-heading::after,
   .section-heading--end::before {
-    content: "";
+    content: '';
     flex: 1;
     block-size: 0.1em;
     background: currentColor;

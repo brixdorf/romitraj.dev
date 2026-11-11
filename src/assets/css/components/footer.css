@@ -118,7 +118,7 @@
 }
 
 .crumb__link::after {
-  content: "";
+  content: '';
   position: absolute;
   inset-inline: 0;
   inset-block-end: 5px;
@@ -159,7 +159,7 @@
 }
 
 .footer__link::after {
-  content: "";
+  content: '';
   position: absolute;
   inset-inline: 0;
   inset-block-end: 4.8px;

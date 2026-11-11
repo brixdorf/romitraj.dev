@@ -31,10 +31,10 @@
   --color-bar-4: #fbe3c4;
 
   /* Fonts: the licensed face first, then its free stand-in (set up in _data/fallbackFonts.json), then a system font. */
-  --font-display: "Manuka", "Manuka Fallback", Impact, sans-serif;
-  --font-serif-display: "Louize Display", "Louize Display Fallback", Georgia, serif;
-  --font-serif: "Louize", "Louize Fallback", Georgia, serif;
-  --font-text: "Neue Montreal", "Neue Montreal Fallback", Arial, sans-serif;
+  --font-display: 'Manuka', 'Manuka Fallback', Impact, sans-serif;
+  --font-serif-display: 'Louize Display', 'Louize Display Fallback', Georgia, serif;
+  --font-serif: 'Louize', 'Louize Fallback', Georgia, serif;
+  --font-text: 'Neue Montreal', 'Neue Montreal Fallback', Arial, sans-serif;
 
   /* Type sizes. The giant hero lines are not here: they are sized to fill their space, in components/hero.css. */
   --type-banner: max(22.4px, 2.4vw);

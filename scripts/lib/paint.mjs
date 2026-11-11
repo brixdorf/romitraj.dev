@@ -55,7 +55,13 @@ function soften(map, width, height, reach) {
 // "tones" are the greys to end up with: the usual tone of the calm areas, the darkest shadow
 // allowed, the lightest edge allowed, the grey that only one pixel in twenty of the fine shading
 // may be darker than, and how many grey levels the broad patches may add or take away.
-export function paintTexture({ width, height, seed = 1, strokes = 11, tones = { calm: 243.5, darkest: 212, lightest: 251, mostlyAbove: 226, swell: 6 } }) {
+export function paintTexture({
+  width,
+  height,
+  seed = 1,
+  strokes = 11,
+  tones = { calm: 243.5, darkest: 212, lightest: 251, mostlyAbove: 226, swell: 6 },
+}) {
   const random = randomFrom(seed);
   const between = (least, most) => least + random() * (most - least);
   const heights = new Float32Array(width * height);
@@ -67,7 +73,9 @@ export function paintTexture({ width, height, seed = 1, strokes = 11, tones = { 
   const swellDown = smoothNoise(random, 6);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const swell = swellAcross((x / width) * 5 + (y / height) * 1.5) * swellDown((y / height) * 5 + (x / width) * 0.8);
+      const swell =
+        swellAcross((x / width) * 5 + (y / height) * 1.5) *
+        swellDown((y / height) * 5 + (x / width) * 0.8);
       heights[y * width + x] = 0.6 * swell;
       patches[y * width + x] = swell;
     }
@@ -151,7 +159,10 @@ export function paintTexture({ width, height, seed = 1, strokes = 11, tones = { 
   const greys = new Uint8Array(width * height);
   for (let index = 0; index < greys.length; index++) {
     // Shadows keep their full depth; light edges are held back, since the paint is nearly white already.
-    const tone = tones.calm + patches[index] * tones.swell + (shade[index] < 0 ? shade[index] * strength : shade[index] * strength * 0.45);
+    const tone =
+      tones.calm +
+      patches[index] * tones.swell +
+      (shade[index] < 0 ? shade[index] * strength : shade[index] * strength * 0.45);
     greys[index] = Math.round(Math.max(tones.darkest, Math.min(tones.lightest, tone)));
   }
   return greys;

@@ -10,6 +10,7 @@ link: https://github.com/brixdorf/hardened
 order: 2
 image: padlock
 ---
+
 > **Sample project**
 >
 > This write-up is placeholder text for a sample project. Replace it with a real one.

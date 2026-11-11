@@ -30,16 +30,28 @@ function placesInSight() {
   for (const element of document.body.querySelectorAll('*')) {
     const rect = element.getBoundingClientRect();
     if (rect.bottom <= 0 || rect.top >= height || (!rect.width && !rect.height)) continue;
-    places.push([element, rect.left, Math.max(rect.top, 0), rect.width, Math.min(rect.bottom, height)]);
+    places.push([
+      element,
+      rect.left,
+      Math.max(rect.top, 0),
+      rect.width,
+      Math.min(rect.bottom, height),
+    ]);
   }
   return places;
 }
-const movedInSight = (places) => places.some(([element, ...was]) => {
-  if (!element.isConnected) return true;
-  const rect = element.getBoundingClientRect();
-  const now = [rect.left, Math.max(rect.top, 0), rect.width, Math.min(rect.bottom, window.innerHeight)];
-  return now.some((value, index) => Math.abs(value - was[index]) > 0.5);
-});
+const movedInSight = (places) =>
+  places.some(([element, ...was]) => {
+    if (!element.isConnected) return true;
+    const rect = element.getBoundingClientRect();
+    const now = [
+      rect.left,
+      Math.max(rect.top, 0),
+      rect.width,
+      Math.min(rect.bottom, window.innerHeight),
+    ];
+    return now.some((value, index) => Math.abs(value - was[index]) > 0.5);
+  });
 
 // Changes the page ("change" makes the change and returns a function that undoes it) only where
 // the visitor cannot see it, as described at the top. "spot" is the piece now on the page, or
@@ -98,12 +110,18 @@ function fill(piece, post) {
 }
 
 // What a piece says: each post's address, title, date and description, to tell whether two are the same.
-const contents = (piece) => [...piece.querySelectorAll('[data-post-link]')]
-  .map((link) => {
-    const post = link.closest('[data-latest-post], li') || piece;
-    return [link.getAttribute('href'), post.querySelector('[data-post-title]').textContent, post.querySelector('[data-post-date]').getAttribute('datetime'), post.querySelector('[data-post-text]')?.textContent || ''].join(' ');
-  })
-  .join('\n');
+const contents = (piece) =>
+  [...piece.querySelectorAll('[data-post-link]')]
+    .map((link) => {
+      const post = link.closest('[data-latest-post], li') || piece;
+      return [
+        link.getAttribute('href'),
+        post.querySelector('[data-post-title]').textContent,
+        post.querySelector('[data-post-date]').getAttribute('datetime'),
+        post.querySelector('[data-post-text]')?.textContent || '',
+      ].join(' ');
+    })
+    .join('\n');
 
 // The home page: the list of cards, each a copy of the blank card in the page's <template>.
 function showList(posts, arriving) {
@@ -114,7 +132,8 @@ function showList(posts, arriving) {
   const fresh = document.createElement('ul');
   fresh.className = 'card-grid';
   fresh.setAttribute('data-posts-list', '');
-  for (const post of posts.slice(0, Number(section.dataset.count) || posts.length)) fresh.append(fill(blank.cloneNode(true), post));
+  for (const post of posts.slice(0, Number(section.dataset.count) || posts.length))
+    fresh.append(fill(blank.cloneNode(true), post));
   if (contents(fresh) === contents(current)) return stopWaiting('list');
   changeUnseen('list', {
     spot: current,

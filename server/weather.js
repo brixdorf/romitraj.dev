@@ -14,7 +14,12 @@ const words = JSON.parse(fs.readFileSync(path.join(data, 'weather.json'), 'utf8'
 async function ask() {
   // WEATHER_URL is only set by pnpm run check, which points it at a stand-in on this computer.
   const url = new URL(process.env.WEATHER_URL || 'https://api.open-meteo.com/v1/forecast');
-  url.search = new URLSearchParams({ latitude: site.latitude, longitude: site.longitude, current: 'temperature_2m,weather_code', timezone: site.timeZone });
+  url.search = new URLSearchParams({
+    latitude: site.latitude,
+    longitude: site.longitude,
+    current: 'temperature_2m,weather_code',
+    timezone: site.timeZone,
+  });
   const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
   if (!response.ok) return null;
   const now = (await response.json()).current;

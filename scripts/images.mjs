@@ -28,7 +28,9 @@ const tokensFile = path.join(root, 'src', 'assets', 'css', 'tokens.css');
 
 // The two colours come from the styles, so the pictures always match the page.
 function colourFromTokens(name) {
-  const hex = new RegExp(`--color-${name}:\\s*#([0-9a-f]{6})`, 'i').exec(fs.readFileSync(tokensFile, 'utf8'))?.[1];
+  const hex = new RegExp(`--color-${name}:\\s*#([0-9a-f]{6})`, 'i').exec(
+    fs.readFileSync(tokensFile, 'utf8'),
+  )?.[1];
   if (!hex) throw new Error(`tokens.css has no --color-${name}.`);
   return [0, 2, 4].map((at) => parseInt(hex.slice(at, at + 2), 16));
 }
@@ -36,9 +38,17 @@ function colourFromTokens(name) {
 // The threshold patterns. A pixel becomes paper when its grey (0 to 1) is above its threshold.
 const patterns = {
   // Two by two: solid ink, one pixel in four, a checkerboard, three in four, solid paper.
-  checker: [[0, 2], [3, 1]],
+  checker: [
+    [0, 2],
+    [3, 1],
+  ],
   // Four by four: sixteen steps, for drawings with long smooth gradients.
-  fine: [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]],
+  fine: [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+  ],
 };
 // "grain" has no repeating pattern: thresholds are scattered evenly, like stippling. It mixes an
 // even scatter with a little plain randomness (both worked out from the pixel's place, so the
@@ -69,13 +79,22 @@ function findBackdrop(light, width, height) {
     backdrop[index] = 1;
     queue.push(index);
   };
-  for (let x = 0; x < width; x++) { visit(x, 0); visit(x, height - 1); }
-  for (let y = 0; y < height; y++) { visit(0, y); visit(width - 1, y); }
+  for (let x = 0; x < width; x++) {
+    visit(x, 0);
+    visit(x, height - 1);
+  }
+  for (let y = 0; y < height; y++) {
+    visit(0, y);
+    visit(width - 1, y);
+  }
   while (queue.length) {
     const index = queue.pop();
     const x = index % width;
     const y = (index - x) / width;
-    visit(x + 1, y); visit(x - 1, y); visit(x, y + 1); visit(x, y - 1);
+    visit(x + 1, y);
+    visit(x - 1, y);
+    visit(x, y + 1);
+    visit(x, y - 1);
   }
   return backdrop;
 }
@@ -92,7 +111,9 @@ function regionToUse(sourceWidth, sourceHeight, shape, crop = {}) {
   width = Math.min(sourceWidth, Math.round(width));
   height = Math.min(sourceHeight, Math.round(height));
   const left = Math.round(Math.min(sourceWidth - width, Math.max(0, x * sourceWidth - width / 2)));
-  const top = Math.round(Math.min(sourceHeight - height, Math.max(0, y * sourceHeight - height / 2)));
+  const top = Math.round(
+    Math.min(sourceHeight - height, Math.max(0, y * sourceHeight - height / 2)),
+  );
   return { left, top, width, height };
 }
 
@@ -104,8 +125,19 @@ const shapeOf = (text) => {
 
 async function convertOne(name, settings, colours) {
   const file = path.join(sourceDir, settings.source);
-  if (!fs.existsSync(file)) throw new Error(`images.json: "${name}" points to ${settings.source}, which is not in src/assets/img/source/.`);
-  const { pattern = 'checker', black = 0.3, white = 0.7, gamma = 1, sharpen = 0, tones = 'ink', ground = 'paper' } = settings;
+  if (!fs.existsSync(file))
+    throw new Error(
+      `images.json: "${name}" points to ${settings.source}, which is not in src/assets/img/source/.`,
+    );
+  const {
+    pattern = 'checker',
+    black = 0.3,
+    white = 0.7,
+    gamma = 1,
+    sharpen = 0,
+    tones = 'ink',
+    ground = 'paper',
+  } = settings;
 
   // Drawings (SVG) are drawn large first, so that shrinking them averages their edges.
   const isDrawing = settings.source.endsWith('.svg');
@@ -114,7 +146,11 @@ async function convertOne(name, settings, colours) {
   const shape = settings.shape ? shapeOf(settings.shape) : meta.width / meta.height;
   const across = settings.across;
   const down = Math.round(across / shape);
-  let image = opened().flatten({ background: '#ffffff' }).extract(regionToUse(meta.width, meta.height, shape, settings.crop)).resize(across, down, { fit: 'fill', kernel: 'lanczos3' }).greyscale();
+  let image = opened()
+    .flatten({ background: '#ffffff' })
+    .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+    .resize(across, down, { fit: 'fill', kernel: 'lanczos3' })
+    .greyscale();
   if (settings.stretch) image = image.normalise({ lower: 1, upper: 99 });
   if (sharpen) image = image.sharpen({ sigma: sharpen });
   const greys = await image.raw().toBuffer();
@@ -141,13 +177,16 @@ async function convertOne(name, settings, colours) {
     let colour = null;
     if (tones === 'paper') colour = dark[index] ? null : colours.paper;
     else if (dark[index]) colour = colours.ink;
-    else if (ground === 'paper' || (ground === 'texture' && !backdrop[index])) colour = colours.paper;
+    else if (ground === 'paper' || (ground === 'texture' && !backdrop[index]))
+      colour = colours.paper;
     if (colour) {
       pixels.set([...colour, 255], index * 4);
       if (colour === (tones === 'paper' ? colours.paper : colours.ink)) used++;
     }
   }
-  const png = await sharp(pixels, { raw: { width: across, height: down, channels: 4 } }).png({ palette: true, colours: 4, compressionLevel: 9, effort: 10, dither: 0 }).toBuffer();
+  const png = await sharp(pixels, { raw: { width: across, height: down, channels: 4 } })
+    .png({ palette: true, colours: 4, compressionLevel: 9, effort: 10, dither: 0 })
+    .toBuffer();
   return { buffer: png, width: across, height: down, share: used / dark.length };
 }
 
@@ -156,11 +195,14 @@ async function makeTexture(settings, shape) {
   const { seed = 1, width = 720, strokes, quality = 72 } = settings.texture || {};
   const height = Math.round(width / shape);
   const greys = paintTexture({ width, height, seed, ...(strokes ? { strokes } : {}) });
-  const buffer = await sharp(Buffer.from(greys), { raw: { width, height, channels: 1 } }).webp({ quality, effort: 6, smartSubsample: true }).toBuffer();
+  const buffer = await sharp(Buffer.from(greys), { raw: { width, height, channels: 1 } })
+    .webp({ quality, effort: 6, smartSubsample: true })
+    .toBuffer();
   return { buffer, width, height };
 }
 
-const fingerprint = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 8);
+const fingerprint = (buffer) =>
+  crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 8);
 
 // Pictures already converted in this run of the build, so that "pnpm run dev" only redoes a
 // picture when its source file or its settings change.
@@ -179,17 +221,33 @@ export async function convertImages(outDir) {
     // missing description should be a decision, not something forgotten.
     const described = typeof settings.alt === 'string' && settings.alt.trim() !== '';
     const decorative = settings.decorative === true;
-    if (described === decorative) throw new Error(`images.json: "${name}" needs exactly one of these: "alt" (a short description for screen readers) or "decorative": true (for a picture that is only decoration).`);
-    if (!(settings.across > 0)) throw new Error(`images.json: "${name}" needs "across": how many blocks wide the picture is.`);
+    if (described === decorative)
+      throw new Error(
+        `images.json: "${name}" needs exactly one of these: "alt" (a short description for screen readers) or "decorative": true (for a picture that is only decoration).`,
+      );
+    if (!(settings.across > 0))
+      throw new Error(
+        `images.json: "${name}" needs "across": how many blocks wide the picture is.`,
+      );
     // Every photo must have its photographer on record. Drawings are the site's own.
-    if (!settings.source.endsWith('.svg') && !credits.photos?.[settings.source]) throw new Error(`image-credits.json has no entry for ${settings.source} (used by "${name}").`);
+    if (!settings.source.endsWith('.svg') && !credits.photos?.[settings.source])
+      throw new Error(
+        `image-credits.json has no entry for ${settings.source} (used by "${name}").`,
+      );
 
     const sourceFile = path.join(sourceDir, settings.source);
-    const key = JSON.stringify([settings, fs.statSync(sourceFile, { throwIfNoEntry: false })?.mtimeMs, colours]);
+    const key = JSON.stringify([
+      settings,
+      fs.statSync(sourceFile, { throwIfNoEntry: false })?.mtimeMs,
+      colours,
+    ]);
     let made = remembered.get(name);
     if (!made || made.key !== key) {
       const picture = await convertOne(name, settings, colours);
-      const texture = settings.ground === 'texture' ? await makeTexture(settings, picture.width / picture.height) : null;
+      const texture =
+        settings.ground === 'texture'
+          ? await makeTexture(settings, picture.width / picture.height)
+          : null;
       made = { key, picture, texture };
       remembered.set(name, made);
     }
@@ -206,7 +264,12 @@ export async function convertImages(outDir) {
     };
     if (made.texture) {
       fs.writeFileSync(path.join(outDir, `${name}-texture.webp`), made.texture.buffer);
-      pictures[name].texture = { src: `/assets/img/${name}-texture.webp?v=${fingerprint(made.texture.buffer)}`, width: made.texture.width, height: made.texture.height, bytes: made.texture.buffer.length };
+      pictures[name].texture = {
+        src: `/assets/img/${name}-texture.webp?v=${fingerprint(made.texture.buffer)}`,
+        width: made.texture.width,
+        height: made.texture.height,
+        bytes: made.texture.buffer.length,
+      };
     }
   }
   return pictures;
@@ -216,6 +279,8 @@ export async function convertImages(outDir) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const pictures = await convertImages(path.join(root, '_site', 'assets', 'img'));
   for (const [name, picture] of Object.entries(pictures)) {
-    console.log(`${name}: ${picture.width} x ${picture.height} blocks, ${picture.bytes} bytes, ${Math.round(picture.share * 100)}% drawn${picture.texture ? `, texture ${picture.texture.bytes} bytes` : ''}`);
+    console.log(
+      `${name}: ${picture.width} x ${picture.height} blocks, ${picture.bytes} bytes, ${Math.round(picture.share * 100)}% drawn${picture.texture ? `, texture ${picture.texture.bytes} bytes` : ''}`,
+    );
   }
 }

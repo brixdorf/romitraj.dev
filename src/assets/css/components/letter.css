@@ -9,7 +9,7 @@
 }
 
 .letter::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: var(--gutter);
   border: 1px solid currentColor;

@@ -5,7 +5,13 @@
 // below); the animations themselves are in page-changes.js.
 import { Core, Transition } from '@unseenco/taxi';
 import * as change from './page-changes.js';
-import { startScrollMemory, markEntry, savePosition, positionOfEntry, takeOverScrolling } from './scroll-memory.js';
+import {
+  startScrollMemory,
+  markEntry,
+  savePosition,
+  positionOfEntry,
+  takeOverScrolling,
+} from './scroll-memory.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -64,7 +70,9 @@ class PageChange extends Transition {
   onEnter({ to, done }) {
     const arrival = howToArrive(kindOf(to), leftKind)(to);
     playing = arrival;
-    arrival.done.then(() => { if (playing === arrival) playing = null; });
+    arrival.done.then(() => {
+      if (playing === arrival) playing = null;
+    });
     // The page is usable straight away: links work while the last pieces are still arriving.
     done();
   }

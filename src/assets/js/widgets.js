@@ -22,7 +22,11 @@ function showLocalTime() {
   for (const element of document.querySelectorAll('[data-local-time]')) {
     try {
       const now = new Date();
-      const text = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: element.dataset.timeZone }).format(now);
+      const text = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: element.dataset.timeZone,
+      }).format(now);
       // Some browsers put a narrow no-break space before AM and PM. A plain space keeps the text in the site's font.
       element.textContent = text.replace(/\s/g, ' ');
       element.dateTime = now.toISOString();
@@ -35,7 +39,8 @@ function showLocalTime() {
 
 // Keeps the copyright year current, even if the site was last built in an earlier year.
 function showCurrentYear() {
-  for (const element of document.querySelectorAll('[data-current-year]')) element.textContent = new Date().getFullYear();
+  for (const element of document.querySelectorAll('[data-current-year]'))
+    element.textContent = new Date().getFullYear();
 }
 
 // Shows the weather, such as "24°C, partly cloudy". The wording comes from the piece itself
@@ -47,7 +52,9 @@ function showWeather() {
       piece.hidden = true;
       continue;
     }
-    const text = piece.dataset.format.replace('{temperature}', answer.temperature).replace('{condition}', answer.condition);
+    const text = piece.dataset.format
+      .replace('{temperature}', answer.temperature)
+      .replace('{condition}', answer.condition);
     // If there is no word for the sky, drop the comma that would be left dangling.
     piece.querySelector('[data-weather-text]').textContent = text.replace(/[\s,]+$/, '');
     piece.hidden = false;
@@ -67,7 +74,9 @@ function showNowPlaying() {
     label.textContent = answer.playing ? label.dataset.playing : label.dataset.played;
     piece.querySelector('[data-now-playing-link]').href = answer.url;
     piece.querySelector('[data-now-playing-title]').textContent = answer.title;
-    piece.querySelector('[data-now-playing-artists]').textContent = answer.artists.length ? `, ${answer.artists.join(', ')}` : '';
+    piece.querySelector('[data-now-playing-artists]').textContent = answer.artists.length
+      ? `, ${answer.artists.join(', ')}`
+      : '';
     piece.hidden = false;
   }
 }
@@ -94,7 +103,9 @@ function keepCurrent(name, address, show, { keepLastGood = false } = {}) {
   refresh();
   setInterval(refresh, every[name]);
   // Coming back to the tab after a while: catch up at once.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') refresh();
+  });
 }
 
 // Fills in every widget on the page as it is now. Called again whenever a page change brings new

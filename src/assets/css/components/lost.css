@@ -4,7 +4,7 @@
 
 /* Where the card's number would say 01, this one says what kind of page it is. */
 .lost__card .panel__title::before {
-  content: "404";
+  content: '404';
 }
 
 /* The ways back: the same list of links as in the home page's hero. */

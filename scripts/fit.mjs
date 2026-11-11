@@ -4,7 +4,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { root, textWidthsFile, buildSite, startServer, measureTextWidths, launchOptions } from './lib/site.mjs';
+import {
+  root,
+  textWidthsFile,
+  buildSite,
+  startServer,
+  measureTextWidths,
+  launchOptions,
+} from './lib/site.mjs';
 
 await buildSite();
 const server = await startServer(4174);
@@ -13,16 +20,22 @@ try {
   const before = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
   const measured = await measureTextWidths(await browser.newPage(), server.address);
   // Two runs can differ by a hair. Keep the saved number unless the line really changed (by more than a thousandth).
-  const after = Object.fromEntries(Object.entries(measured).map(([name, value]) => [
-    name,
-    before[name] && Math.abs(value - before[name]) / value < 0.001 ? before[name] : value,
-  ]));
+  const after = Object.fromEntries(
+    Object.entries(measured).map(([name, value]) => [
+      name,
+      before[name] && Math.abs(value - before[name]) / value < 0.001 ? before[name] : value,
+    ]),
+  );
   fs.writeFileSync(textWidthsFile, JSON.stringify(after, null, 2) + '\n');
   console.log('\nWidth of each line, in units of its own font size:');
   for (const [name, value] of Object.entries(after)) {
-    console.log(`  ${name.padEnd(18)} ${String(value).padEnd(8)} ${before[name] === value ? '(unchanged)' : `(was ${before[name]})`}`);
+    console.log(
+      `  ${name.padEnd(18)} ${String(value).padEnd(8)} ${before[name] === value ? '(unchanged)' : `(was ${before[name]})`}`,
+    );
   }
-  console.log(`\nSaved to ${path.relative(root, textWidthsFile)}. Run pnpm run check to see the result.`);
+  console.log(
+    `\nSaved to ${path.relative(root, textWidthsFile)}. Run pnpm run check to see the result.`,
+  );
 } finally {
   await browser.close();
   server.stop();

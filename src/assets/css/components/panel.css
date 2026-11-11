@@ -21,7 +21,7 @@
 
 /* The card's number, above its title. */
 .panel__title::before {
-  content: "0" counter(panel);
+  content: '0' counter(panel);
   display: block;
   margin-block-end: 12px;
   font-size: var(--type-panel-number);
@@ -69,7 +69,7 @@
 }
 
 .panel__list li::before {
-  content: "";
+  content: '';
   position: absolute;
   inset-block-start: 0.65em;
   inset-inline-start: -0.8em;

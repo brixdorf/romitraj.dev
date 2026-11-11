@@ -81,7 +81,7 @@
 }
 
 .project-card__more::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: var(--radius);

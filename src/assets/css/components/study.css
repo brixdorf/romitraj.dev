@@ -17,7 +17,10 @@
   font-weight: 400;
   /* On a narrow window the letters shrink until the longest word fits. A letter of this font is
      about 0.5 of the type size wide, and the template passes in the longest word's letter count. */
-  font-size: min(var(--type-study-title), (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.5));
+  font-size: min(
+    var(--type-study-title),
+    (100vw - 2 * var(--gutter)) / (var(--longest-word, 1) * 0.5)
+  );
   line-height: 0.8;
   text-align: center;
   text-wrap: balance;
@@ -81,8 +84,11 @@
    crossing them. It sits one pixel above the bottom of the letters' own box, as measured: a
    little above the bottom of the line. */
 .study__contents-list .link {
-  background: linear-gradient(currentColor, currentColor) no-repeat left 0 bottom calc(0.056em + 1px) / 0% 1px;
-  transition: color var(--duration-base) var(--ease-in-out-cubic), background-size var(--duration-base) var(--ease-in-out-cubic);
+  background: linear-gradient(currentColor, currentColor) no-repeat left 0 bottom
+    calc(0.056em + 1px) / 0% 1px;
+  transition:
+    color var(--duration-base) var(--ease-in-out-cubic),
+    background-size var(--duration-base) var(--ease-in-out-cubic);
   -webkit-text-stroke: 2px var(--color-paper);
   paint-order: stroke fill;
 }
@@ -141,7 +147,7 @@
 }
 
 .study__body > ul > li::before {
-  content: "";
+  content: '';
   position: absolute;
   inset-block-start: 0.65em;
   inset-inline-start: -0.8em;
@@ -172,7 +178,7 @@
 
 /* The section's number, above its heading. */
 .study__body h2::before {
-  content: "0" counter(section);
+  content: '0' counter(section);
   display: block;
   margin-block-end: 12px;
   font-size: var(--type-panel-number);
@@ -309,7 +315,7 @@
   }
 
   .study__body h2::after {
-    content: "";
+    content: '';
     position: absolute;
     inset-block-start: 0.56em;
     inset-inline-end: calc(100% + 16px);

@@ -202,7 +202,10 @@
     justify-self: end;
     align-self: start;
     /* As wide as the space the first headline line leaves free, and never wider than the reference's share. */
-    inline-size: min(41.7cqw, calc(100cqw * (1 - var(--giant-first-line-em) / var(--giant-line-em)) - var(--grid-gap)));
+    inline-size: min(
+      41.7cqw,
+      calc(100cqw * (1 - var(--giant-first-line-em) / var(--giant-line-em)) - var(--grid-gap))
+    );
     aspect-ratio: 1.4;
     background: var(--color-paper);
   }

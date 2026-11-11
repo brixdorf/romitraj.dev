@@ -10,6 +10,7 @@ link: https://github.com/brixdorf/dokploy-templates
 order: 6
 image: crane
 ---
+
 > **Sample project**
 >
 > This write-up is placeholder text for a sample project. Replace it with a real one.

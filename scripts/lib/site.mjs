@@ -14,7 +14,8 @@ export const textWidthsFile = path.join(root, 'src', '_data', 'textWidths.json')
 // to whole pixels (font hinting), so its lines run a pixel shorter or longer than in Firefox,
 // WebKit, or Chrome on Windows and macOS, and a long text can wrap one line differently. With
 // hinting off, it lays text out like the others. The setting does nothing on Windows and macOS.
-export const launchOptions = (engineName) => (engineName === 'chromium' ? { args: ['--font-render-hinting=none'] } : {});
+export const launchOptions = (engineName) =>
+  engineName === 'chromium' ? { args: ['--font-render-hinting=none'] } : {};
 
 // Builds the site from scratch into _site/.
 export async function buildSite() {
@@ -27,7 +28,11 @@ export async function buildSite() {
 // "settings" are extra environment values for it: the check uses them to point the widgets at
 // stand-in services (lib/pretend.mjs) instead of the real ones. Values given here win over .env.
 export async function startServer(port, settings = {}) {
-  const server = spawn(process.execPath, ['server/index.js'], { cwd: root, env: { ...process.env, ...settings, PORT: String(port) }, stdio: 'ignore' });
+  const server = spawn(process.execPath, ['server/index.js'], {
+    cwd: root,
+    env: { ...process.env, ...settings, PORT: String(port) },
+    stdio: 'ignore',
+  });
   const address = `http://localhost:${port}`;
   for (let attempt = 0; attempt < 50; attempt++) {
     try {
@@ -44,28 +49,48 @@ export async function startServer(port, settings = {}) {
 // Measures each big hero line on the home page: its width divided by its font size.
 // The styles use these numbers to size each line so it fills its space exactly.
 export async function measureTextWidths(page, address) {
-  const widthInEms = (selector) => page.evaluate((target) => [...document.querySelectorAll(target)].map((element) => {
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    return range.getBoundingClientRect().width / parseFloat(getComputedStyle(element).fontSize);
-  }), selector);
+  const widthInEms = (selector) =>
+    page.evaluate(
+      (target) =>
+        [...document.querySelectorAll(target)].map((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          return (
+            range.getBoundingClientRect().width / parseFloat(getComputedStyle(element).fontSize)
+          );
+        }),
+      selector,
+    );
   const round = (value) => Math.round(value * 10000) / 10000;
 
   // The headline must be at rest to be measured, not sliding in.
-  await page.addInitScript(() => { window.steadyMotion = true; });
+  await page.addInitScript(() => {
+    window.steadyMotion = true;
+  });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(address + '/', { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
-  const usingRealFonts = await page.evaluate(() => document.fonts.check('100px "Manuka"') && document.fonts.check('100px "Louize Display"'));
-  if (!usingRealFonts) throw new Error('The licensed fonts did not load, so the lines cannot be measured.');
+  const usingRealFonts = await page.evaluate(
+    () => document.fonts.check('100px "Manuka"') && document.fonts.check('100px "Louize Display"'),
+  );
+  if (!usingRealFonts)
+    throw new Error('The licensed fonts did not load, so the lines cannot be measured.');
   const [giant] = await widthInEms('[data-fit="giant"]');
   const [serif] = await widthInEms('[data-fit="serif"]');
   const [opening] = await widthInEms('[data-fit="opening"]');
 
   // On a tablet-sized window the giant headline is split into lines.
   await page.setViewportSize({ width: 768, height: 1024 });
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
   const lines = await widthInEms('[data-fit="giant"] .hero__giant-line');
 
-  return { opening: round(opening), giant: round(giant), giantFirstLine: round(lines[0]), giantLongestLine: round(Math.max(...lines)), serif: round(serif) };
+  return {
+    opening: round(opening),
+    giant: round(giant),
+    giantFirstLine: round(lines[0]),
+    giantLongestLine: round(Math.max(...lines)),
+    serif: round(serif),
+  };
 }

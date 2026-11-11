@@ -27,7 +27,7 @@
 /* The line under the version tag, and under the back link's words, grows from the right. */
 .page-row__version::after,
 .page-row__back-text::after {
-  content: "";
+  content: '';
   position: absolute;
   inset-inline: 0;
   inset-block-start: 19px;
@@ -103,7 +103,9 @@
     inset-inline-start: 100%;
     opacity: 0;
     transform: translateX(-16px);
-    transition: opacity var(--duration-base), transform var(--duration-base);
+    transition:
+      opacity var(--duration-base),
+      transform var(--duration-base);
   }
 
   .page-row__home .dash {

@@ -7,7 +7,12 @@ export default defineConfig({
   fmt: {
     singleQuote: true,
     // Files the build scripts write themselves, in their own layout.
-    ignorePatterns: ['src/_data/fontVersions.json', 'src/_data/fallbackFonts.json', 'src/_data/textWidths.json', 'pnpm-lock.yaml'],
+    ignorePatterns: [
+      'src/_data/fontVersions.json',
+      'src/_data/fallbackFonts.json',
+      'src/_data/textWidths.json',
+      'pnpm-lock.yaml',
+    ],
   },
   // The linter (Oxlint), with its default rules, plus one from Vite+: tests import from
   // "vite-plus/test", never from "vitest" directly.

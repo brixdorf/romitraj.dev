@@ -9,6 +9,7 @@ year: 2026
 link: https://github.com/brixdorf/splitwise-lite
 order: 3
 ---
+
 > **Sample project**
 >
 > This write-up is placeholder text for a sample project. Replace it with a real one.

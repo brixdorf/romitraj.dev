@@ -40,7 +40,7 @@ a {
 
 /* After a page change, keyboard focus is moved to the new page's heading so that screen readers
    and the Tab key start from there. A heading is not a control, so it gets no outline. */
-[tabindex="-1"]:focus {
+[tabindex='-1']:focus {
   outline: none;
 }
 
@@ -160,7 +160,7 @@ a {
 }
 
 .apostrophe::before {
-  content: ",";
+  content: ',';
   display: inline-block;
   /* Moved, not re-flowed, so the line keeps its height. "block-start" is up for normal text
      and the matching side for text turned on its side. */

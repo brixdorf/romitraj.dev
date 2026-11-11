@@ -34,7 +34,7 @@
 }
 
 .icon-list__link::after {
-  content: "";
+  content: '';
   position: absolute;
   z-index: -1;
   inset-inline: 32px 0;

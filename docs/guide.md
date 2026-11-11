@@ -4,11 +4,11 @@ The manual for romitraj.dev: how to run it, where things live, and how to change
 
 ## What you need
 
-| Tool | Needed for | Notes |
-|---|---|---|
-| Node.js 24 (the current LTS line) | Everything | `package.json` asks for `24.x`. See "Node.js version" below. |
+| Tool                                  | Needed for           | Notes                                                                              |
+| ------------------------------------- | -------------------- | ---------------------------------------------------------------------------------- |
+| Node.js 24 (the current LTS line)     | Everything           | `package.json` asks for `24.x`. See "Node.js version" below.                       |
 | Python, with `fonttools` and `brotli` | `npm run fonts` only | Install the two packages once: `python -m pip install -r scripts/requirements.txt` |
-| Playwright's browsers | `npm run check` only | Install once: `npx playwright install chromium firefox webkit` |
+| Playwright's browsers                 | `npm run check` only | Install once: `npx playwright install chromium firefox webkit`                     |
 
 First time on a new computer, in PowerShell:
 
@@ -21,18 +21,18 @@ npm install
 
 These are the only commands you need. All of them work in Windows PowerShell.
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C. |
-| `npm run build` | Builds the finished site into `_site/`. |
-| `npm start` | Serves `_site/` the way the live server does, at http://localhost:3000. Run `npm run build` first. |
-| `npm run spotify` | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below. |
-| `npm run fonts` | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file. |
-| `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes. |
-| `npm run fit` | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words. |
-| `npm run speed` | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed. |
-| `npm run share` | Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image". |
-| `npm run check` | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit. |
+| Command                  | What it does                                                                                                                                                                                                                |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`            | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C.                                                                                                               |
+| `npm run build`          | Builds the finished site into `_site/`.                                                                                                                                                                                     |
+| `npm start`              | Serves `_site/` the way the live server does, at http://localhost:3000. Run `npm run build` first.                                                                                                                          |
+| `npm run spotify`        | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below.                                                                                             |
+| `npm run fonts`          | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file.                                                                                                       |
+| `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes.                                                                                                                   |
+| `npm run fit`            | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words.                                                                                                                      |
+| `npm run speed`          | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed. |
+| `npm run share`          | Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image".                                                                             |
+| `npm run check`          | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit.           |
 
 ## Where things live
 
@@ -95,55 +95,55 @@ Every file starts with a comment saying what it does.
 
 ## How do I change...?
 
-| I want to change | Open this file |
-|---|---|
-| My name, email, city, social links, blog address | `src/_data/site.json` |
-| The words on the Credits page | `src/_data/pages.json` (`credits`) |
-| A photographer's name, profile or what they are thanked for | `src/_data/image-credits.json` |
-| The visitor counter's address or site number, or switching it off | `src/_data/site.json` (`analytics`) |
-| The bio line in the top banner | `src/_data/site.json` (`banner`) |
-| The headline's words (opening serif line, giant line, italic words, serif word) | `src/_data/headline.json`, then run `npm run fit` |
-| The introduction sentence, the scroll note | `src/_data/home.json` |
-| The ticker's small words, and how the weather is worded | `src/_data/home.json` (`ticker`) |
-| The words for the sky ("partly cloudy") | `src/_data/weather.json` |
-| The city whose weather and time are shown | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`) |
-| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below) |
-| Which picture a project shows | `image` at the top of the project's file |
-| Which picture sits beside a page's giant name | `picture` at the top of the page's file |
-| The page links and their descriptions (hero and footer) | `src/_data/navigation.json` |
-| The intro letter, the about text, section headings, button labels, the footer sign-off | `src/_data/home.json` |
-| A project's name, one-line description, tags, year, link or write-up | Its file in `src/content/projects/` (the six there now are samples) |
-| The order of the projects | `order` at the top of each file in `src/content/projects/` |
-| The text on the About page | `src/_data/about.json` |
-| The resume note | `src/_data/pages.json` (`resume`) |
-| The site's icon (the compass in the browser tab) | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css` |
-| The picture shown when a link is shared | Run `npm run share`; its description is `shareImageAlt` in `src/_data/site.json` |
-| The page for a missing address ("Lost at sea") | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`) |
-| The giant name at the top of an inner page | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`) |
-| The line beside the version tag on inner pages | `src/_data/site.json` (`tagline`) |
-| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents") | `src/_data/pages.json` |
-| How many blog posts the home page shows | `src/_data/home.json` (`writing.count`) |
-| The links under "Elsewhere" (about card and footer) | `src/_data/site.json` (`elsewhere`) |
-| The version tag (footer, and the small row on inner pages) | `src/_data/site.json` (`version`) |
-| An icon's drawing, or a new icon | `src/_data/icons.json` |
-| Where and how far things move as you scroll | `src/assets/js/motion.js` (`scroll`) |
-| The city, country or coordinates in the status ticker | `src/_data/site.json` |
-| How fast the ticker moves, and how much it slows under the pointer | `src/assets/js/motion.js` |
-| A color | `src/assets/css/tokens.css` |
-| The colors of the gradient bar | `src/assets/css/tokens.css` (the four `--color-bar` lines) |
-| Which fonts are used for what | `src/assets/css/tokens.css` (the `--font` lines) |
-| Spacing, corner size, line thickness | `src/assets/css/tokens.css` |
-| How fast a hover or the gradient bar moves | `src/assets/css/tokens.css` (the `--duration` lines) |
-| The color of the ring around whatever has keyboard focus | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks) |
-| How fast the tickers and scroll drift move | `src/assets/js/motion.js` |
-| How a page change moves: how long, how far, in what order | `src/assets/js/motion.js` (`pageChange`) |
-| How the headline slides in when the home page opens | `src/assets/js/motion.js` (`intro`, and the letter pace above it) |
-| The words screen readers hear on a link that opens a new tab | `src/_data/site.json` (`newTabNote`) |
-| The list of font files, or which ones load first | `src/_data/fonts.json`, then run `npm run fonts` |
-| Which free font stands in for a licensed one | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `npm run fonts:fallback` |
-| Which sections the home page has, and their order | `src/content/index.njk` |
-| The page title or description shown in browser tabs and search results | `src/_data/site.json`, or the top of the page's own file |
-| The browser's toolbar color on phones | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`. |
+| I want to change                                                                                 | Open this file                                                                                                                   |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| My name, email, city, social links, blog address                                                 | `src/_data/site.json`                                                                                                            |
+| The words on the Credits page                                                                    | `src/_data/pages.json` (`credits`)                                                                                               |
+| A photographer's name, profile or what they are thanked for                                      | `src/_data/image-credits.json`                                                                                                   |
+| The visitor counter's address or site number, or switching it off                                | `src/_data/site.json` (`analytics`)                                                                                              |
+| The bio line in the top banner                                                                   | `src/_data/site.json` (`banner`)                                                                                                 |
+| The headline's words (opening serif line, giant line, italic words, serif word)                  | `src/_data/headline.json`, then run `npm run fit`                                                                                |
+| The introduction sentence, the scroll note                                                       | `src/_data/home.json`                                                                                                            |
+| The ticker's small words, and how the weather is worded                                          | `src/_data/home.json` (`ticker`)                                                                                                 |
+| The words for the sky ("partly cloudy")                                                          | `src/_data/weather.json`                                                                                                         |
+| The city whose weather and time are shown                                                        | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`)                                                              |
+| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below)                                                                                   |
+| Which picture a project shows                                                                    | `image` at the top of the project's file                                                                                         |
+| Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                          |
+| The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                      |
+| The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                            |
+| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/` (the six there now are samples)                                                              |
+| The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                       |
+| The text on the About page                                                                       | `src/_data/about.json`                                                                                                           |
+| The resume note                                                                                  | `src/_data/pages.json` (`resume`)                                                                                                |
+| The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                 |
+| The picture shown when a link is shared                                                          | Run `npm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                 |
+| The page for a missing address ("Lost at sea")                                                   | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                |
+| The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                   |
+| The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                |
+| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                           |
+| How many blog posts the home page shows                                                          | `src/_data/home.json` (`writing.count`)                                                                                          |
+| The links under "Elsewhere" (about card and footer)                                              | `src/_data/site.json` (`elsewhere`)                                                                                              |
+| The version tag (footer, and the small row on inner pages)                                       | `src/_data/site.json` (`version`)                                                                                                |
+| An icon's drawing, or a new icon                                                                 | `src/_data/icons.json`                                                                                                           |
+| Where and how far things move as you scroll                                                      | `src/assets/js/motion.js` (`scroll`)                                                                                             |
+| The city, country or coordinates in the status ticker                                            | `src/_data/site.json`                                                                                                            |
+| How fast the ticker moves, and how much it slows under the pointer                               | `src/assets/js/motion.js`                                                                                                        |
+| A color                                                                                          | `src/assets/css/tokens.css`                                                                                                      |
+| The colors of the gradient bar                                                                   | `src/assets/css/tokens.css` (the four `--color-bar` lines)                                                                       |
+| Which fonts are used for what                                                                    | `src/assets/css/tokens.css` (the `--font` lines)                                                                                 |
+| Spacing, corner size, line thickness                                                             | `src/assets/css/tokens.css`                                                                                                      |
+| How fast a hover or the gradient bar moves                                                       | `src/assets/css/tokens.css` (the `--duration` lines)                                                                             |
+| The color of the ring around whatever has keyboard focus                                         | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks)                                |
+| How fast the tickers and scroll drift move                                                       | `src/assets/js/motion.js`                                                                                                        |
+| How a page change moves: how long, how far, in what order                                        | `src/assets/js/motion.js` (`pageChange`)                                                                                         |
+| How the headline slides in when the home page opens                                              | `src/assets/js/motion.js` (`intro`, and the letter pace above it)                                                                |
+| The words screen readers hear on a link that opens a new tab                                     | `src/_data/site.json` (`newTabNote`)                                                                                             |
+| The list of font files, or which ones load first                                                 | `src/_data/fonts.json`, then run `npm run fonts`                                                                                 |
+| Which free font stands in for a licensed one                                                     | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `npm run fonts:fallback` |
+| Which sections the home page has, and their order                                                | `src/content/index.njk`                                                                                                          |
+| The page title or description shown in browser tabs and search results                           | `src/_data/site.json`, or the top of the page's own file                                                                         |
+| The browser's toolbar color on phones                                                            | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`.                                         |
 
 This table grows as sections are built.
 
@@ -151,13 +151,13 @@ This table grows as sections are built.
 
 The sentence at the top of the home page is set in five pieces, all in `src/_data/headline.json`:
 
-| Piece | Where it shows | Font |
-|---|---|---|
-| `full` | Nowhere on screen. It is the page's main heading for screen readers and search engines. | none |
-| `opening` (`plain` and `italic`) | The serif line across the full width, above the giant line | Louize Display |
-| `giant` | The giant black line. Each entry is one line on tablets; on laptops they run together, and on phones they run down the left edge. | Manuka |
-| `flourish` | The outlined italic words that overlap the giant line | Louize Display Italic |
-| `serif` | The very large serif word | Louize Display |
+| Piece                            | Where it shows                                                                                                                    | Font                  |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `full`                           | Nowhere on screen. It is the page's main heading for screen readers and search engines.                                           | none                  |
+| `opening` (`plain` and `italic`) | The serif line across the full width, above the giant line                                                                        | Louize Display        |
+| `giant`                          | The giant black line. Each entry is one line on tablets; on laptops they run together, and on phones they run down the left edge. | Manuka                |
+| `flourish`                       | The outlined italic words that overlap the giant line                                                                             | Louize Display Italic |
+| `serif`                          | The very large serif word                                                                                                         | Louize Display        |
 
 Read top to bottom, the opening line, giant line, italic words and serif word should make the whole sentence.
 
@@ -175,15 +175,15 @@ The layout has three arrangements, chosen by window width: phone (under 600px), 
 
 The home page is a stack of sections, listed in order in `src/content/index.njk`. Each has its own file in `src/_includes/partials/` and its own stylesheet in `src/assets/css/components/`.
 
-| Section | What it is | Its words |
-|---|---|---|
-| Hero | Headline, ticker (weather, place, local time, what is playing), page links, the framed picture | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`) |
-| Letter | A short signed note on a dark block | `home.json` (`letter`) |
-| About | Sliding heading, quote ticker, bio, card of links, a large drawing behind them | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`diver`) |
-| Projects | One row per project on a dark block | The files in `src/content/projects/`, `home.json` (`projects`) |
-| Writing | The latest blog posts as cards, kept up to date by the server | The blog's own feed, `home.json` (`writing`) |
-| Shore | A band of stippled sea that sinks into the footer's dark (`shore.css`) | `images.json` (`swells`) |
-| Footer | Site map, links, email, copyright, sign-off, and a compass half off the edge (on every page) | `navigation.json`, `site.json`, `home.json` (`footer`), `images.json` (`compass`) |
+| Section  | What it is                                                                                     | Its words                                                                         |
+| -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Hero     | Headline, ticker (weather, place, local time, what is playing), page links, the framed picture | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`)           |
+| Letter   | A short signed note on a dark block                                                            | `home.json` (`letter`)                                                            |
+| About    | Sliding heading, quote ticker, bio, card of links, a large drawing behind them                 | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`diver`)         |
+| Projects | One row per project on a dark block                                                            | The files in `src/content/projects/`, `home.json` (`projects`)                    |
+| Writing  | The latest blog posts as cards, kept up to date by the server                                  | The blog's own feed, `home.json` (`writing`)                                      |
+| Shore    | A band of stippled sea that sinks into the footer's dark (`shore.css`)                         | `images.json` (`swells`)                                                          |
+| Footer   | Site map, links, email, copyright, sign-off, and a compass half off the edge (on every page)   | `navigation.json`, `site.json`, `home.json` (`footer`), `images.json` (`compass`) |
 
 Things to know:
 
@@ -207,30 +207,30 @@ Every page except the home page shares three pieces:
 - **The giant page name** (`partials/page-header.njk`, used through `layouts/page.njk`), with a small framed picture beside it. A project's page has its own top instead: the project's name in very large serif letters.
 - **"You are here"** at the top of the footer (`partials/crumb.njk`): the path from the home page down to the current page.
 
-| Page | Its file | Its words |
-|---|---|---|
-| About | `src/content/about.njk` | `about.json` |
-| Projects (the list) | `src/content/projects.njk` | The files in `src/content/projects/`, `pages.json` (`projects`) |
-| One project | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/` |
-| Resume | `src/content/resume.njk` | `pages.json` (`resume`) |
-| Credits | `src/content/credits.njk` | `pages.json` (`credits`), `image-credits.json` |
-| A missing address ("Lost at sea") | `src/content/404.njk` | `pages.json` (`lost`), `navigation.json` |
+| Page                              | Its file                            | Its words                                                       |
+| --------------------------------- | ----------------------------------- | --------------------------------------------------------------- |
+| About                             | `src/content/about.njk`             | `about.json`                                                    |
+| Projects (the list)               | `src/content/projects.njk`          | The files in `src/content/projects/`, `pages.json` (`projects`) |
+| One project                       | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/`               |
+| Resume                            | `src/content/resume.njk`            | `pages.json` (`resume`)                                         |
+| Credits                           | `src/content/credits.njk`           | `pages.json` (`credits`), `image-credits.json`                  |
+| A missing address ("Lost at sea") | `src/content/404.njk`               | `pages.json` (`lost`), `navigation.json`                        |
 
 ### A page's settings
 
 The top of a page's file (between the two `---` lines) sets:
 
-| Setting | What it does |
-|---|---|
-| `title` | The name in the browser tab and in "You are here" |
-| `heading` | The giant name on the page, if it should differ from the title |
-| `headingSize: long` | Smaller giant letters, for a heading of several words |
-| `frame: square` | A small square picture frame instead of a wide one |
-| `picture` | Which picture from `images.json` goes in that frame. Without it the frame is empty |
-| `frameTone: ink` | A dark frame, for a picture drawn in the paper colour (the compass) |
-| `ruled: true` | A line under the header, with more room below it |
-| `description` | The sentence search engines show |
-| `entrance: true` | The giant name slides in letter by letter when the page is opened (only the page for a missing address uses it) |
+| Setting             | What it does                                                                                                    |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `title`             | The name in the browser tab and in "You are here"                                                               |
+| `heading`           | The giant name on the page, if it should differ from the title                                                  |
+| `headingSize: long` | Smaller giant letters, for a heading of several words                                                           |
+| `frame: square`     | A small square picture frame instead of a wide one                                                              |
+| `picture`           | Which picture from `images.json` goes in that frame. Without it the frame is empty                              |
+| `frameTone: ink`    | A dark frame, for a picture drawn in the paper colour (the compass)                                             |
+| `ruled: true`       | A line under the header, with more room below it                                                                |
+| `description`       | The sentence search engines show                                                                                |
+| `entrance: true`    | The giant name slides in letter by letter when the page is opened (only the page for a missing address uses it) |
 
 On phones the giant name shrinks until its longest word fits the screen. This is worked out from the number of letters in that word, so no measuring step is needed.
 
@@ -271,18 +271,19 @@ link: https://github.com/brixdorf/snip
 order: 5
 image: padlock
 ---
+
 The write-up starts here.
 ```
 
-| Fact | What it is | Where it shows |
-|---|---|---|
-| `title` | The project's name | Everywhere, and in the browser tab |
-| `description` | One sentence | The Projects page, the top of the project's page, search engines |
-| `tags` | A short list, one per line, each starting with two spaces, a hyphen and a space | The Projects page and the project's page |
-| `year` | A year | The Projects page and the project's page |
-| `link` | The address of the code | "GitHub" on the project's page |
-| `order` | A number: 1 comes first | Decides the project's place in both lists |
-| `image` | The name of a picture in `images.json`. Optional | The frame beside the project on the Projects page |
+| Fact          | What it is                                                                      | Where it shows                                                   |
+| ------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `title`       | The project's name                                                              | Everywhere, and in the browser tab                               |
+| `description` | One sentence                                                                    | The Projects page, the top of the project's page, search engines |
+| `tags`        | A short list, one per line, each starting with two spaces, a hyphen and a space | The Projects page and the project's page                         |
+| `year`        | A year                                                                          | The Projects page and the project's page                         |
+| `link`        | The address of the code                                                         | "GitHub" on the project's page                                   |
+| `order`       | A number: 1 comes first                                                         | Decides the project's place in both lists                        |
+| `image`       | The name of a picture in `images.json`. Optional                                | The frame beside the project on the Projects page                |
 
 - **To add a project:** copy an existing file, rename it, change the facts and the write-up. Give it the `order` number of the place it should take, and renumber the ones after it.
 - **To remove a project:** delete its file.
@@ -323,19 +324,19 @@ When a page is first opened nothing animates, with two exceptions: on the home p
 
 Every page has a kind, written as `pageKind`. There are three that matter:
 
-| Kind | Which pages | Where it is set |
-|---|---|---|
-| `home` | The home page | The top of `src/content/index.njk` |
-| `project` | Each project's page | Once for all of them, in `src/content/projects/projects.11tydata.js` |
+| Kind                | Which pages                                                          | Where it is set                                                                     |
+| ------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `home`              | The home page                                                        | The top of `src/content/index.njk`                                                  |
+| `project`           | Each project's page                                                  | Once for all of them, in `src/content/projects/projects.11tydata.js`                |
 | `page` (and `list`) | Pages with a giant name on top: About, Resume, and Projects (`list`) | `layouts/page.njk` gives every page that uses it `page`; `projects.njk` says `list` |
 
 Each kind leaves in its own way and arrives in its own way:
 
-| Kind | Leaving | Arriving |
-|---|---|---|
-| Home | The headline's letters slide out of their lines one after another, then the rest of the top of the page goes piece by piece while the sections below fade in turn. | The headline's letters slide into their lines, then the navigation, the ticker, the note, the picture frame and the introduction follow. Coming from the Projects page the letters arrive one after another; coming from anywhere else they arrive together and the rest follows sooner. |
-| A page with a giant name | The name's letters slide up and out while the cards fade as one. On the way to a project the letters leave faster and the cards drift aside. | The name's letters rise into place, then the picture frame appears, then the cards one by one, in the order they are written in the page. |
-| A project | The name, description, facts, list of sections and write-up drop away in turn. | The name sharpens letter by letter, the description comes in line by line, then the facts, the list of sections and the write-up. |
+| Kind                     | Leaving                                                                                                                                                            | Arriving                                                                                                                                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home                     | The headline's letters slide out of their lines one after another, then the rest of the top of the page goes piece by piece while the sections below fade in turn. | The headline's letters slide into their lines, then the navigation, the ticker, the note, the picture frame and the introduction follow. Coming from the Projects page the letters arrive one after another; coming from anywhere else they arrive together and the rest follows sooner. |
+| A page with a giant name | The name's letters slide up and out while the cards fade as one. On the way to a project the letters leave faster and the cards drift aside.                       | The name's letters rise into place, then the picture frame appears, then the cards one by one, in the order they are written in the page.                                                                                                                                                |
+| A project                | The name, description, facts, list of sections and write-up drop away in turn.                                                                                     | The name sharpens letter by letter, the description comes in line by line, then the facts, the list of sections and the write-up.                                                                                                                                                        |
 
 Two exceptions:
 
@@ -346,14 +347,14 @@ On the site this design follows, About is a plain fade in every direction. Here 
 
 ### Where it lives
 
-| File | What it holds |
-|---|---|
-| `src/assets/js/motion.js` (`pageChange`) | Every number: how long each piece takes, when it starts, how far it moves, on what curve. Change timings here. |
-| `src/assets/js/page-changes.js` | One function per page leaving or arriving. Each one moves the pieces named in the templates. |
-| `src/assets/js/transitions.js` | Sets up Taxi.js, picks how each kind of page leaves and arrives (`howToLeave` and `howToArrive`), and keeps the small row, the "You are here" line and the page description up to date. |
-| `src/assets/js/scroll-memory.js` | Remembers how far down each page was scrolled, for the back and forward buttons and for reloads. |
-| `src/assets/js/split.js` | Cuts a heading into letters, or a paragraph into its lines, for the length of an animation, then puts the text back. |
-| The templates | Pieces that move are marked `data-part="..."` (for example `data-part="title"` or `data-part="card"`). The swapped content is the `<main data-taxi-view>` in `layouts/base.njk`. |
+| File                                     | What it holds                                                                                                                                                                           |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/assets/js/motion.js` (`pageChange`) | Every number: how long each piece takes, when it starts, how far it moves, on what curve. Change timings here.                                                                          |
+| `src/assets/js/page-changes.js`          | One function per page leaving or arriving. Each one moves the pieces named in the templates.                                                                                            |
+| `src/assets/js/transitions.js`           | Sets up Taxi.js, picks how each kind of page leaves and arrives (`howToLeave` and `howToArrive`), and keeps the small row, the "You are here" line and the page description up to date. |
+| `src/assets/js/scroll-memory.js`         | Remembers how far down each page was scrolled, for the back and forward buttons and for reloads.                                                                                        |
+| `src/assets/js/split.js`                 | Cuts a heading into letters, or a paragraph into its lines, for the length of an animation, then puts the text back.                                                                    |
+| The templates                            | Pieces that move are marked `data-part="..."` (for example `data-part="title"` or `data-part="card"`). The swapped content is the `<main data-taxi-view>` in `layouts/base.njk`.        |
 
 ### Things to know
 
@@ -365,7 +366,7 @@ On the site this design follows, About is a plain fade in every direction. Here 
 - **After a change, keyboard focus moves to the new page's heading** and screen readers are told the page's name.
 - **`npm run check` clicks through the page changes** in all three browsers: home to Projects, into a project, back out twice, to About, and back with the browser's back button. It reports a reload, a wrong page, animation pieces left behind, or the small row out of step. It then scrolls two pages and checks that back, forward and a reload return to the same place.
 - **Nothing may move once a page change has finished.** `npm run check` watches each arrival and fails if any letter, any heading's box or the picture frame beside a page name is somewhere else just after the animation than during it, or if the finished page is laid out differently from a fresh load of the same page.
-- **No letter may be cut by its own window.** While a heading slides, each letter is shown through a window (a clip-path from `shapes.js`) that opens around the letter's box: a tenth of the box's height above and below it, and half a letter-height to each side. Ink that reaches further out than that is cut off for as long as the animation runs. Two things follow. Anything drawn out of line, like the raised apostrophe, must be moved *inside* a box that stays in the line (see `.apostrophe` in `base.css`), not by moving the box. And `npm run check` photographs every sliding heading with its letters' windows fully open and fails if any ink is missing, naming the letter and where it is.
+- **No letter may be cut by its own window.** While a heading slides, each letter is shown through a window (a clip-path from `shapes.js`) that opens around the letter's box: a tenth of the box's height above and below it, and half a letter-height to each side. Ink that reaches further out than that is cut off for as long as the animation runs. Two things follow. Anything drawn out of line, like the raised apostrophe, must be moved _inside_ a box that stays in the line (see `.apostrophe` in `base.css`), not by moving the box. And `npm run check` photographs every sliding heading with its letters' windows fully open and fails if any ink is missing, naming the letter and where it is.
 - **Headings are cut into single letters only while they move.** Afterwards the page's HTML is exactly as it was built. While they are cut, no letter may shift: each word stays whole, on the line where it ends up. `npm run check` tests this for every heading on every page at thirteen window widths in all three browsers, so a new project name or page name is covered automatically. If it ever reports "letters that move", the fix is in `src/assets/js/split.js`.
 
 ## The headline's entrance
@@ -417,7 +418,11 @@ How it works:
 - A few lines of script at the top of every page (`src/_includes/layouts/base.njk`) look at the address the page is being viewed at. Only if it is `romitraj.dev` do they add Rybbit's tag to the page's head, exactly as Rybbit's install page gives it:
 
   ```html
-  <script src="https://analytics.romitraj.dev/api/script.js" data-site-id="4662ddf4f073" defer></script>
+  <script
+    src="https://analytics.romitraj.dev/api/script.js"
+    data-site-id="4662ddf4f073"
+    defer
+  ></script>
   ```
 
 - So the counter is never loaded by `npm run dev`, `npm start` on your computer, or `npm run check`: those view the site at `localhost`. No setting has to be remembered when deploying, and a copy of the site at any other address counts nothing either.
@@ -438,18 +443,18 @@ The server sends no rule that limits which scripts may run (no Content-Security-
 
 What each kind of link does under the pointer, and when it is reached with the Tab key. All of it was measured on the design reference, link by link, in three browsers.
 
-| Link | Under the pointer | With keyboard focus |
-|---|---|---|
-| Navigation links in the hero | A line draws under the name (0.2s) and the description sharpens | The same, plus the ring |
-| Links in the footer, the "Elsewhere" lists, "You are here", the small row under the banner, the bold link that ends a card, the code link on a project's page | A line draws under the words (0.2s) | The ring only |
-| A link inside a sentence (about text, cards, a project's write-up) | Turns grey at once | The ring only |
-| "View all projects", "Read the blog" | Underlined at once | Underlined, plus the ring |
-| The links at the bottom of the About page's first card, and "Read the post" | Underlined at once | The ring only |
-| A writing card on the home page | Its outline darkens at once and a line draws under "Read more" (0.2s) | The same, with the ring around "Read more" |
-| A project card on the Projects page | Its outline darkens at once and a line draws under "Read more" (0.2s) | Its outline darkens, plus the ring around "Read more" |
-| A project row on the home page | The name opens near its middle and its faint copies sharpen (0.15s) | The ring only |
-| A line in a project's "Contents" | Turns grey while a line draws under it (0.2s) | The ring only |
-| The track's title in the ticker | Nothing (it is already underlined) | The ring only |
+| Link                                                                                                                                                          | Under the pointer                                                     | With keyboard focus                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------- |
+| Navigation links in the hero                                                                                                                                  | A line draws under the name (0.2s) and the description sharpens       | The same, plus the ring                               |
+| Links in the footer, the "Elsewhere" lists, "You are here", the small row under the banner, the bold link that ends a card, the code link on a project's page | A line draws under the words (0.2s)                                   | The ring only                                         |
+| A link inside a sentence (about text, cards, a project's write-up)                                                                                            | Turns grey at once                                                    | The ring only                                         |
+| "View all projects", "Read the blog"                                                                                                                          | Underlined at once                                                    | Underlined, plus the ring                             |
+| The links at the bottom of the About page's first card, and "Read the post"                                                                                   | Underlined at once                                                    | The ring only                                         |
+| A writing card on the home page                                                                                                                               | Its outline darkens at once and a line draws under "Read more" (0.2s) | The same, with the ring around "Read more"            |
+| A project card on the Projects page                                                                                                                           | Its outline darkens at once and a line draws under "Read more" (0.2s) | Its outline darkens, plus the ring around "Read more" |
+| A project row on the home page                                                                                                                                | The name opens near its middle and its faint copies sharpen (0.15s)   | The ring only                                         |
+| A line in a project's "Contents"                                                                                                                              | Turns grey while a line draws under it (0.2s)                         | The ring only                                         |
+| The track's title in the ticker                                                                                                                               | Nothing (it is already underlined)                                    | The ring only                                         |
 
 - **The ring** is a 2px dashed outline, 2px away from the link: mid grey on paper, a lighter warm grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
 - **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `npm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
@@ -466,13 +471,13 @@ The small picture in a browser tab, in bookmarks and on a phone's home screen is
 - **The drawing** is this site's own: `src/assets/icons/site-icon.svg`, on a 64 by 64 grid. Its sizes were chosen so that at 16 pixels the ring is exactly one pixel thick and sits on whole pixels. Each shape in the file says what it is with a class (`ring`, `mark` for the points, `hub`), and the build colors them.
 - **The build makes every file from it** (`scripts/icons.mjs`), in the site's ink and paper colors from `tokens.css`:
 
-  | File | What it is | Who uses it |
-  |---|---|---|
-  | `favicon-light.svg` | The ink compass as a drawing | Light tabs in Chrome, Edge, Firefox, and Safari from version 26 |
-  | `favicon-dark.svg` | The paper compass as a drawing | Dark tabs in the same browsers |
-  | `favicon.ico` | The ink compass at 16 and 32 pixels, in the old icon format | Older Safari, and anything that looks for an icon without reading the page |
-  | `apple-touch-icon.png` | A paper compass on an ink square, 180 pixels | An iPhone or iPad home screen |
-  | `icon-192.png`, `icon-512.png`, `site.webmanifest` | The same square at two sizes, and the small file that names them | An Android home screen |
+  | File                                               | What it is                                                       | Who uses it                                                                |
+  | -------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+  | `favicon-light.svg`                                | The ink compass as a drawing                                     | Light tabs in Chrome, Edge, Firefox, and Safari from version 26            |
+  | `favicon-dark.svg`                                 | The paper compass as a drawing                                   | Dark tabs in the same browsers                                             |
+  | `favicon.ico`                                      | The ink compass at 16 and 32 pixels, in the old icon format      | Older Safari, and anything that looks for an icon without reading the page |
+  | `apple-touch-icon.png`                             | A paper compass on an ink square, 180 pixels                     | An iPhone or iPad home screen                                              |
+  | `icon-192.png`, `icon-512.png`, `site.webmanifest` | The same square at two sizes, and the small file that names them | An Android home screen                                                     |
 
 - **How the tab icon follows light and dark** (the way GitHub does it): every page names `favicon-light.svg`, and a short script in its head (`src/_includes/layouts/base.njk`) asks the browser whether it is set to light or dark ("prefers-color-scheme"). In dark it puts `favicon-dark.svg` in its place, and it swaps them again the moment you switch, with no reload. Without scripts the ink compass stays. The script follows the browser's light or dark setting (or the system's, when the browser follows the system); a custom-colored browser theme is not something a page can see.
 - **Why the first version did not switch:** it was one drawing with a rule inside it for dark tabs. Chrome and Edge draw a tab icon once, when the page loads, and keep that picture: the rule is only looked at again after a reload, and their store of icons can keep the old picture even then. Safari ignores such a rule altogether. A script that changes the page's icon line is something all of them notice at once.
@@ -494,6 +499,7 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
   ```
 
   It builds the site, draws the card in a real browser with the licensed fonts, and saves it. It also retakes `docs/screenshot.png`, the picture at the top of the README, from the site running on this computer (so that one shows the weather and the track of the moment). Run it after changing the headline, the fonts, the colors or the diver drawing, look at both pictures, and commit them.
+
 - **Why it is a command and not part of the build:** the card needs the licensed fonts, which are on your computer and not on the live server.
 - **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
 - **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
@@ -528,32 +534,32 @@ The list of pictures is `src/_data/images.json`. One entry looks like this:
 }
 ```
 
-| Setting | What it does |
-|---|---|
-| `source` | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops |
-| `alt` | The short description screen readers read aloud. Every picture needs either this or `decorative` |
-| `decorative` | `true` for a picture that is only decoration (the compass, the sea band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both |
-| `across` | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size |
-| `shape` | Cuts the source to this shape, written width:height. Without it the source's own shape is kept |
-| `crop` | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it |
+| Setting          | What it does                                                                                                                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source`         | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops                                                                                                                                                      |
+| `alt`            | The short description screen readers read aloud. Every picture needs either this or `decorative`                                                                                                                                                   |
+| `decorative`     | `true` for a picture that is only decoration (the compass, the sea band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both                                                                 |
+| `across`         | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size                                                                                                                  |
+| `shape`          | Cuts the source to this shape, written width:height. Without it the source's own shape is kept                                                                                                                                                     |
+| `crop`           | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it                                                                                                               |
 | `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker |
-| `sharpen` | Crisper edges before the picture is reduced to two tones. 0 to 2 |
-| `pattern` | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band) |
-| `tones` | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass) |
-| `ground` | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below) |
+| `sharpen`        | Crisper edges before the picture is reduced to two tones. 0 to 2                                                                                                                                                                                   |
+| `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band)                                                                                                   |
+| `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                           |
+| `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                   |
 
 Where each picture is shown:
 
-| Picture | Source | Where |
-|---|---|---|
-| `hero` | whale-tail.jpg | The frame in the hero |
-| `diver` | diver.svg | Behind the home page's about section |
-| `swells` | swells.svg | The band above the footer on the home page, and the wide frame on the About page |
-| `compass` | compass.svg | The footer on every page, and beside the About page's name |
-| `servers` | server-rack.jpg | Beside the Projects page's name |
-| `padlock`, `ship`, `crane` | padlock.jpg, container-ship.jpg, harbour-cranes.jpg | The frames on the Projects page (Hardened, Ship It, Dokploy Templates) |
-| `bust`, `jellyfish` | marble-bust.jpg, diver.svg | The About page |
-| `fluke` | whale-tail.jpg | Beside the Resume page's name |
+| Picture                    | Source                                              | Where                                                                            |
+| -------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `hero`                     | whale-tail.jpg                                      | The frame in the hero                                                            |
+| `diver`                    | diver.svg                                           | Behind the home page's about section                                             |
+| `swells`                   | swells.svg                                          | The band above the footer on the home page, and the wide frame on the About page |
+| `compass`                  | compass.svg                                         | The footer on every page, and beside the About page's name                       |
+| `servers`                  | server-rack.jpg                                     | Beside the Projects page's name                                                  |
+| `padlock`, `ship`, `crane` | padlock.jpg, container-ship.jpg, harbour-cranes.jpg | The frames on the Projects page (Hardened, Ship It, Dokploy Templates)           |
+| `bust`, `jellyfish`        | marble-bust.jpg, diver.svg                          | The About page                                                                   |
+| `fluke`                    | whale-tail.jpg                                      | Beside the Resume page's name                                                    |
 
 ### Changing a picture
 
@@ -599,11 +605,11 @@ The status ticker in the hero shows four things: the weather in Bangalore, the c
 
 (Each `|` stands for the short drawn line between two pieces, and Spotify's icon sits before the track.)
 
-| Piece | Where it comes from | How fresh |
-|---|---|---|
-| Local time | Worked out in the visitor's browser | Every minute |
-| Weather | The site's server asks Open-Meteo (`server/weather.js`) | The server keeps an answer for 15 minutes |
-| Now playing | The site's server asks Spotify (`server/spotify.js`) | The server keeps an answer for 30 seconds |
+| Piece                                       | Where it comes from                                        | How fresh                                                                                 |
+| ------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Local time                                  | Worked out in the visitor's browser                        | Every minute                                                                              |
+| Weather                                     | The site's server asks Open-Meteo (`server/weather.js`)    | The server keeps an answer for 15 minutes                                                 |
+| Now playing                                 | The site's server asks Spotify (`server/spotify.js`)       | The server keeps an answer for 30 seconds                                                 |
 | The blog's posts (home page and About page) | The site's server reads the blog's feed (`server/blog.js`) | The server keeps the list for 30 minutes; see "Blog posts" under "The home page sections" |
 
 How it fits together:
@@ -697,13 +703,13 @@ Notes:
 
 ### If a widget is missing
 
-| What you see | Likely cause | What to do |
-|---|---|---|
-| No now-playing line, locally | `.env` is missing one of the three Spotify values | Check `.env`; run `npm run spotify` |
-| No now-playing line, after it worked for months | The refresh token is 6 months old | "Spotify: every 6 months" above |
-| No now-playing line, and Premium has lapsed | Spotify switches the app off | Resubscribe |
-| No weather | Open-Meteo is unreachable | Wait; it comes back by itself within a minute of the service returning |
-| Neither, with `npm start` | The site was not built first | `npm run build`, then `npm start` |
+| What you see                                                                 | Likely cause                                                                | What to do                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No now-playing line, locally                                                 | `.env` is missing one of the three Spotify values                           | Check `.env`; run `npm run spotify`                                                                                                                                                                                                                                                                          |
+| No now-playing line, after it worked for months                              | The refresh token is 6 months old                                           | "Spotify: every 6 months" above                                                                                                                                                                                                                                                                              |
+| No now-playing line, and Premium has lapsed                                  | Spotify switches the app off                                                | Resubscribe                                                                                                                                                                                                                                                                                                  |
+| No weather                                                                   | Open-Meteo is unreachable                                                   | Wait; it comes back by itself within a minute of the service returning                                                                                                                                                                                                                                       |
+| Neither, with `npm start`                                                    | The site was not built first                                                | `npm run build`, then `npm start`                                                                                                                                                                                                                                                                            |
 | A new blog post is not on the home page or the About page after half an hour | The server could not read the feed, and keeps showing the last list it read | Open https://blog.romitraj.dev/rss.xml: the post must be in it. The server tries again every 5 minutes. If the post is there, check Cloudflare's IP Access rule for your server ("Deploying with Dokploy", step 1.5): without it Bot Fight Mode blocks the server, for example after its IP address changed. |
 
 To see what the server answers, open http://localhost:3000/api/weather, http://localhost:3000/api/now-playing or http://localhost:3000/api/posts while `npm start` is running. An empty page means "nothing to show".
@@ -771,12 +777,12 @@ node compare.mjs out/compare
 node compare-report.mjs out/compare
 ```
 
-| Script | What it compares | Time |
-|---|---|---|
-| `compare.mjs`, then `compare-report.mjs` | Layout, spacing, type and color: about 150 pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px, in three browsers | about 7 minutes |
-| `compare-states.mjs`, then the same with `differences` | What 24 kinds of link do under the pointer and with keyboard focus, and how long each change takes | about 15 minutes |
-| `compare-motion.mjs` | The two tickers' speeds, the gradient bar's loop, and how the scroll-tied movement follows the scroll position | about 15 minutes |
-| `pagechange.mjs`, then `pagechange-compare.mjs` | Every page change as a timeline: what leaves, what arrives, when and for how long | about 2 minutes per site and browser |
+| Script                                                 | What it compares                                                                                                                                    | Time                                 |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `compare.mjs`, then `compare-report.mjs`               | Layout, spacing, type and color: about 150 pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px, in three browsers | about 7 minutes                      |
+| `compare-states.mjs`, then the same with `differences` | What 24 kinds of link do under the pointer and with keyboard focus, and how long each change takes                                                  | about 15 minutes                     |
+| `compare-motion.mjs`                                   | The two tickers' speeds, the gradient bar's loop, and how the scroll-tied movement follows the scroll position                                      | about 15 minutes                     |
+| `pagechange.mjs`, then `pagechange-compare.mjs`        | Every page change as a timeline: what leaves, what arrives, when and for how long                                                                   | about 2 minutes per site and browser |
 
 - **Which piece is which** is written in `compare-map.mjs`: for each piece, where it is on the reference and where it is here. When a section of this site is rebuilt, update its lines there.
 - **Reading the report.** Each line is one value of one piece: the reference's, this site's, and the browsers and widths it shows in. Many lines are not visible differences: the two sites are built differently (a margin there is a gap here), and their words are different lengths. A line matters when a size, a color, a gap between two pieces or an edge differs. [decisions.md](decisions.md) lists the differences that are there by choice.
@@ -801,10 +807,10 @@ Open a few of the pictures before committing. The same page should look the same
 
 The live site is two applications on your own server, both set up in Dokploy's dashboard:
 
-| Application | Address | Built from | What it is |
-|---|---|---|---|
-| The site | https://romitraj.dev | `brixdorf/romitraj.dev` (public), branch `main` | The pages, and the two small questions the ticker asks |
-| The fonts | https://fonts.romitraj.dev | `brixdorf/romitraj-private` (private), branch `main` | The licensed fonts, sent to the site and to nobody else |
+| Application | Address                    | Built from                                           | What it is                                              |
+| ----------- | -------------------------- | ---------------------------------------------------- | ------------------------------------------------------- |
+| The site    | https://romitraj.dev       | `brixdorf/romitraj.dev` (public), branch `main`      | The pages, and the two small questions the ticker asks  |
+| The fonts   | https://fonts.romitraj.dev | `brixdorf/romitraj-private` (private), branch `main` | The licensed fonts, sent to the site and to nobody else |
 
 Both are built by Railpack, Dokploy's builder that reads `package.json` and works out the rest. There is no Dockerfile and nothing to type on the server: every step below is a click in a dashboard.
 
@@ -814,14 +820,14 @@ Both are built by Railpack, Dokploy's builder that reads `package.json` and work
 
 Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) and by building and starting clean copies of both repositories on Linux under Node.js 24.21.0, with no `.env` file and no private folder beside the site.
 
-| | The site | The fonts |
-|---|---|---|
-| Node.js | 24.21.0, from `"engines": { "node": "24.x" }` in `package.json` | the same |
-| Install | `npm install` | `npm install` (nothing to install) |
-| Build | `npm run build` (about 3 seconds) | none |
-| Start | `npm run start` | `npm run start` |
-| Port inside the container | 3000 | 3000 |
-| Settings to enter | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` | none |
+|                           | The site                                                              | The fonts                          |
+| ------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| Node.js                   | 24.21.0, from `"engines": { "node": "24.x" }` in `package.json`       | the same                           |
+| Install                   | `npm install`                                                         | `npm install` (nothing to install) |
+| Build                     | `npm run build` (about 3 seconds)                                     | none                               |
+| Start                     | `npm run start`                                                       | `npm run start`                    |
+| Port inside the container | 3000                                                                  | 3000                               |
+| Settings to enter         | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` | none                               |
 
 - **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
 - **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
@@ -880,8 +886,9 @@ If Dokploy can already see both repositories, skip this step.
    - **Repository:** `romitraj-private`
    - **Branch:** `main`
    - **Build path:** `/`
-   
+
    Save the source settings.
+
 4. Still on **General**, choose **Railpack** as the build type and save. Leave the **Railpack Version** field as it is.
 5. Check that **Auto Deploy** on the **General** tab is on. It starts switched on for a new application.
 6. The **Environment** tab stays empty for this application.
@@ -894,16 +901,16 @@ If Dokploy can already see both repositories, skip this step.
     - **Container Port:** `3000`
     - **HTTPS:** on
     - **Certificate:** **None** (not Let's Encrypt: the certificate from step 2 is used)
-    
+
     Click **Create**. A domain takes effect at once; no new deploy is needed.
 
 **Check the fonts application**
 
-| Open this | You should get |
-|---|---|
+| Open this                                     | You should get                                                                                   |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | https://fonts.romitraj.dev/manuka-black.woff2 | A small file is downloaded or shown (8,692 bytes). This is the one address that proves it works. |
-| https://fonts.romitraj.dev/ | The two words `Not found` |
-| https://fonts.romitraj.dev/BRIEF.md | `Not found` |
+| https://fonts.romitraj.dev/                   | The two words `Not found`                                                                        |
+| https://fonts.romitraj.dev/BRIEF.md           | `Not found`                                                                                      |
 
 ### Step 5: the site application
 
@@ -912,8 +919,9 @@ If Dokploy can already see both repositories, skip this step.
    - **Repository:** `romitraj.dev`
    - **Branch:** `main`
    - **Build path:** `/`
-   
+
    Save.
+
 3. Choose **Railpack** as the build type and save.
 4. Check that **Auto Deploy** is on (it starts switched on).
 5. Open the **Environment** tab. Type these three lines, each followed by its value from the `.env` file on your PC (open it with `notepad .env` in the site's folder). No spaces around the `=`, no quotes:
@@ -925,6 +933,7 @@ If Dokploy can already see both repositories, skip this step.
    ```
 
    Save the settings with the save button on that tab. Close Notepad without saving.
+
 6. Go back to **General** and click **Deploy**.
 7. On the **Deployments** tab, watch the newest entry. It should mention Node 24, `npm install`, `npm run build` (with lines beginning `[11ty]`) and `npm run start`.
 8. On the **Logs** tab the last line should read `Site running at http://localhost:3000`.
@@ -934,34 +943,34 @@ If Dokploy can already see both repositories, skip this step.
    - **Container Port:** `3000`
    - **HTTPS:** on
    - **Certificate:** **None**
-   
+
    Click **Create**.
 
 **Check the site**
 
-| Do this | You should see |
-|---|---|
-| Open https://romitraj.dev | The home page, with the headline in its tall heavy letters and the serif lines in the fine serif. If the text is in plainer fonts, the fonts application is not answering: check step 4. |
-| Wait two seconds and look at the ticker | The weather, the coordinates, the time, and Spotify's icon with a track |
-| Open https://romitraj.dev/api/weather | One short line with a temperature and a word for the sky |
-| Open https://romitraj.dev/api/now-playing | One short line with a track's title. An empty page means the three settings are missing or wrong: check step 5.5, save, and deploy again. |
-| Open https://romitraj.dev/api/posts | A line listing your latest blog posts |
-| Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload |
-| Open https://www.romitraj.dev | You end up on https://romitraj.dev |
-| Open https://romitraj.dev/nothing-here/ | The "Lost at sea" page, its name sliding in |
-| Open your Rybbit dashboard | Your own visit, counted once per page |
-| Open the site on your phone | The same, in the phone arrangement |
+| Do this                                                   | You should see                                                                                                                                                                           |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open https://romitraj.dev                                 | The home page, with the headline in its tall heavy letters and the serif lines in the fine serif. If the text is in plainer fonts, the fonts application is not answering: check step 4. |
+| Wait two seconds and look at the ticker                   | The weather, the coordinates, the time, and Spotify's icon with a track                                                                                                                  |
+| Open https://romitraj.dev/api/weather                     | One short line with a temperature and a word for the sky                                                                                                                                 |
+| Open https://romitraj.dev/api/now-playing                 | One short line with a track's title. An empty page means the three settings are missing or wrong: check step 5.5, save, and deploy again.                                                |
+| Open https://romitraj.dev/api/posts                       | A line listing your latest blog posts                                                                                                                                                    |
+| Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload                                                                                                                              |
+| Open https://www.romitraj.dev                             | You end up on https://romitraj.dev                                                                                                                                                       |
+| Open https://romitraj.dev/nothing-here/                   | The "Lost at sea" page, its name sliding in                                                                                                                                              |
+| Open your Rybbit dashboard                                | Your own visit, counted once per page                                                                                                                                                    |
+| Open the site on your phone                               | The same, in the phone arrangement                                                                                                                                                       |
 
 ### If something is wrong
 
-| What you see | What it means | Where to look |
-|---|---|---|
-| The newest entry on **Deployments** ends in an error | The build failed | Read the last lines of that entry. A wrong Node version there (not 24) means an old Railpack: type `0.40.1` into **Railpack Version** on **General**, save, deploy again. |
-| `404 page not found` | The server has no application for that address | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://` |
-| Cloudflare's page "Bad gateway" (502) | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains** |
-| Cloudflare's page "Invalid SSL certificate" (526) | The server is not presenting the origin certificate | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.) |
-| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all | The DNS record's address in Cloudflare, and that the server is running |
-| The site shows but the ticker has no track | The Spotify settings | **Environment**, then deploy again. See "If a widget is missing". |
+| What you see                                                    | What it means                                           | Where to look                                                                                                                                                                                     |
+| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The newest entry on **Deployments** ends in an error            | The build failed                                        | Read the last lines of that entry. A wrong Node version there (not 24) means an old Railpack: type `0.40.1` into **Railpack Version** on **General**, save, deploy again.                         |
+| `404 page not found`                                            | The server has no application for that address          | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://`                                                                                                           |
+| Cloudflare's page "Bad gateway" (502)                           | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains**                                                                                                                                                   |
+| Cloudflare's page "Invalid SSL certificate" (526)               | The server is not presenting the origin certificate     | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.) |
+| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all               | The DNS record's address in Cloudflare, and that the server is running                                                                                                                            |
+| The site shows but the ticker has no track                      | The Spotify settings                                    | **Environment**, then deploy again. See "If a widget is missing".                                                                                                                                 |
 
 ### After the first deployment
 

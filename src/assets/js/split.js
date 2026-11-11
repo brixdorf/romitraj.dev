@@ -11,7 +11,8 @@ const along = (rect, sideways) => (sideways ? rect.top : rect.left);
 const across = (rect, sideways) => (sideways ? rect.left : rect.top);
 const thickness = (rect, sideways) => (sideways ? rect.width : rect.height);
 // Two boxes are on different lines if they sit more than half a line apart across the lines.
-const onNewLine = (rect, previous, sideways) => Math.abs(across(rect, sideways) - across(previous, sideways)) > thickness(rect, sideways) / 2;
+const onNewLine = (rect, previous, sideways) =>
+  Math.abs(across(rect, sideways) - across(previous, sideways)) > thickness(rect, sideways) / 2;
 
 // Remembers an element's own style setting, to put it back to the letter afterwards.
 const keepStyle = (element) => {
@@ -50,7 +51,8 @@ export function splitLetters(element) {
   while (walker.nextNode()) {
     const node = walker.currentNode;
     if (node.nodeType === Node.ELEMENT_NODE) {
-      if (node.classList.contains('apostrophe')) plan.push({ ink: node, rect: node.getBoundingClientRect() });
+      if (node.classList.contains('apostrophe'))
+        plan.push({ ink: node, rect: node.getBoundingClientRect() });
       continue;
     }
     textNodes.push(node);
@@ -69,7 +71,12 @@ export function splitLetters(element) {
     previousLetter.push(lastLetter);
     if (entry.node) lastLetter = index;
   });
-  const startsLine = plan.map((entry, index) => Boolean(entry.node) && previousLetter[index] >= 0 && onNewLine(entry.rect, plan[previousLetter[index]].rect, sideways));
+  const startsLine = plan.map(
+    (entry, index) =>
+      Boolean(entry.node) &&
+      previousLetter[index] >= 0 &&
+      onNewLine(entry.rect, plan[previousLetter[index]].rect, sideways),
+  );
 
   // Pass 2: put each letter in its two boxes. Spaces stay as plain text between the boxes.
   const newBox = () => Object.assign(document.createElement('span'), { className: 'split-letter' });
@@ -89,7 +96,10 @@ export function splitLetters(element) {
       }
       const entry = plan.find((planned) => planned.node === node && planned.index === index);
       entry.box = newBox();
-      entry.ink = Object.assign(document.createElement('span'), { className: 'split-letter__ink', textContent: character });
+      entry.ink = Object.assign(document.createElement('span'), {
+        className: 'split-letter__ink',
+        textContent: character,
+      });
       entry.box.append(entry.ink);
       pieces.append(entry.box);
     });
@@ -102,17 +112,25 @@ export function splitLetters(element) {
   element.style.whiteSpace = 'nowrap';
   plan.forEach((entry, index) => {
     if (!startsLine[index]) return;
-    if (!onNewLine(entry.box.getBoundingClientRect(), plan[previousLetter[index]].box.getBoundingClientRect(), sideways)) entry.box.before(document.createElement('br'));
+    if (
+      !onNewLine(
+        entry.box.getBoundingClientRect(),
+        plan[previousLetter[index]].box.getBoundingClientRect(),
+        sideways,
+      )
+    )
+      entry.box.before(document.createElement('br'));
   });
 
   // Where each letter is now, measured the same way as before the cut.
-  const measure = () => plan.map((entry) => {
-    const text = entry.ink.firstChild;
-    if (!text || text.nodeType !== Node.TEXT_NODE) return entry.ink.getBoundingClientRect();
-    range.setStart(text, 0);
-    range.setEnd(text, text.length);
-    return range.getBoundingClientRect();
-  });
+  const measure = () =>
+    plan.map((entry) => {
+      const text = entry.ink.firstChild;
+      if (!text || text.nodeType !== Node.TEXT_NODE) return entry.ink.getBoundingClientRect();
+      range.setStart(text, 0);
+      range.setEnd(text, text.length);
+      return range.getBoundingClientRect();
+    });
 
   // Pass 4: put back the spacing between the letters with small margins, so that every line is
   // as long as it was and the heading keeps its size (a longer line would push whatever sits
@@ -145,12 +163,14 @@ export function splitLetters(element) {
   plan.forEach((entry, index) => {
     const acrossBy = entry.rect.left - now[index].left;
     const downBy = entry.rect.top - now[index].top;
-    if (Math.abs(acrossBy) > 0.01 || Math.abs(downBy) > 0.01) entry.box.style.translate = `${acrossBy}px ${downBy}px`;
+    if (Math.abs(acrossBy) > 0.01 || Math.abs(downBy) > 0.01)
+      entry.box.style.translate = `${acrossBy}px ${downBy}px`;
   });
 
   // The heading keeps its words for screen readers while the letter boxes are in place.
   const hadLabel = element.hasAttribute('aria-label');
-  if (!hadLabel && element.getAttribute('aria-hidden') !== 'true') element.setAttribute('aria-label', element.textContent.replace(/\s+/g, ' ').trim());
+  if (!hadLabel && element.getAttribute('aria-hidden') !== 'true')
+    element.setAttribute('aria-label', element.textContent.replace(/\s+/g, ' ').trim());
 
   return {
     letters: plan.map((entry) => entry.ink),

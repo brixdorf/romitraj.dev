@@ -24,7 +24,7 @@
    The pattern repeats every 200vw along the slant, which is 282.84vw across the page, and slides
    sideways by exactly that distance each loop, so the loop has no visible seam. */
 .banner::after {
-  content: "";
+  content: '';
   position: absolute;
   inset-inline: 0;
   inset-block-start: 100%;

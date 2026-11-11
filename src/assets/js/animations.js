@@ -81,11 +81,11 @@ function startScrollMovement(root) {
   // Where each project row starts from. Picked once per page load, so resizing the window does not reshuffle the rows.
   // The check script sets window.steadyMotion, which swaps the random picks for a fixed list.
   const [least, most] = scroll.rowOffsetRange;
-  const rowOffsets = [...root.querySelectorAll('[data-row]')].map((row, index) => (
+  const rowOffsets = [...root.querySelectorAll('[data-row]')].map((row, index) =>
     window.steadyMotion === true
       ? scroll.rowOffsetsForChecks[index % scroll.rowOffsetsForChecks.length]
-      : least + Math.random() * (most - least)
-  ));
+      : least + Math.random() * (most - least),
+  );
 
   const media = gsap.matchMedia();
   media.add('(min-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
@@ -94,47 +94,94 @@ function startScrollMovement(root) {
 
     // A heading that slides in from the right.
     for (const heading of root.querySelectorAll('[data-drift]')) {
-      gsap.fromTo(heading, { x: () => window.innerWidth * scroll.headingDistance }, {
-        x: 0,
-        ease: ease.scrollIn,
-        scrollTrigger: { trigger: heading.parentElement, start: scroll.headingStart, end: scroll.headingEnd, scrub, invalidateOnRefresh: true },
-      });
+      gsap.fromTo(
+        heading,
+        { x: () => window.innerWidth * scroll.headingDistance },
+        {
+          x: 0,
+          ease: ease.scrollIn,
+          scrollTrigger: {
+            trigger: heading.parentElement,
+            start: scroll.headingStart,
+            end: scroll.headingEnd,
+            scrub,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
     }
 
     // The bar beside a giant heading, growing from nothing. The styles read its length from "--bar".
     for (const heading of root.querySelectorAll('[data-bar]')) {
-      gsap.fromTo(heading, { '--bar': 0 }, {
-        '--bar': 1,
-        ease: ease.scrollIn,
-        scrollTrigger: { trigger: heading, start: scroll.headingStart, end: scroll.headingEnd, scrub },
-      });
+      gsap.fromTo(
+        heading,
+        { '--bar': 0 },
+        {
+          '--bar': 1,
+          ease: ease.scrollIn,
+          scrollTrigger: {
+            trigger: heading,
+            start: scroll.headingStart,
+            end: scroll.headingEnd,
+            scrub,
+          },
+        },
+      );
     }
 
     // Project rows: each strip slides to rest from one side, then the row fades as it leaves the top.
     root.querySelectorAll('[data-row]').forEach((row, index) => {
       const strip = row.firstElementChild;
       const offset = rowOffsets[index];
-      gsap.fromTo(strip, { x: () => row.clientWidth * offset }, {
-        x: 0,
-        ease: 'none',
-        scrollTrigger: { trigger: row, start: scroll.rowStart, end: scroll.rowEnd, scrub, invalidateOnRefresh: true },
-      });
-      gsap.fromTo(row, { opacity: 1 }, {
-        opacity: 0,
-        ease: ease.scrollIn,
-        scrollTrigger: { trigger: row, start: scroll.rowFadeStart, end: scroll.rowFadeEnd, scrub: true },
-      });
+      gsap.fromTo(
+        strip,
+        { x: () => row.clientWidth * offset },
+        {
+          x: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: row,
+            start: scroll.rowStart,
+            end: scroll.rowEnd,
+            scrub,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+      gsap.fromTo(
+        row,
+        { opacity: 1 },
+        {
+          opacity: 0,
+          ease: ease.scrollIn,
+          scrollTrigger: {
+            trigger: row,
+            start: scroll.rowFadeStart,
+            end: scroll.rowFadeEnd,
+            scrub: true,
+          },
+        },
+      );
     });
 
     // The compass in the footer rises a little as the footer scrolls into view. The footer is not
     // part of "root" (it stays in place through page changes), so it is looked up in the whole page.
     const ornament = document.querySelector('[data-ornament] .picture');
     if (ornament) {
-      gsap.fromTo(ornament, { y: scroll.ornamentDistance }, {
-        y: 0,
-        ease: 'none',
-        scrollTrigger: { trigger: ornament.closest('footer'), start: scroll.ornamentStart, end: scroll.ornamentEnd, scrub },
-      });
+      gsap.fromTo(
+        ornament,
+        { y: scroll.ornamentDistance },
+        {
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: ornament.closest('footer'),
+            start: scroll.ornamentStart,
+            end: scroll.ornamentEnd,
+            scrub,
+          },
+        },
+      );
     }
   });
 

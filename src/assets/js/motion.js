@@ -44,7 +44,12 @@ export const intro = {
   // The same curve as "power2.inOut" in the page changes, written the way CSS writes it.
   ease: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
   // The outlined italic words, as when arriving from another page. The curve is "power1.out".
-  flourish: { at: flourishAt, time: flourishTime, x: flourishFrom, ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' },
+  flourish: {
+    at: flourishAt,
+    time: flourishTime,
+    x: flourishFrom,
+    ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  },
 };
 
 // Page changes. Moving between pages is choreographed: pieces leave and arrive one after another.

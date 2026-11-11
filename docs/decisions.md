@@ -68,10 +68,10 @@ Romit found the water drop too plain and asked for three options to choose from,
 
 ### The three options
 
-| Option | What it was | How it looked at 16 pixels |
-|---|---|---|
-| A pixel helmet | A diver's helmet drawn by hand on a 16 by 16 grid, in the style of the site's pixel pictures | Sharp: every pixel placed |
-| A letter R | See the note below | Readable but soft |
+| Option                        | What it was                                                                                                 | How it looked at 16 pixels                     |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| A pixel helmet                | A diver's helmet drawn by hand on a 16 by 16 grid, in the style of the site's pixel pictures                | Sharp: every pixel placed                      |
+| A letter R                    | See the note below                                                                                          | Readable but soft                              |
 | **A simple compass (chosen)** | This site's compass (the footer's drawing) reduced to a ring, four long points, four short points and a hub | Soft in the first drawing; reworked, see below |
 
 - **The R was not set in the headline font.** A logo made from a typeface needs a licence that covers logos, which is separate from a licence to show text on a website and is Romit's to settle with the foundry. So the option shown was an R in Anton, the free stand-in the site already ships under the SIL Open Font License, which does not restrict artwork made with it.
@@ -97,11 +97,11 @@ Romit found the water drop too plain and asked for three options to choose from,
 
 ### Versions and sources checked
 
-| What | Version or page | Source, read on 2026-10-11 | What it settled |
-|---|---|---|---|
-| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 (unchanged) | `npm view @phosphor-icons/core version`; the drawings and the license text were read from the published package | The drop, and the README's small icons. MIT license |
-| Safari and drawn icons | Safari 26.0 release notes; WebKit's notes on Safari 26 | developer.apple.com, webkit.org | Safari takes an SVG icon from version 26 (September 2025). Older Safari needs the `.ico` |
-| LinkedIn Post Inspector | Its page | linkedin.com/post-inspector | It exists, for previewing a shared link |
+| What                                    | Version or page                                        | Source, read on 2026-10-11                                                                                      | What it settled                                                                          |
+| --------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 (unchanged)                                      | `npm view @phosphor-icons/core version`; the drawings and the license text were read from the published package | The drop, and the README's small icons. MIT license                                      |
+| Safari and drawn icons                  | Safari 26.0 release notes; WebKit's notes on Safari 26 | developer.apple.com, webkit.org                                                                                 | Safari takes an SVG icon from version 26 (September 2025). Older Safari needs the `.ico` |
+| LinkedIn Post Inspector                 | Its page                                               | linkedin.com/post-inspector                                                                                     | It exists, for previewing a shared link                                                  |
 
 No package was installed: the drawings are copied in, as the other icons were.
 
@@ -196,13 +196,13 @@ Nothing was installed or upgraded in the site. Nothing was deployed: this entry 
 
 ### Versions and sources checked
 
-| What | Version or page | Source, read on 2026-10-11 | What it settled |
-|---|---|---|---|
-| Node.js, newest LTS line | 24 (24.21.0, "Krypton"); 26 is the current line and not yet LTS | https://nodejs.org/dist/index.json | `engines` stays at `24.x` in both repositories |
-| Railpack | 0.40.1 (released 2026-09-28) | github.com/railwayapp/railpack, latest release; railpack.com, "Node" | How the Node.js version, the install, build and start commands are chosen; which settings it reads |
-| Dokploy | 0.30.8 (released 2026-09-29) | github.com/Dokploy/dokploy, latest release | The version the documentation below describes |
-| Dokploy's documentation | Applications, Build Type, Domains, Cloudflare, Certificates, Auto Deploy, GitHub, Watch Paths, Variables, Going Production | docs.dokploy.com | The tab, field and button names used in the guide, and the ones it does not give |
-| Rybbit | Its home page | rybbit.com | "cookieless", "no cookies, no consent banner": the Credits page's sentence is accurate |
+| What                     | Version or page                                                                                                            | Source, read on 2026-10-11                                           | What it settled                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Node.js, newest LTS line | 24 (24.21.0, "Krypton"); 26 is the current line and not yet LTS                                                            | https://nodejs.org/dist/index.json                                   | `engines` stays at `24.x` in both repositories                                                     |
+| Railpack                 | 0.40.1 (released 2026-09-28)                                                                                               | github.com/railwayapp/railpack, latest release; railpack.com, "Node" | How the Node.js version, the install, build and start commands are chosen; which settings it reads |
+| Dokploy                  | 0.30.8 (released 2026-09-29)                                                                                               | github.com/Dokploy/dokploy, latest release                           | The version the documentation below describes                                                      |
+| Dokploy's documentation  | Applications, Build Type, Domains, Cloudflare, Certificates, Auto Deploy, GitHub, Watch Paths, Variables, Going Production | docs.dokploy.com                                                     | The tab, field and button names used in the guide, and the ones it does not give                   |
+| Rybbit                   | Its home page                                                                                                              | rybbit.com                                                           | "cookieless", "no cookies, no consent banner": the Credits page's sentence is accurate             |
 
 ### What the live server needs, and how each was checked
 
@@ -228,13 +228,13 @@ Nothing was installed or upgraded in the site. Nothing was deployed: this entry 
 
 Tested with seventeen requests against the server as it will run:
 
-| Who asks | Answer |
-|---|---|
-| A page on romitraj.dev (with or without its address shown) | 200, the font, marked for use by `https://romitraj.dev` only, to be kept for a year |
-| A page on another website, a look-alike address, or `www.romitraj.dev` | 403 |
-| Anything that is not one of the font files: the folder, the brief, an original font file, the server's own code, a path that climbs out of the folder | 404 |
-| Anything but a GET or HEAD request | 405 |
-| The font's address typed into a browser, or fetched by a program that names no website | 200, the font |
+| Who asks                                                                                                                                              | Answer                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| A page on romitraj.dev (with or without its address shown)                                                                                            | 200, the font, marked for use by `https://romitraj.dev` only, to be kept for a year |
+| A page on another website, a look-alike address, or `www.romitraj.dev`                                                                                | 403                                                                                 |
+| Anything that is not one of the font files: the folder, the brief, an original font file, the server's own code, a path that climbs out of the folder | 404                                                                                 |
+| Anything but a GET or HEAD request                                                                                                                    | 405                                                                                 |
+| The font's address typed into a browser, or fetched by a program that names no website                                                                | 200, the font                                                                       |
 
 - **The last row cannot be closed.** A browser has to be able to download a web font to show it, so anyone who looks up a font's address on the site can fetch that one file. What the server prevents is other websites using the fonts, and anything else in the private repository being reached.
 - **Cloudflare sits in front and keeps the fonts at its edge**, so most requests are answered by Cloudflare without reaching this server, including a second site's request for a font Cloudflare already holds. The answer still says the font is for `https://romitraj.dev` only, and browsers refuse to use a font for any other site. That header, not the 403, is the protection that always holds.
@@ -267,12 +267,12 @@ Nothing was installed or upgraded in this step.
 
 New scripts in the private folder (`../romitraj-private/reference/scripts/`) measure the reference and this site in the same way and list the differences. They read rendered values only: sizes, colors, positions and timings as a browser reports them. Each ran in Chromium, Firefox and WebKit (Safari's engine).
 
-| What | How much | Script |
-|---|---|---|
-| Layout, spacing, type sizes, colors | About 150 pieces and 50 gaps between pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px | `compare.mjs`, `compare-report.mjs` |
-| Hover and keyboard focus | 24 kinds of link: what changes, what it ends at, how long it takes | `compare-states.mjs` |
-| Movement | The two tickers, the gradient bar, the scroll-tied movement and how long it takes to catch up | `compare-motion.mjs` |
-| Page changes | Ten changes of page, each as a timeline of what leaves and arrives | `pagechange.mjs`, `pagechange-compare.mjs` |
+| What                                | How much                                                                                                                   | Script                                     |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Layout, spacing, type sizes, colors | About 150 pieces and 50 gaps between pieces on four pages (home, About, Projects, one project), at 1440px, 768px and 390px | `compare.mjs`, `compare-report.mjs`        |
+| Hover and keyboard focus            | 24 kinds of link: what changes, what it ends at, how long it takes                                                         | `compare-states.mjs`                       |
+| Movement                            | The two tickers, the gradient bar, the scroll-tied movement and how long it takes to catch up                              | `compare-motion.mjs`                       |
+| Page changes                        | Ten changes of page, each as a timeline of what leaves and arrives                                                         | `pagechange.mjs`, `pagechange-compare.mjs` |
 
 **The three browsers agree.** Every difference found was between the two sites, the same in all three browsers. None showed in one browser only.
 
@@ -282,33 +282,33 @@ Each line gives the reference's value, what this site had, and what it has now.
 
 **Layout and spacing**
 
-| Where | Reference | Was | Now |
-|---|---|---|---|
-| Navigation rows in the hero, phones and tablets | 27.2px tall | 32px (the link took the body text's taller line) | 27.2px |
-| The letter's text on phones | Flush left | Centered | Flush left under 600px, centered from there |
-| Faint copies of project names on phones | Sharp | Blurred | Sharp under 600px, blurred from there |
-| The ring in the corner of the card of links | Pale grey `#bdbdbd` | Ink | `#bdbdbd` |
-| The outlined italic words in the hero, phones and tablets | A line of 84px | 84.9px | 84px |
-| Footer on the home page, phones and tablets: room above the first line | None: it starts at the footer's top edge, under the band | 32px | None |
-| Footer on the other pages: ink above "You are here" | 48px up to 1099px wide, 96px from 1100px | 32px at every width | 48px and 96px |
-| Footer between 900px and 1099px: room under the links | 64px | 112px | 64px (112px from 1100px, as before) |
-| About page: gap between the portrait and its caption | 8px | 14px | 8px |
-| About page: gap between the latest post's text and its link | 32px | 40px (the link sat in a line of text) | 32px |
-| About page on tablets: room above the latest post | 32px | 16px | 32px |
-| Projects page, stacked cards: gap between a card's number and its name | 16px | 12px | 16px |
-| A project's page on tablets: gap between the rows of its header | 16px | None | 16px |
-| A project's page on laptops: where the name sits | 240px below the top of its header (80px, then its logo's 160px) | 80px | 240px. This log already said the name stands "in the same place" without a logo; on phones and tablets it did, on laptops it did not |
+| Where                                                                  | Reference                                                       | Was                                              | Now                                                                                                                                  |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Navigation rows in the hero, phones and tablets                        | 27.2px tall                                                     | 32px (the link took the body text's taller line) | 27.2px                                                                                                                               |
+| The letter's text on phones                                            | Flush left                                                      | Centered                                         | Flush left under 600px, centered from there                                                                                          |
+| Faint copies of project names on phones                                | Sharp                                                           | Blurred                                          | Sharp under 600px, blurred from there                                                                                                |
+| The ring in the corner of the card of links                            | Pale grey `#bdbdbd`                                             | Ink                                              | `#bdbdbd`                                                                                                                            |
+| The outlined italic words in the hero, phones and tablets              | A line of 84px                                                  | 84.9px                                           | 84px                                                                                                                                 |
+| Footer on the home page, phones and tablets: room above the first line | None: it starts at the footer's top edge, under the band        | 32px                                             | None                                                                                                                                 |
+| Footer on the other pages: ink above "You are here"                    | 48px up to 1099px wide, 96px from 1100px                        | 32px at every width                              | 48px and 96px                                                                                                                        |
+| Footer between 900px and 1099px: room under the links                  | 64px                                                            | 112px                                            | 64px (112px from 1100px, as before)                                                                                                  |
+| About page: gap between the portrait and its caption                   | 8px                                                             | 14px                                             | 8px                                                                                                                                  |
+| About page: gap between the latest post's text and its link            | 32px                                                            | 40px (the link sat in a line of text)            | 32px                                                                                                                                 |
+| About page on tablets: room above the latest post                      | 32px                                                            | 16px                                             | 32px                                                                                                                                 |
+| Projects page, stacked cards: gap between a card's number and its name | 16px                                                            | 12px                                             | 16px                                                                                                                                 |
+| A project's page on tablets: gap between the rows of its header        | 16px                                                            | None                                             | 16px                                                                                                                                 |
+| A project's page on laptops: where the name sits                       | 240px below the top of its header (80px, then its logo's 160px) | 80px                                             | 240px. This log already said the name stands "in the same place" without a logo; on phones and tablets it did, on laptops it did not |
 
 **Hover**
 
-| Link | Reference | Was | Now |
-|---|---|---|---|
-| The track's title in the ticker | No change | Turned grey | No change |
-| "View all projects", "Read the blog" | Underlined at once | No change | Underlined at once |
-| The links at the bottom of the About page's first card, and "Read the post" | Underlined at once | No change | Underlined at once |
-| A link inside a project's write-up | Turns grey at once | No change | Turns grey at once |
-| A line in a project's "Contents" | Turns grey while a line grows 1px above the bottom of its letters' box | The same, with the line one pixel lower | As the reference |
-| Links in the "Elsewhere" lists, "Contents" and the Projects page's "Read more" | The drawn line breaks around the tails of letters (g, p, y) | The line ran through them | Breaks around them |
+| Link                                                                           | Reference                                                              | Was                                     | Now                |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------- | --------------------------------------- | ------------------ |
+| The track's title in the ticker                                                | No change                                                              | Turned grey                             | No change          |
+| "View all projects", "Read the blog"                                           | Underlined at once                                                     | No change                               | Underlined at once |
+| The links at the bottom of the About page's first card, and "Read the post"    | Underlined at once                                                     | No change                               | Underlined at once |
+| A link inside a project's write-up                                             | Turns grey at once                                                     | No change                               | Turns grey at once |
+| A line in a project's "Contents"                                               | Turns grey while a line grows 1px above the bottom of its letters' box | The same, with the line one pixel lower | As the reference   |
+| Links in the "Elsewhere" lists, "Contents" and the Projects page's "Read more" | The drawn line breaks around the tails of letters (g, p, y)            | The line ran through them               | Breaks around them |
 
 - **The third row corrects this log.** The entry for the inner pages says those links "do not react at all". That came from a measurement that watched an underline's color and thickness but not whether there was one. Watching that as well shows the underline appearing.
 - **How the line breaks around a tail.** The reference gives those letters a 2px outline in the color of whatever is behind them, painted under the letters, and puts the line under that outline. This site now does the same. At rest the outline cannot be seen: photographs with and without it are identical pixel for pixel in all three browsers. In Chromium before version 123 (early 2024), which could not yet paint an outline under HTML text, these few links would look thinner; the reference has the same limit.
@@ -322,8 +322,8 @@ Each line gives the reference's value, what this site had, and what it has now.
 
 **Movement**
 
-| What | Reference | Was | Now |
-|---|---|---|---|
+| What                                                             | Reference                                                                   | Was                                                          | Now                                                                     |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | Scroll-tied movement catching up after the scroll position jumps | Halfway after about 0.14s, nine tenths after 0.5s, settled after about 1.0s | Nine tenths after 0.27s, settled after 0.53s: twice as quick | Nine tenths after 0.5s, settled after about 1.0s, in all three browsers |
 
 - The earlier note "trailing the scroll by about a second" was right about the reference, but the setting handed to GSAP was 1, and GSAP eases toward the new place, so the movement was done in half that time. The setting is 2 now (`scrollCatchUp` in `motion.js`).
@@ -334,25 +334,25 @@ Each line gives the reference's value, what this site had, and what it has now.
 
 ### Left as they are, each from a choice recorded in this log
 
-| Difference | Recorded choice |
-|---|---|
-| The giant line is smaller, the serif word larger, and the hero has one more line above the giant line | "How the headline is set" (2026-10-10): version B, chosen by Romit; 18 letters against the reference's 12 |
-| On phones the sideways headline is narrower (71px against 108.5px), so everything beside it starts further left and is wider | The same: its letters are about two thirds as tall |
-| On tablets the hero's picture frame is smaller (186px wide against 307px) | "On tablets the picture is as wide as the space the first headline line leaves free" (2026-10-10) |
-| The weather shows a word for the sky; the track's title and artists are not in capitals; Spotify's icon is larger | "The ticker's line" (2026-10-11): Romit's choices, and Spotify's rules |
-| No dark first card in the writing section; no category, tags or reading time on cards | "No dark featured card", and the feed has neither (2026-10-10) |
-| The footer's compass is 300px across, not 400px, and the footer is shorter | "Positions are the measured ones" under Pictures (2026-10-10): this footer has fewer links |
-| The frame beside "About the human" is dark with a compass in it; the reference's is light with padding | "The inner pages reuse these" (2026-10-10) |
-| No logo above a project's name or beside a name on the Projects page (its cards have four columns, not five) | "A project's page has no logo above its name" (2026-10-10) |
-| Giant page names are smaller on phones ("Projects" 121px against 160px) | "Giant names shrink on phones by letter count" (2026-10-10) |
-| The About page's table is stacked on narrow windows where the reference swaps in a list | "The table is a real table" (2026-10-10): a stand-in |
-| The About page's cards are about other things, and the piece beside the second card has no video | "The About page's cards" (2026-10-10) |
-| About and Resume are choreographed where the reference fades plainly; back and forward return to the scroll position; the headline slides in on first load | Romit's choices, all recorded on 2026-10-10 |
-| The small row sits a fixed distance below the banner (1px lower than the reference in Firefox on tablets) | "The small row sits a fixed distance below the banner" (2026-10-10) |
-| The one bold label is weight 600, not 700 | "Neue Montreal Semibold stands in for bold" (2026-10-09) |
-| The status ticker moves at 41px a second where the reference's moved at 39.5px on the day of the comparison | "The ticker runs on the browser's built-in animation engine ... at 41px per second" (2026-10-10). See the note below |
-| The ticker also slows while keyboard focus is inside it | The same entry: "under the pointer or keyboard focus" |
-| No Now page, block or link | "No Now page" (2026-10-10) |
+| Difference                                                                                                                                                 | Recorded choice                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| The giant line is smaller, the serif word larger, and the hero has one more line above the giant line                                                      | "How the headline is set" (2026-10-10): version B, chosen by Romit; 18 letters against the reference's 12            |
+| On phones the sideways headline is narrower (71px against 108.5px), so everything beside it starts further left and is wider                               | The same: its letters are about two thirds as tall                                                                   |
+| On tablets the hero's picture frame is smaller (186px wide against 307px)                                                                                  | "On tablets the picture is as wide as the space the first headline line leaves free" (2026-10-10)                    |
+| The weather shows a word for the sky; the track's title and artists are not in capitals; Spotify's icon is larger                                          | "The ticker's line" (2026-10-11): Romit's choices, and Spotify's rules                                               |
+| No dark first card in the writing section; no category, tags or reading time on cards                                                                      | "No dark featured card", and the feed has neither (2026-10-10)                                                       |
+| The footer's compass is 300px across, not 400px, and the footer is shorter                                                                                 | "Positions are the measured ones" under Pictures (2026-10-10): this footer has fewer links                           |
+| The frame beside "About the human" is dark with a compass in it; the reference's is light with padding                                                     | "The inner pages reuse these" (2026-10-10)                                                                           |
+| No logo above a project's name or beside a name on the Projects page (its cards have four columns, not five)                                               | "A project's page has no logo above its name" (2026-10-10)                                                           |
+| Giant page names are smaller on phones ("Projects" 121px against 160px)                                                                                    | "Giant names shrink on phones by letter count" (2026-10-10)                                                          |
+| The About page's table is stacked on narrow windows where the reference swaps in a list                                                                    | "The table is a real table" (2026-10-10): a stand-in                                                                 |
+| The About page's cards are about other things, and the piece beside the second card has no video                                                           | "The About page's cards" (2026-10-10)                                                                                |
+| About and Resume are choreographed where the reference fades plainly; back and forward return to the scroll position; the headline slides in on first load | Romit's choices, all recorded on 2026-10-10                                                                          |
+| The small row sits a fixed distance below the banner (1px lower than the reference in Firefox on tablets)                                                  | "The small row sits a fixed distance below the banner" (2026-10-10)                                                  |
+| The one bold label is weight 600, not 700                                                                                                                  | "Neue Montreal Semibold stands in for bold" (2026-10-09)                                                             |
+| The status ticker moves at 41px a second where the reference's moved at 39.5px on the day of the comparison                                                | "The ticker runs on the browser's built-in animation engine ... at 41px per second" (2026-10-10). See the note below |
+| The ticker also slows while keyboard focus is inside it                                                                                                    | The same entry: "under the pointer or keyboard focus"                                                                |
+| No Now page, block or link                                                                                                                                 | "No Now page" (2026-10-10)                                                                                           |
 
 - **A note on the tickers' speed.** The comparison showed the rule behind the reference's speeds: each of its tickers takes 20 seconds for one loop, however long its line is. Its status line was 822px long when first measured (41px a second) and 790px on the day of the comparison, with a shorter song title (39.5px a second); its quote strip is 1205px (60px a second). This site moves at the fixed speeds first measured, 41px and 60px a second. With the reference's rule this site's status line would move at about 44px a second and its shorter quote strip at about 36px a second. The fixed speeds were kept because they are the recorded choice and keep the quote strip at the pace seen on the reference; Romit can ask for the 20-second rule instead.
 
@@ -377,12 +377,12 @@ All ten changes of page on the route (home to About and back, home to Projects, 
 
 `npm run speed` after all the changes (Chromium, the home page, nine loads each way, the middle value; lowest and highest in brackets):
 
-| | With the headline's entrance | Without it |
-|---|---|---|
-| Slow phone, First Contentful Paint | 1236ms (1232 to 1284) | 1252ms (1236 to 1308) |
-| Slow phone, Largest Contentful Paint | 1236ms (1232 to 1284) | 1252ms (1236 to 1308) |
-| Fast laptop, First Contentful Paint | 152ms (104 to 168) | 148ms (112 to 172) |
-| Fast laptop, Largest Contentful Paint | 152ms (104 to 168) | 148ms (112 to 172) |
+|                                       | With the headline's entrance | Without it            |
+| ------------------------------------- | ---------------------------- | --------------------- |
+| Slow phone, First Contentful Paint    | 1236ms (1232 to 1284)        | 1252ms (1236 to 1308) |
+| Slow phone, Largest Contentful Paint  | 1236ms (1232 to 1284)        | 1252ms (1236 to 1308) |
+| Fast laptop, First Contentful Paint   | 152ms (104 to 168)           | 148ms (112 to 172)    |
+| Fast laptop, Largest Contentful Paint | 152ms (104 to 168)           | 148ms (112 to 172)    |
 
 - "Slow phone" is the connection and processor Lighthouse uses for its mobile score. The largest piece is the hero picture, drawn with the first paint.
 - The figures are the same as after the pictures were added (1252ms and 1236ms then); the difference between the two columns is within the spread from one load to the next. Nothing in this step changed what the page loads.
@@ -399,13 +399,13 @@ All ten changes of page on the route (home to About and back, home to Projects, 
 
 No package was added. Read on 2026-10-11:
 
-| What | Source | What it settled |
-|---|---|---|
-| Rybbit's tag and settings | rybbit.com, "Tracking script" | The tag goes in the head of every page; views in single-page sites are counted through the browser's History API, after a waiting time of half a second (`data-debounce`); automatic counting is switched in the dashboard, not on the tag |
-| The script Romit's own Rybbit serves | https://analytics.romitraj.dev/api/script.js, fetched and read | It reads `data-site-id` from its own tag; it counts one view when it starts, and one more, half a second after the last of them, whenever `history.pushState` or `history.replaceState` is called or a `popstate` or `hashchange` event fires. It does not compare addresses |
-| How Taxi changes pages | `@unseenco/taxi` 2.0.0, its bundled code | One `pushState` per page change by link, none for back and forward; it reloads only scripts marked `data-taxi-reload` |
-| How the build could know it is the live one | railpack.com, "Node" | `NODE_ENV=production` is documented at run time only, and nothing says whether a setting made in Dokploy reaches the build. Not something to rely on |
-| Each photographer's Unsplash profile | The six profile pages, opened one by one | Each profile shows the name on record |
+| What                                        | Source                                                         | What it settled                                                                                                                                                                                                                                                              |
+| ------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rybbit's tag and settings                   | rybbit.com, "Tracking script"                                  | The tag goes in the head of every page; views in single-page sites are counted through the browser's History API, after a waiting time of half a second (`data-debounce`); automatic counting is switched in the dashboard, not on the tag                                   |
+| The script Romit's own Rybbit serves        | https://analytics.romitraj.dev/api/script.js, fetched and read | It reads `data-site-id` from its own tag; it counts one view when it starts, and one more, half a second after the last of them, whenever `history.pushState` or `history.replaceState` is called or a `popstate` or `hashchange` event fires. It does not compare addresses |
+| How Taxi changes pages                      | `@unseenco/taxi` 2.0.0, its bundled code                       | One `pushState` per page change by link, none for back and forward; it reloads only scripts marked `data-taxi-reload`                                                                                                                                                        |
+| How the build could know it is the live one | railpack.com, "Node"                                           | `NODE_ENV=production` is documented at run time only, and nothing says whether a setting made in Dokploy reaches the build. Not something to rely on                                                                                                                         |
+| Each photographer's Unsplash profile        | The six profile pages, opened one by one                       | Each profile shows the name on record                                                                                                                                                                                                                                        |
 
 ### Visitor counting (Rybbit)
 
@@ -449,15 +449,15 @@ Romit asked that clicking a line under "Contents" on a project's page should no 
 
 No package was added or upgraded. These pages were read on 2026-10-11, before any code was written:
 
-| What | Source | What it settled |
-|---|---|---|
-| Spotify redirect addresses | developer.spotify.com, "Redirect URIs" | `localhost` is refused; `http://127.0.0.1:PORT` is the one plain-http form allowed (enforced for new apps since April 2025) |
-| Spotify approval and tokens | "Authorization Code Flow", "Refreshing tokens" | The flow the helper uses; **refresh tokens last 6 months from the approval and refreshing does not extend them** |
-| Spotify development mode | "Quota modes", "February 2026 Migration Guide", changelogs for February, March, May and July 2026 | The owner needs Premium; 5 users per app; 25 apps per account since July 2026; the two player endpoints used here are not among the ones removed in February 2026 |
-| Spotify endpoints | "Get Currently Playing Track", "Get Recently Played Tracks" | Scopes `user-read-currently-playing` and `user-read-recently-played`; the fields used |
-| Spotify design rules | "Design & Branding Guidelines" | Spotify's icon beside its content (at least 21px), a link back to Spotify, titles as Spotify gives them |
-| Open-Meteo | open-meteo.com: docs, terms, licence | No key; free for sites without ads or subscriptions, under 10,000 requests a day; data under CC BY 4.0 with "a link next to any location Open-Meteo data are displayed" |
-| The Spotify icon's drawing | Phosphor Icons 2.1.1, fill weight (`npm view @phosphor-icons/core version`: still 2.1.1) | Same icon set and licence as the other icons |
+| What                        | Source                                                                                            | What it settled                                                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spotify redirect addresses  | developer.spotify.com, "Redirect URIs"                                                            | `localhost` is refused; `http://127.0.0.1:PORT` is the one plain-http form allowed (enforced for new apps since April 2025)                                             |
+| Spotify approval and tokens | "Authorization Code Flow", "Refreshing tokens"                                                    | The flow the helper uses; **refresh tokens last 6 months from the approval and refreshing does not extend them**                                                        |
+| Spotify development mode    | "Quota modes", "February 2026 Migration Guide", changelogs for February, March, May and July 2026 | The owner needs Premium; 5 users per app; 25 apps per account since July 2026; the two player endpoints used here are not among the ones removed in February 2026       |
+| Spotify endpoints           | "Get Currently Playing Track", "Get Recently Played Tracks"                                       | Scopes `user-read-currently-playing` and `user-read-recently-played`; the fields used                                                                                   |
+| Spotify design rules        | "Design & Branding Guidelines"                                                                    | Spotify's icon beside its content (at least 21px), a link back to Spotify, titles as Spotify gives them                                                                 |
+| Open-Meteo                  | open-meteo.com: docs, terms, licence                                                              | No key; free for sites without ads or subscriptions, under 10,000 requests a day; data under CC BY 4.0 with "a link next to any location Open-Meteo data are displayed" |
+| The Spotify icon's drawing  | Phosphor Icons 2.1.1, fill weight (`npm view @phosphor-icons/core version`: still 2.1.1)          | Same icon set and licence as the other icons                                                                                                                            |
 
 ### How it is built
 
@@ -480,6 +480,7 @@ No package was added or upgraded. These pages were read on 2026-10-11, before an
   - `npm run check` fails if the home page mentions Open-Meteo, so the words cannot creep back in by accident.
 - **Spotify's icon is 21px across**, the smallest its rules allow, where the reference's icon is a little smaller. The line stays 20px tall.
 - **The title and the artists are written as Spotify gives them** ("Elastic Heart, Sia"), not in the ticker's capitals, and the title links to that track on Spotify in a new tab. Romit's choice (2026-10-11), to follow Spotify's design rules, which say titles and artist names must be shown as Spotify provides them. The first version showed them in capitals to match the reference's look. He named the title; the artists are shown the same way because the rule covers both and a title in its own case beside an artist in capitals read badly.
+
 ### The drawn lines in Firefox
 
 Romit's review of the ticker showed the short drawn lines between its pieces looking heavier in Firefox than in Chrome and Safari. They date from the hero step.
@@ -524,7 +525,7 @@ Romit noticed that the raised comma in DON'T was cut while the headline slid in,
 
 - **Cause.** While a heading moves, each letter is shown through a window that opens around the letter's own box. The apostrophe is Manuka's comma, lifted to the top of the letters. It was lifted by moving its whole box up by half a letter-height, so its box no longer sat in the line: the comma's ink ended up at the very bottom of that box, with its tail hanging 25px below it at laptop size, where the window allows 19px. Two things followed. The tail was cut for as long as the window was there (measured: about 150 pixels of ink missing, the same in all three browsers). And because a window opens from the top of its box downward, the apostrophe appeared late and from the top down, as a flat bar, while N and T beside it were already mostly in view.
 - **Fix.** The apostrophe's box now stays in the line, exactly where a letter's box would be, and only the comma inside it is lifted (`.apostrophe::before` in `base.css`). Its ink sits in the upper part of an ordinary letter box, so it comes through the edge together with the tops of N and T, as every letter does, and nothing of it is outside the window afterwards. At rest the headline is unchanged: screenshots before and after are identical pixel for pixel in three browsers at six widths.
-- **The new check found a second case**, which was fixed with it: the comma after "DROP" in the opening line lost the tip of its tail (about 10 pixels at wide windows). An italic comma's tail leans left, out of its narrow box, and the windows reached only a tenth of the box's *width* to each side. They now reach half a letter-height to each side. The slide is up or down, so the sides play no part in the movement; above and below, the windows are as before. The shapes are written as `inset(...)` instead of `polygon(...)` for this.
+- **The new check found a second case**, which was fixed with it: the comma after "DROP" in the opening line lost the tip of its tail (about 10 pixels at wide windows). An italic comma's tail leans left, out of its narrow box, and the windows reached only a tenth of the box's _width_ to each side. They now reach half a letter-height to each side. The slide is up or down, so the sides play no part in the movement; above and below, the windows are as before. The shapes are written as `inset(...)` instead of `polygon(...)` for this.
 - **New test in `npm run check`** (`lettersStayWhole` in `scripts/lib/letters.mjs`), in three browsers at seven widths: each sliding heading is cut into letters and photographed twice, once as it is and once with every letter's window fully open. Any pixel that differs is ink the window took away. It reports the letter and the place. Before the fix it failed on the apostrophe at every width.
 - **What "whole" means here.** Every letter is deliberately hidden bit by bit as it passes the edge it slides through; that is the animation. The apostrophe now passes that edge with its neighbours (for one or two frames, like them) and is whole in every frame after that, where before it stayed cut until the animation ended.
 
@@ -532,9 +533,9 @@ Romit noticed that the raised comma in DON'T was cut while the headline slid in,
 
 ### Versions verified
 
-| What | Version | Source | Used for |
-|---|---|---|---|
-| sharp | 0.35.5 | `npm view sharp version`, 2026-10-10. Apache-2.0. Needs Node.js 20.9 or newer | Reading the photos and drawings, shrinking them, and writing the finished PNG and WebP files |
+| What  | Version | Source                                                                        | Used for                                                                                     |
+| ----- | ------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| sharp | 0.35.5  | `npm view sharp version`, 2026-10-10. Apache-2.0. Needs Node.js 20.9 or newer | Reading the photos and drawings, shrinking them, and writing the finished PNG and WebP files |
 
 sharp is a new package for this project; nothing was upgraded. It is a normal dependency, not a dev-only one, because the live server runs the build too.
 
@@ -574,11 +575,11 @@ sharp is a new package for this project; nothing was upgraded. It is a normal de
   - That last step exists because the first version of the compass differed: its box took its width from its height, which Chrome's engine, Firefox and Safari's engine each worked out differently (half a compass, most of one, a whole one). Every size is now written out in full. **Rule: never let a box take its width from its height.** A height worked out from a width (the hero frame, the about drawing) is fine and the same everywhere.
 - **Loading speed, measured with `npm run speed`** (Chromium, middle of nine loads). The largest piece of the home page is now the hero picture, which is drawn with the first paint:
 
-  | | Before the pictures | With the pictures |
-  |---|---|---|
-  | Slow phone, Largest Contentful Paint, with the entrance | about 1310ms | 1252ms |
-  | Slow phone, Largest Contentful Paint, without the entrance | about 1235ms | 1236ms |
-  | Fast laptop, Largest Contentful Paint, with the entrance | about 180ms | 148ms |
+  |                                                            | Before the pictures | With the pictures |
+  | ---------------------------------------------------------- | ------------------- | ----------------- |
+  | Slow phone, Largest Contentful Paint, with the entrance    | about 1310ms        | 1252ms            |
+  | Slow phone, Largest Contentful Paint, without the entrance | about 1235ms        | 1236ms            |
+  | Fast laptop, Largest Contentful Paint, with the entrance   | about 180ms         | 148ms             |
 
   The headline's entrance used to cost about 70ms on the slow phone because the giant line was the largest piece. It now costs about 16ms.
 
@@ -596,10 +597,10 @@ sharp is a new package for this project; nothing was upgraded. It is a normal de
 
 ### Versions verified
 
-| What | Version | Source | Used for |
-|---|---|---|---|
-| Taxi.js (`@unseenco/taxi`) | 2.0.0 | `npm view @unseenco/taxi version` (the only release line marked `latest`); its bundled README and type definitions were read for the 2.0 interface | Page changes without a reload |
-| gsap | 3.15.0 (unchanged) | `npm view gsap version` | The page-change animations |
+| What                       | Version            | Source                                                                                                                                             | Used for                      |
+| -------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Taxi.js (`@unseenco/taxi`) | 2.0.0              | `npm view @unseenco/taxi version` (the only release line marked `latest`); its bundled README and type definitions were read for the 2.0 interface | Page changes without a reload |
+| gsap                       | 3.15.0 (unchanged) | `npm view gsap version`                                                                                                                            | The page-change animations    |
 
 Taxi.js is under the BSD 3-Clause license. It is a new package for this project; nothing was upgraded.
 
@@ -661,21 +662,22 @@ Romit noticed that after going back and forth between pages, the picture frame b
 
 - **The home page's headline now slides in when the page is opened or reloaded. This is Romit's choice and goes beyond the reference**, where nothing animates on first load. The letters of the three big lines slide in one after another at the pace of the page changes, and the outlined italic words slide in from the left. Only the home page has an entrance.
 - **Romit's conditions, and how each is met:**
-  - *Letters slide in rather than fade from invisible:* the letters are fully solid from their first frame and come in from behind an edge. (Only the small outlined words fade as they slide, as they do in the page changes.)
-  - *No flash before the script runs:* a few lines of script in the page's head mark the page before anything is drawn, and the styles hide the headline while the mark is there.
-  - *The text stays visible if the script fails:* without scripts the page is never marked. The mark is removed after three seconds whatever happens, and at once if the entrance script fails or the fonts cannot be fetched.
-  - *Reduced motion gets no animation:* the head script does not mark the page for those visitors.
-  - *Without hurting page speed:* see the measurements below.
+  - _Letters slide in rather than fade from invisible:_ the letters are fully solid from their first frame and come in from behind an edge. (Only the small outlined words fade as they slide, as they do in the page changes.)
+  - _No flash before the script runs:_ a few lines of script in the page's head mark the page before anything is drawn, and the styles hide the headline while the mark is there.
+  - _The text stays visible if the script fails:_ without scripts the page is never marked. The mark is removed after three seconds whatever happens, and at once if the entrance script fails or the fonts cannot be fetched.
+  - _Reduced motion gets no animation:_ the head script does not mark the page for those visitors.
+  - _Without hurting page speed:_ see the measurements below.
 - **Measured with `npm run speed`** (new): Chromium, the home page, nine loads each way, taking the middle value. "Slow phone" is the connection and processor Lighthouse uses for its mobile score. Largest Contentful Paint is the moment the biggest piece of content (here the giant line) is first drawn.
 
-  | | Without the entrance | With the entrance | Difference |
-  |---|---|---|---|
-  | Slow phone, Largest Contentful Paint | about 1235ms | about 1310ms | 44 to 96ms later over four runs, typically about 70ms |
-  | Slow phone, First Contentful Paint | about 1235ms | about 1245ms | within the noise (4 to 12ms) |
-  | Fast laptop, Largest Contentful Paint | about 155ms | about 180ms | 24 to 44ms later |
-  | Fast laptop, First Contentful Paint | about 155ms | about 156ms | none |
+  |                                       | Without the entrance | With the entrance | Difference                                            |
+  | ------------------------------------- | -------------------- | ----------------- | ----------------------------------------------------- |
+  | Slow phone, Largest Contentful Paint  | about 1235ms         | about 1310ms      | 44 to 96ms later over four runs, typically about 70ms |
+  | Slow phone, First Contentful Paint    | about 1235ms         | about 1245ms      | within the noise (4 to 12ms)                          |
+  | Fast laptop, Largest Contentful Paint | about 155ms          | about 180ms       | 24 to 44ms later                                      |
+  | Fast laptop, First Contentful Paint   | about 155ms          | about 156ms       | none                                                  |
 
   These are measurements on Romit's computer of the locally built site. The live site will differ, but the difference between the two columns is what matters.
+
 - **The first build of the entrance cost 840ms on the slow phone** (2076ms against 1236ms), for two reasons, both removed:
   - It put the plain headline back when the animation ended. The browser counts that as a very large new piece drawn late. Now the letters stay in the page (they sit exactly where the text would) and the plain text is only put back at the visitor's first click, tap, key press or wheel turn, when the browser has stopped measuring, or on a resize or a page change, when the letters' places would be wrong.
   - It ran from the main script, which a slow phone needs about 0.9s longer to fetch and run than the fonts. Now the entrance is a script of its own, about 2 KB compressed, written into the home page. It uses the browser's built-in animation (the Web Animations API) instead of GSAP, and starts one frame after the headline's fonts arrive, which is when the headline would have appeared anyway.
@@ -692,8 +694,8 @@ Romit noticed that after going back and forth between pages, the picture frame b
 
 ### Versions verified
 
-| What | Version | Source | Used for |
-|---|---|---|---|
+| What                                    | Version           | Source                                                                             | Used for                                                                 |
+| --------------------------------------- | ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 (unchanged) | `npm view @phosphor-icons/core version`; drawing copied from the published package | One more drawing: the bent arrow in "You are here" on phones and tablets |
 
 No new packages. Eleventy's own Markdown library does the write-ups.
@@ -737,10 +739,10 @@ No new packages. Eleventy's own Markdown library does the write-ups.
 
 ### Versions verified
 
-| What | Version | Source | Used for |
-|---|---|---|---|
-| gsap | 3.15.0 | `npm view gsap version` | Movement tied to scroll (with its ScrollTrigger plugin) |
-| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1 | `npm view @phosphor-icons/core version`; drawings copied from the published package | The heart and the link icons |
+| What                                    | Version | Source                                                                              | Used for                                                |
+| --------------------------------------- | ------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| gsap                                    | 3.15.0  | `npm view gsap version`                                                             | Movement tied to scroll (with its ScrollTrigger plugin) |
+| Phosphor Icons (`@phosphor-icons/core`) | 2.1.1   | `npm view @phosphor-icons/core version`; drawings copied from the published package | The heart and the link icons                            |
 
 Licenses: GSAP is under its standard "no charge" license (https://gsap.com/standard-license). Phosphor Icons is MIT; its license text is kept in `src/assets/icons/LICENSE-phosphor.txt`. Only six drawings are used, copied into `src/_data/icons.json`, so the package itself is not installed.
 
@@ -784,14 +786,14 @@ Nothing was installed in this step. Bangalore's coordinates were checked on 2026
 
 ### How the headline is set
 
-The banner carries the bio line: A LIFELONG EXPLORER *WHO PROCRASTINATES A LOT.* The whole headline sits inside the hero, in four pieces read top to bottom:
+The banner carries the bio line: A LIFELONG EXPLORER _WHO PROCRASTINATES A LOT._ The whole headline sits inside the hero, in four pieces read top to bottom:
 
-| Piece | Words | How it is sized |
-|---|---|---|
-| Opening serif line | WHAT WE KNOW *IS A DROP,* | Fills the full width |
-| Giant line (Manuka) | WHAT WE DON'T KNOW | Fills the full width |
-| Outlined italic words | is an | A fixed share of the width, overlapping the giant line |
-| Large serif word | OCEAN. | Fills eight columns, beside the picture |
+| Piece                 | Words                     | How it is sized                                        |
+| --------------------- | ------------------------- | ------------------------------------------------------ |
+| Opening serif line    | WHAT WE KNOW _IS A DROP,_ | Fills the full width                                   |
+| Giant line (Manuka)   | WHAT WE DON'T KNOW        | Fills the full width                                   |
+| Outlined italic words | is an                     | A fixed share of the width, overlapping the giant line |
+| Large serif word      | OCEAN.                    | Fills eight columns, beside the picture                |
 
 Two versions were built and compared side by side in the browser:
 
@@ -828,8 +830,8 @@ The giant line has 18 characters where the reference's has 12, so its letters ar
 
 ### Versions verified
 
-| What | Version | Source |
-|---|---|---|
+| What                                           | Version                                                                                                         | Source                                                 |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | Anton, Cormorant, Inter Tight (fallback fonts) | Snapshot `51303ca9e8ac9dcea7b12d307ba568fd0e6fcfca` of github.com/google/fonts, its newest commit on 2026-10-09 | https://api.github.com/repos/google/fonts/commits/main |
 
 The snapshot is written into `scripts/fallback_fonts.py`, so a rerun downloads exactly the same files. To take newer versions, look up the newest commit and change that one line.
@@ -858,15 +860,15 @@ The snapshot is written into `scripts/fallback_fonts.py`, so a rerun downloads e
 
 Each version was looked up on the day, from the source listed, and is the latest stable release.
 
-| What | Version | Source | Used for |
-|---|---|---|---|
-| Node.js (newest LTS line) | 24 (24.21.0, "Krypton") | https://nodejs.org/dist/index.json | `engines` in `package.json` |
-| @11ty/eleventy | 3.1.6 | `npm view @11ty/eleventy version` | Builds the pages |
-| esbuild | 0.28.2 | `npm view esbuild version` | Bundles CSS and JavaScript |
-| playwright | 1.64.0 | `npm view playwright version` | `npm run check` (dev only) |
-| fonttools | 4.66.1 | https://pypi.org/pypi/fonttools/json | `npm run fonts` |
-| brotli | 1.2.0 | https://pypi.org/pypi/brotli/json | WOFF2 compression for `npm run fonts` |
-| Python | 3.15.0 is the latest | https://www.python.org/downloads/ | See the note below |
+| What                      | Version                 | Source                               | Used for                              |
+| ------------------------- | ----------------------- | ------------------------------------ | ------------------------------------- |
+| Node.js (newest LTS line) | 24 (24.21.0, "Krypton") | https://nodejs.org/dist/index.json   | `engines` in `package.json`           |
+| @11ty/eleventy            | 3.1.6                   | `npm view @11ty/eleventy version`    | Builds the pages                      |
+| esbuild                   | 0.28.2                  | `npm view esbuild version`           | Bundles CSS and JavaScript            |
+| playwright                | 1.64.0                  | `npm view playwright version`        | `npm run check` (dev only)            |
+| fonttools                 | 4.66.1                  | https://pypi.org/pypi/fonttools/json | `npm run fonts`                       |
+| brotli                    | 1.2.0                   | https://pypi.org/pypi/brotli/json    | WOFF2 compression for `npm run fonts` |
+| Python                    | 3.15.0 is the latest    | https://www.python.org/downloads/    | See the note below                    |
 
 Not installed yet, on purpose: GSAP (3.15.0 today) and Taxi.js (`@unseenco/taxi`, 2.0.0 today). They are added, and verified again, in the steps that first use them.
 

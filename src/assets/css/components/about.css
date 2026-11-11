@@ -102,7 +102,7 @@
 
 /* The small ring in the card's corner. */
 .about__card::before {
-  content: "";
+  content: '';
   position: absolute;
   inset-block-start: 32px;
   inset-inline-end: 32px;

@@ -18,7 +18,7 @@ My corner of the internet. Part portfolio, part proof that I do finish things (e
 
 This is the code behind my personal website. It has a home page, a list of things I built, a page about me, and a resume I keep promising to finish. The longer writing lives on [my blog](https://blog.romitraj.dev), and the newest posts show up here by themselves.
 
-The headline says *"What we know is a drop, what we don't know is an ocean."* That is pretty much the mood of the whole place: a lot of sea, one diver, and a compass in the corner.
+The headline says _"What we know is a drop, what we don't know is an ocean."_ That is pretty much the mood of the whole place: a lot of sea, one diver, and a compass in the corner.
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/sparkle-dark.svg"><img src="docs/readme/sparkle-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What makes it special
 

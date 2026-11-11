@@ -62,7 +62,10 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
   const tokens = fs.readFileSync(path.join(root, 'src', 'assets', 'css', 'tokens.css'), 'utf8');
   const color = (name) => {
     const found = new RegExp(`--${name}:\\s*(#[0-9a-f]{6})\\b`, 'i').exec(tokens);
-    if (!found) throw new Error(`tokens.css has no six-digit color for --${name}, which the site's icon needs.`);
+    if (!found)
+      throw new Error(
+        `tokens.css has no six-digit color for --${name}, which the site's icon needs.`,
+      );
     return found[1];
   };
   const ink = color('color-ink');
@@ -70,16 +73,30 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
 
   // The drawing's shapes, without its own colors: each shape says what it is with a class
   // ("ring", "mark" or "hub"), and the colors are given here, differently for each file.
-  const source = fs.readFileSync(path.join(root, 'src', 'assets', 'icons', 'site-icon.svg'), 'utf8');
-  const shapes = source.replace(/<!--[\s\S]*?-->/g, '').replace(/<style>[\s\S]*?<\/style>/, '').replace(/<\/?svg[^>]*>/g, '').replace(/\s*\n\s*/g, '').trim();
-  if (!shapes.includes('class="ring"') || !shapes.includes('class="mark"')) throw new Error('src/assets/icons/site-icon.svg has no shapes marked "ring" and "mark" to color.');
+  const source = fs.readFileSync(
+    path.join(root, 'src', 'assets', 'icons', 'site-icon.svg'),
+    'utf8',
+  );
+  const shapes = source
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<style>[\s\S]*?<\/style>/, '')
+    .replace(/<\/?svg[^>]*>/g, '')
+    .replace(/\s*\n\s*/g, '')
+    .trim();
+  if (!shapes.includes('class="ring"') || !shapes.includes('class="mark"'))
+    throw new Error(
+      'src/assets/icons/site-icon.svg has no shapes marked "ring" and "mark" to color.',
+    );
   // The ring and the points in one color, the hub in the other.
-  const colors = (main, other) => `.ring{fill:none;stroke:${main};stroke-width:4}.mark{fill:${main}}.hub{fill:${other}}`;
+  const colors = (main, other) =>
+    `.ring{fill:none;stroke:${main};stroke-width:4}.mark{fill:${main}}.hub{fill:${other}}`;
 
   // The two drawings for browser tabs: the ink compass for a light tab, the paper one for a dark tab.
-  const tabIcon = (main, other) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}"><style>${colors(main, other)}</style>${shapes}</svg>\n`;
+  const tabIcon = (main, other) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}"><style>${colors(main, other)}</style>${shapes}</svg>\n`;
   // The same compass in ink only, and the paper compass on an ink square, for the files that cannot switch.
-  const inkOnly = (size) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}" width="${size}" height="${size}"><style>${colors(ink, paper)}</style>${shapes}</svg>`;
+  const inkOnly = (size) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${grid} ${grid}" width="${size}" height="${size}"><style>${colors(ink, paper)}</style>${shapes}</svg>`;
   const square = (size) => {
     const scale = shareOfSquare;
     const edge = (grid * (1 - scale)) / 2;
@@ -90,24 +107,45 @@ export async function makeSiteIcons(outputDir, { root = process.cwd() } = {}) {
   const files = {
     'favicon-light.svg': Buffer.from(tabIcon(ink, paper)),
     'favicon-dark.svg': Buffer.from(tabIcon(paper, ink)),
-    'favicon.ico': wrapAsIco([{ size: 16, data: await png(inkOnly(16)) }, { size: 32, data: await png(inkOnly(32)) }]),
+    'favicon.ico': wrapAsIco([
+      { size: 16, data: await png(inkOnly(16)) },
+      { size: 32, data: await png(inkOnly(32)) },
+    ]),
     'apple-touch-icon.png': await png(square(180)),
     'icon-192.png': await png(square(192)),
     'icon-512.png': await png(square(512)),
   };
   const address = (name) => `/${name}?v=${fingerprint(files[name])}`;
   // What Android reads when the site is added to a home screen.
-  files['site.webmanifest'] = Buffer.from(JSON.stringify({
-    name: site.name,
-    short_name: site.name,
-    start_url: '/',
-    display: 'browser',
-    background_color: paper,
-    theme_color: site.themeColor,
-    icons: [192, 512].map((size) => ({ src: address(`icon-${size}.png`), sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' })),
-  }, null, 2) + '\n');
+  files['site.webmanifest'] = Buffer.from(
+    JSON.stringify(
+      {
+        name: site.name,
+        short_name: site.name,
+        start_url: '/',
+        display: 'browser',
+        background_color: paper,
+        theme_color: site.themeColor,
+        icons: [192, 512].map((size) => ({
+          src: address(`icon-${size}.png`),
+          sizes: `${size}x${size}`,
+          type: 'image/png',
+          purpose: 'any maskable',
+        })),
+      },
+      null,
+      2,
+    ) + '\n',
+  );
 
   fs.mkdirSync(outputDir, { recursive: true });
-  for (const [name, data] of Object.entries(files)) fs.writeFileSync(path.join(outputDir, name), data);
-  return { light: address('favicon-light.svg'), dark: address('favicon-dark.svg'), ico: address('favicon.ico'), touch: address('apple-touch-icon.png'), manifest: address('site.webmanifest') };
+  for (const [name, data] of Object.entries(files))
+    fs.writeFileSync(path.join(outputDir, name), data);
+  return {
+    light: address('favicon-light.svg'),
+    dark: address('favicon-dark.svg'),
+    ico: address('favicon.ico'),
+    touch: address('apple-touch-icon.png'),
+    manifest: address('site.webmanifest'),
+  };
 }

@@ -23,7 +23,14 @@ let currentKey = null;
 // Writing a key changes no address and is not a page view, so it goes around the counter.
 export function markEntry() {
   if (!history.state?.scrollKey) {
-    History.prototype.replaceState.call(history, { ...history.state, scrollKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}` }, '');
+    History.prototype.replaceState.call(
+      history,
+      {
+        ...history.state,
+        scrollKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      },
+      '',
+    );
   }
   currentKey = history.state.scrollKey;
 }
@@ -37,7 +44,8 @@ export function savePosition() {
     positions[currentKey] = Math.round(window.scrollY);
     // Keep only the most recent ones.
     const keys = Object.keys(positions);
-    for (const key of keys.slice(0, Math.max(0, keys.length - mostRemembered))) delete positions[key];
+    for (const key of keys.slice(0, Math.max(0, keys.length - mostRemembered)))
+      delete positions[key];
     sessionStorage.setItem(storageName, JSON.stringify(positions));
   } catch {
     // Storage is full or switched off: pages simply open at the top.
@@ -65,7 +73,10 @@ export function startScrollMemory() {
   const arrival = performance.getEntriesByType('navigation')[0]?.type;
   if (arrival === 'back_forward' || arrival === 'reload') {
     const saved = positionOfEntry();
-    const restore = () => { if (saved > 0 && Math.abs(window.scrollY - saved) > 2 && window.scrollY < 2) window.scrollTo(0, saved); };
+    const restore = () => {
+      if (saved > 0 && Math.abs(window.scrollY - saved) > 2 && window.scrollY < 2)
+        window.scrollTo(0, saved);
+    };
     restore();
     window.addEventListener('load', restore, { once: true });
   }

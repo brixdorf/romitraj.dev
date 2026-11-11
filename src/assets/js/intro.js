@@ -84,50 +84,77 @@ function enter() {
     for (const element of content.querySelectorAll(`[data-part="${part}"]`)) {
       const split = splitLetters(element);
       const from = startingPlace(parseFloat(getComputedStyle(element).fontSize));
-      const animations = split.letters.map((letter, index) => letter.animate(
-        [from, { transform: 'translateY(0)', clipPath: shape.all }],
-        // "backwards" holds each letter in its starting place until its turn comes.
-        { duration: rule.time * 1000, delay: index * rule.apart * 1000, easing: rule.ease, fill: 'backwards' },
-      ));
+      const animations = split.letters.map((letter, index) =>
+        letter.animate(
+          [from, { transform: 'translateY(0)', clipPath: shape.all }],
+          // "backwards" holds each letter in its starting place until its turn comes.
+          {
+            duration: rule.time * 1000,
+            delay: index * rule.apart * 1000,
+            easing: rule.ease,
+            fill: 'backwards',
+          },
+        ),
+      );
       lines.push({ animations, restore: split.restore });
     }
   }
   // The outlined italic words are not cut: they slide in from the left as one piece.
   for (const element of content.querySelectorAll('[data-part="flourish"]')) {
-    others.push(element.animate(
-      [{ transform: `translateX(${rule.flourish.x}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }],
-      { duration: rule.flourish.time * 1000, delay: rule.flourish.at * 1000, easing: rule.flourish.ease, fill: 'backwards' },
-    ));
+    others.push(
+      element.animate(
+        [
+          { transform: `translateX(${rule.flourish.x}px)`, opacity: 0 },
+          { transform: 'translateX(0)', opacity: 1 },
+        ],
+        {
+          duration: rule.flourish.time * 1000,
+          delay: rule.flourish.at * 1000,
+          easing: rule.flourish.ease,
+          fill: 'backwards',
+        },
+      ),
+    );
   }
   // Everything is in its starting place, so the headline can be un-hidden.
   page.classList.remove('intro');
   for (const type of firstInputs) addEventListener(type, onFirstInput, { passive: true });
   addEventListener('resize', settle);
   document.addEventListener('headline:settle', settle);
-  Promise.all([...others, ...lines.flatMap((line) => line.animations)].map((animation) => animation.finished)).then(() => {
-    over = true;
-    if (inputSeen) putBack();
-  }).catch(() => {});
+  Promise.all(
+    [...others, ...lines.flatMap((line) => line.animations)].map((animation) => animation.finished),
+  )
+    .then(() => {
+      over = true;
+      if (inputSeen) putBack();
+    })
+    .catch(() => {});
 }
 
 if (page.classList.contains('intro')) {
   // The letters can only be measured once the headline's fonts are here. If they take too long,
   // or anything fails, the headline is simply shown.
   const fonts = Promise.all(rule.fonts.map((font) => document.fonts.load(font)));
-  const tooLong = new Promise((resolve, reject) => { setTimeout(reject, rule.patience * 1000); });
-  Promise.race([fonts, tooLong]).then(() => {
-    // One frame later, so that the rest of the page is drawn first and is not held up by this.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (!page.classList.contains('intro')) return;
-      try {
-        enter();
-      } catch {
-        page.classList.remove('intro');
-        putBack();
-      }
-    }));
-  }).catch(() => {
-    page.classList.remove('intro');
-    putBack();
+  const tooLong = new Promise((resolve, reject) => {
+    setTimeout(reject, rule.patience * 1000);
   });
+  Promise.race([fonts, tooLong])
+    .then(() => {
+      // One frame later, so that the rest of the page is drawn first and is not held up by this.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (!page.classList.contains('intro')) return;
+          try {
+            enter();
+          } catch {
+            page.classList.remove('intro');
+            putBack();
+          }
+        }),
+      );
+    })
+    .catch(() => {
+      page.classList.remove('intro');
+      putBack();
+    });
 }
