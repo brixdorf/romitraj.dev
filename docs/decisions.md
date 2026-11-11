@@ -2,6 +2,65 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12: Romit's own words, projects, resume, portrait and OpenPGP key
+
+Part 2 of the overhaul: every piece of draft text replaced with Romit's (`../inputs/site-text.md`), his real projects, his resume, his portrait and his OpenPGP key. No new packages and no version changes.
+
+### Text
+
+- **Every text in `site-text.md` is in place as written**: the banner ("A lifelong explorer" plus the italic "of how things work."), the tagline ("on", not "of"), the link hints, the home page, the About page, the Credits page, the page for a missing address (now "Lost in oblivion", one paragraph, "Actual places") and the search descriptions. Every procrastination joke is gone. The one place the word is left is the sample text `scripts/fallback_fonts.py` measures fonts with; it is never shown, and changing it would change the fallback fonts' measurements.
+- **"Tinkering" is titled "Whereabouts".** Its key in `about.json` and its class name stay `tinkering`, so the blog-post test that names that class is unchanged.
+- **The toolbox matches the resume's skills**: two columns (area, skills) instead of three. A two-column table keeps the skills in ink and gives them the room the third column had (`panel.css`).
+- **The 404 caption is unchanged** for now: Romit asked for one that fits the new Part 3 picture.
+- **The test of the page for a missing address reads the page's name from `404.njk`** instead of having "Lost at sea" written into it, so renaming the page needs no change to the test.
+
+### The Epictetus quote
+
+Placed as the last piece of the About page, under the toolbox, across the same width: "It is impossible for a man to learn _what he thinks he already knows._" in Louize Display at the size of the project names on the Projects page (48 to 80px), with "Epictetus, c. 108 AD" in small grey capitals under it. Why there and why so:
+
+- It answers the "Who" card ("keep learning more about things I think I already know") and closes the page on it, as an epigraph closes a chapter. At the top it would have pushed the portrait and the frames down and broken the grid the cards are measured against.
+- The plain-then-italic split repeats the banner and the hero's opening line, the site's own way of setting a sentence. Romit can drop the split by moving all the words into `plain`.
+- Every character is in Louize Display (no straight apostrophe, no slash); the author line is in Neue Montreal. It is a `<figure>` with a `<blockquote>`, and arrives last in page changes, like a card.
+
+### Projects
+
+- **The six samples are gone; DevOps Labs, Aletheia, Watchsheet and My Homelab are in**, in that order, written from Romit's facts and the public READMEs of the three repositories (nothing is fetched from GitHub by the build). Each has an opening line and four sections: What it is, Why it exists, How it works (ending in "Built with:"), What I learned, as he asked ("what it is, why it exists, how it works, and what he learned"). The "why" and "learned" parts are drafts built only from those facts; Romit reviews them. Aletheia's write-up says it was built with Abhijit P, as its README says. My Homelab names no IP address.
+- **`link` is optional**, since My Homelab has no public link, and **a link that is not on GitHub is shown as "Live:" with its address** (Aletheia and Watchsheet link to the running apps). `scripts/lib/projects.mjs`, tested.
+- **A copy-and-fill template**, `src/content/projects/_template.md`, next to the projects. Eleventy ignores it, so it never becomes a page. A test checks that it names every fact and the four sections.
+- **Pictures:** Aletheia (2nd) has the padlock and My Homelab (4th) the harbour cranes, until Part 3 replaces every picture. The container ship photo was no longer used and is gone, with its credit.
+
+### Resume
+
+`src/assets/files/resume.pdf` (the PDF from `../inputs/`, phone number included, as Romit allowed) is published at `/resume.pdf` with a fingerprint in the link, and the Resume page is one card that offers it. The PDF is not shown inside the page: browsers show embedded PDFs very differently (Safari on phones shows only the first page), and the site must look the same everywhere.
+
+### Email and the OpenPGP key
+
+- **The email address is in the "Elsewhere" lists** (home page, About page, footer), first, as the address itself with Phosphor's envelope icon (2.1.1, fill, like the others). The list reads `{email}` from `site.json`, so the address is still written in one place. It is plain text everywhere; Cloudflare's Email Address Obfuscation is off (Romit, 2026-11-11).
+- **The Contact card on the About page shows the key**: fingerprint `010F 1F08 E31C AFDB 78E1 AEEC CF7E F21B CBB8 D0BB`, key ID `CF7EF21BCBB8D0BB`, Ed25519, expires 2029-09-28, and a download link. These are read from the key file during the build (`scripts/lib/pgp.mjs`, Node's built-in modules only), so they cannot drift from the key. They match what GnuPG 2.4.9 prints for the same file, and the tests check them.
+- **The Web Key Directory, direct method**: the build writes the binary key to `/.well-known/openpgpkey/hu/aeii9rmagouy1owpp7e5ftpxjof7h41n` and an empty `/.well-known/openpgpkey/policy`; the server sends both as `application/octet-stream` with `Access-Control-Allow-Origin: *` (`server/wkd.js`), with or without `?l=hi`. The binary is byte for byte what `gpg --dearmor` gives, and the hash is the one WKD gives `hi`; the tests check both, and the build stops if the key has no user ID for the site's email.
+- **Tested on this computer** with the site's own server and a throwaway `GNUPGHOME`: both files answer 200 with the right headers, and the key fetched from the WKD address imports as `Romit Raj Sahu <hi@romitraj.dev>`, `CF7EF21BCBB8D0BB`, expiring 2029-09-28. `gpg --locate-external-keys` itself needs the live site over HTTPS: run on 2026-11-12, it answered "No data" because the live site does not have the files yet (404). It works once this is pushed and deployed; the guide has the command ("The OpenPGP key").
+- **`openpgpkey.romitraj.dev` does not resolve** (checked 2026-11-12 with the computer's resolver and with 1.1.1.1: no A or AAAA record; Cloudflare answers it exactly as it answers a made-up name). GnuPG tries that name first and uses the direct method only when it does not exist. Never add a record for it, or a wildcard.
+- **Cloudflare's Bot Fight Mode** let `curl` through to the WKD address (it answered with the server's own 404), so it should let GnuPG through too. If the check after deploying fails with a challenge page, the WKD folder needs the same care as the blog's feed.
+
+### The portrait
+
+`src/assets/img/source/portrait.jpg` (Romit's photo, already cut out onto white) replaces the marble bust, in the same 11:21 frame. Starting from the tested settings (`across 160`, `pattern fine`, `black 0.05`, `white 0.93`, `sharpen 0.8`, crop `{x 0.45, y 0.42, zoom 1.15}`):
+
+- **With black 0.05 and white 0.93 the face did not read**: all of the skin fell on one or two steps of the dither and the eyes nearly vanished. Four contrast settings were compared side by side; `black 0.3`, `white 0.8`, `sharpen 1.2` gave the clearest eyes, brows and mouth while keeping the face light, as on the reference's portrait. The crop is unchanged (head to crossed arms).
+- **Stray specks:** the cut-out left a faint grey outline around the shirt, which became scattered dots. A median filter on the full-size photo before shrinking removed only some of them. What works is a new picture setting, `"despeckle": true` (`removeSpecks` in `scripts/images.mjs`, tested): after dithering, a block of ink with no ink touching it and at most one other within three blocks is removed. The dots of a light tone always have more ink near them, so the shading of the face and arms stays.
+- **On phones and tablets the frame is square** and showed the middle of the tall picture (chin to chest). The picture is now placed from the top there (`object-position: 50% 10%`), so the face shows.
+- **Credit:** `image-credits.json` keeps every photo on record; the portrait is entered as `"own": true` with Romit as photographer, and the Credits page leaves it out (`scripts/lib/credits.mjs`, tested). The caption and the Credits text say the photos and the portrait are his.
+- 1.5 KB as a file.
+
+### Checks
+
+After each step: the build, `pnpm run lint`, `pnpm test` (50 tests) and `pnpm run smoke` (10 pages at three widths in Chromium). `pnpm run links`: no dead links; "could not be sure" only for LinkedIn and four Unsplash profiles, which turn programs away. The full three-browser check runs once, at the end of Part 3.
+
+### Known issues
+
+- **The full check has not run** (Romit's plan: once, at the end of Part 3). Changes it will look at first: the new About page pieces (the key block, the quote) and the portrait in three browsers, and the hero's introduction, which is longer now: on wide windows its last line should still end level with the picture frame.
+- **The README's screenshot** shows the old banner line until it is retaken with `pnpm run share` (see Part 3, which makes a new share image anyway).
+
 ## 2026-11-11: Updates, pnpm, Vite+, a dead-link checker, and a new computer
 
 Part 1 of the overhaul: setup, updates and tooling. Nothing a visitor sees changed, except list items in Firefox on Linux (see below).
