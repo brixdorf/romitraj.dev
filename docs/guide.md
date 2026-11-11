@@ -4,35 +4,59 @@ The manual for romitraj.dev: how to run it, where things live, and how to change
 
 ## What you need
 
-| Tool                                  | Needed for           | Notes                                                                              |
-| ------------------------------------- | -------------------- | ---------------------------------------------------------------------------------- |
-| Node.js 24 (the current LTS line)     | Everything           | `package.json` asks for `24.x`. See "Node.js version" below.                       |
-| Python, with `fonttools` and `brotli` | `npm run fonts` only | Install the two packages once: `python -m pip install -r scripts/requirements.txt` |
-| Playwright's browsers                 | `npm run check` only | Install once: `npx playwright install chromium firefox webkit`                     |
+| Tool                     | Needed for                              | Notes                                                                                                                                                                                                       |
+| ------------------------ | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vite+ (the `vp` command) | Everything                              | Install it once from https://viteplus.dev. It brings Node.js and pnpm, and picks the Node.js version that `engines` in `package.json` asks for (`26.x`, the current LTS line). See "Node.js version" below. |
+| pnpm                     | Everything                              | The package manager: it installs the packages listed in `package.json`. Its version is named there too (`packageManager`), and Vite+ provides it.                                                           |
+| Python 3                 | `pnpm run fonts` only                   | Nothing to install by hand: the first run makes a `.venv` folder in the project and installs the two packages it needs into it (see "Fonts").                                                               |
+| The `playwright` toolbox | Every command that opens a test browser | Playwright, the tool that drives the test browsers, does not support Fedora. Those commands run inside an Ubuntu container instead. See "Test browsers on Fedora" below.                                    |
 
-First time on a new computer, in PowerShell:
+First time on a new computer, in a terminal:
 
-```powershell
-cd "D:\My Codes\Personal Website\romitraj.dev"
-npm install
+```bash
+cd ~/"My Codes/Personal Website/romitraj.dev"
+pnpm install
 ```
 
 ## Everyday commands
 
-These are the only commands you need. All of them work in Windows PowerShell.
+These are the only commands you need. Type them in a terminal (Konsole) in the site's folder. The ones marked "browser" open a test browser, so on Fedora they run inside the toolbox (see "Test browsers on Fedora").
 
-| Command                  | What it does                                                                                                                                                                                                                |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`            | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C.                                                                                                               |
-| `npm run build`          | Builds the finished site into `_site/`.                                                                                                                                                                                     |
-| `npm start`              | Serves `_site/` the way the live server does, at http://localhost:3000. Run `npm run build` first.                                                                                                                          |
-| `npm run spotify`        | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below.                                                                                             |
-| `npm run fonts`          | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file.                                                                                                       |
-| `npm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes.                                                                                                                   |
-| `npm run fit`            | Measures the hero's big lines so each one fills its space. Run it after changing the headline's words.                                                                                                                      |
-| `npm run speed`          | Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed. |
-| `npm run share`          | Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image".                                                                             |
-| `npm run check`          | Builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. Run it before every commit.           |
+| Command                   | What it does                                                                                                                                                                                                                                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm run dev`            | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C.                                                                                                                                                                                  |
+| `pnpm run build`          | Builds the finished site into `_site/`.                                                                                                                                                                                                                                                        |
+| `pnpm start`              | Serves `_site/` the way the live server does, at http://localhost:3000. Run `pnpm run build` first.                                                                                                                                                                                            |
+| `pnpm run lint`           | Checks that the code is tidy and has no obvious mistakes (Vite+: Oxfmt and Oxlint). Takes a second. See "Formatting, linting and tests".                                                                                                                                                       |
+| `pnpm run format`         | Tidies the code's layout for you, then does the same check.                                                                                                                                                                                                                                    |
+| `pnpm test`               | Runs the small tests of the helper scripts (Vite+: Vitest). Takes a few seconds.                                                                                                                                                                                                               |
+| `pnpm run smoke`          | Browser. A quick check: builds the site, opens every page in Chromium at three widths, and reports a page that fails to load or any script error. About 20 seconds.                                                                                                                            |
+| `pnpm run links`          | Looks for dead links on every page of the site, inside it and out. Add an address to check another website, such as your blog. See "Dead links".                                                                                                                                               |
+| `pnpm run check`          | Browser. The full check: builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. The three browsers run at the same time. Run it before pushing a visual change. |
+| `pnpm run spotify`        | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below.                                                                                                                                                                |
+| `pnpm run fonts`          | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file.                                                                                                                                                                          |
+| `pnpm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes.                                                                                                                                                                                      |
+| `pnpm run fit`            | Browser. Measures the hero's big lines so each one fills its space. Run it after changing the headline's words.                                                                                                                                                                                |
+| `pnpm run speed`          | Browser. Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed.                                                           |
+| `pnpm run share`          | Browser. Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image".                                                                                                                                       |
+
+### Test browsers on Fedora
+
+Playwright does not support Fedora, so the commands marked "browser" run inside a toolbox: a small Ubuntu 24.04 system living in a container on your computer, named `playwright`, which shares your home folder. Put the command inside this line:
+
+```bash
+toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj.dev" && pnpm run smoke'
+```
+
+- **The browsers themselves** are installed once, and again after every update of Playwright (the versions belong together):
+
+  ```bash
+  toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj.dev" && pnpm exec playwright install chromium firefox webkit'
+  ```
+
+  They are kept in `~/.cache/ms-playwright`. Old versions are removed by the same command.
+
+- **Chromium starts with font hinting off** (`launchOptions` in `scripts/lib/site.mjs`). On Linux, Chromium rounds the width of every letter to whole pixels, so its lines of text came out a pixel shorter or longer than in Firefox, WebKit, or Chrome on Windows and macOS, and a long write-up could wrap one line differently. With hinting off it lays text out like the others. Every script that starts a test browser uses this setting.
 
 ## Where things live
 
@@ -70,24 +94,32 @@ src/
                 resume note, projects.njk the list of projects. projects/ holds one Markdown
                 file per project (its facts on top, its write-up below), plus
                 projects.11tydata.js, the settings those files share.
-server/         index.js: the small server behind npm start. api.js answers the page's three
+server/         index.js: the small server behind pnpm start. api.js answers the page's three
                 questions, weather.js asks Open-Meteo, spotify.js asks Spotify, blog.js reads
                 the blog's feed (for the build too), cache.js keeps their answers for a while
-scripts/        fonts.py (npm run fonts), fallback_fonts.py (npm run fonts:fallback),
-                fit.mjs (npm run fit), check.mjs (npm run check), lib/site.mjs (shared helpers),
+scripts/        python.mjs (runs the two font scripts with the project's own Python, in .venv),
+                fonts.py (pnpm run fonts), fallback_fonts.py (pnpm run fonts:fallback),
+                fit.mjs (pnpm run fit), check.mjs (pnpm run check), lib/site.mjs (shared helpers),
                 images.mjs (turns the photos and drawings into the site's pictures, during
                 every build), lib/paint.mjs (paints the texture behind the hero picture),
                 lib/pictures.mjs (the check's tests of the pictures),
                 lib/analytics.mjs (the check's test of the visitor counter),
-                spotify.mjs (npm run spotify), lib/widgets.mjs and lib/posts.mjs (the check's tests
+                spotify.mjs (pnpm run spotify), lib/widgets.mjs and lib/posts.mjs (the check's tests
                 of the widgets and of the list of blog posts), lib/pretend.mjs (stand-ins for
                 Open-Meteo, Spotify and the blog's feed during the check),
                 lib/letters.mjs, lib/walk.mjs and lib/entrance.mjs (the check's tests of the
-                letters, the page changes and the headline's entrance), speed.mjs (npm run speed),
-                icons.mjs (makes the site's icon files during every build), share.mjs (npm run share),
+                letters, the page changes and the headline's entrance), speed.mjs (pnpm run speed),
+                icons.mjs (makes the site's icon files during every build), share.mjs (pnpm run share),
                 lib/lost.mjs and lib/head.mjs (the check's tests of the page for a missing address,
-                the icon and the preview tags)
+                the icon and the preview tags), smoke.mjs (pnpm run smoke), links.mjs and
+                lib/links.mjs (pnpm run links), lib/bundle.mjs (bundles the CSS and JavaScript
+                with Vite+, during every build), lib/venv.mjs (the font scripts' Python
+                environment). Files ending in .test.mjs are the tests (pnpm test).
 docs/           This guide and the decisions log
+package.json    The packages, the commands, and the Node.js and pnpm versions
+pnpm-lock.yaml  The exact version of every package, written by pnpm. Commit it, never edit it
+pnpm-workspace.yaml  pnpm's settings
+vite.config.js  Vite+'s settings: how the code is formatted and linted, where the tests are
 _site/          The built site. Made by the build, never edited by hand, never committed.
 ```
 
@@ -95,55 +127,58 @@ Every file starts with a comment saying what it does.
 
 ## How do I change...?
 
-| I want to change                                                                                 | Open this file                                                                                                                   |
-| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| My name, email, city, social links, blog address                                                 | `src/_data/site.json`                                                                                                            |
-| The words on the Credits page                                                                    | `src/_data/pages.json` (`credits`)                                                                                               |
-| A photographer's name, profile or what they are thanked for                                      | `src/_data/image-credits.json`                                                                                                   |
-| The visitor counter's address or site number, or switching it off                                | `src/_data/site.json` (`analytics`)                                                                                              |
-| The bio line in the top banner                                                                   | `src/_data/site.json` (`banner`)                                                                                                 |
-| The headline's words (opening serif line, giant line, italic words, serif word)                  | `src/_data/headline.json`, then run `npm run fit`                                                                                |
-| The introduction sentence, the scroll note                                                       | `src/_data/home.json`                                                                                                            |
-| The ticker's small words, and how the weather is worded                                          | `src/_data/home.json` (`ticker`)                                                                                                 |
-| The words for the sky ("partly cloudy")                                                          | `src/_data/weather.json`                                                                                                         |
-| The city whose weather and time are shown                                                        | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`)                                                              |
-| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below)                                                                                   |
-| Which picture a project shows                                                                    | `image` at the top of the project's file                                                                                         |
-| Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                          |
-| The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                      |
-| The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                            |
-| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/` (the six there now are samples)                                                              |
-| The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                       |
-| The text on the About page                                                                       | `src/_data/about.json`                                                                                                           |
-| The resume note                                                                                  | `src/_data/pages.json` (`resume`)                                                                                                |
-| The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                 |
-| The picture shown when a link is shared                                                          | Run `npm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                 |
-| The page for a missing address ("Lost at sea")                                                   | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                |
-| The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                   |
-| The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                |
-| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                           |
-| How many blog posts the home page shows                                                          | `src/_data/home.json` (`writing.count`)                                                                                          |
-| The links under "Elsewhere" (about card and footer)                                              | `src/_data/site.json` (`elsewhere`)                                                                                              |
-| The version tag (footer, and the small row on inner pages)                                       | `src/_data/site.json` (`version`)                                                                                                |
-| An icon's drawing, or a new icon                                                                 | `src/_data/icons.json`                                                                                                           |
-| Where and how far things move as you scroll                                                      | `src/assets/js/motion.js` (`scroll`)                                                                                             |
-| The city, country or coordinates in the status ticker                                            | `src/_data/site.json`                                                                                                            |
-| How fast the ticker moves, and how much it slows under the pointer                               | `src/assets/js/motion.js`                                                                                                        |
-| A color                                                                                          | `src/assets/css/tokens.css`                                                                                                      |
-| The colors of the gradient bar                                                                   | `src/assets/css/tokens.css` (the four `--color-bar` lines)                                                                       |
-| Which fonts are used for what                                                                    | `src/assets/css/tokens.css` (the `--font` lines)                                                                                 |
-| Spacing, corner size, line thickness                                                             | `src/assets/css/tokens.css`                                                                                                      |
-| How fast a hover or the gradient bar moves                                                       | `src/assets/css/tokens.css` (the `--duration` lines)                                                                             |
-| The color of the ring around whatever has keyboard focus                                         | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks)                                |
-| How fast the tickers and scroll drift move                                                       | `src/assets/js/motion.js`                                                                                                        |
-| How a page change moves: how long, how far, in what order                                        | `src/assets/js/motion.js` (`pageChange`)                                                                                         |
-| How the headline slides in when the home page opens                                              | `src/assets/js/motion.js` (`intro`, and the letter pace above it)                                                                |
-| The words screen readers hear on a link that opens a new tab                                     | `src/_data/site.json` (`newTabNote`)                                                                                             |
-| The list of font files, or which ones load first                                                 | `src/_data/fonts.json`, then run `npm run fonts`                                                                                 |
-| Which free font stands in for a licensed one                                                     | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `npm run fonts:fallback` |
-| Which sections the home page has, and their order                                                | `src/content/index.njk`                                                                                                          |
-| The page title or description shown in browser tabs and search results                           | `src/_data/site.json`, or the top of the page's own file                                                                         |
-| The browser's toolbar color on phones                                                            | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`.                                         |
+| I want to change                                                                                 | Open this file                                                                                                                    |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| My name, email, city, social links, blog address                                                 | `src/_data/site.json`                                                                                                             |
+| The words on the Credits page                                                                    | `src/_data/pages.json` (`credits`)                                                                                                |
+| A photographer's name, profile or what they are thanked for                                      | `src/_data/image-credits.json`                                                                                                    |
+| The visitor counter's address or site number, or switching it off                                | `src/_data/site.json` (`analytics`)                                                                                               |
+| The bio line in the top banner                                                                   | `src/_data/site.json` (`banner`)                                                                                                  |
+| The headline's words (opening serif line, giant line, italic words, serif word)                  | `src/_data/headline.json`, then run `pnpm run fit`                                                                                |
+| The introduction sentence, the scroll note                                                       | `src/_data/home.json`                                                                                                             |
+| The ticker's small words, and how the weather is worded                                          | `src/_data/home.json` (`ticker`)                                                                                                  |
+| The words for the sky ("partly cloudy")                                                          | `src/_data/weather.json`                                                                                                          |
+| The city whose weather and time are shown                                                        | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`)                                                               |
+| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below)                                                                                    |
+| Which picture a project shows                                                                    | `image` at the top of the project's file                                                                                          |
+| Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                           |
+| The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                       |
+| The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                             |
+| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/` (the six there now are samples)                                                               |
+| The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                        |
+| The text on the About page                                                                       | `src/_data/about.json`                                                                                                            |
+| The resume note                                                                                  | `src/_data/pages.json` (`resume`)                                                                                                 |
+| The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                  |
+| The picture shown when a link is shared                                                          | Run `pnpm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                 |
+| The page for a missing address ("Lost at sea")                                                   | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                 |
+| The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                    |
+| The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                 |
+| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                            |
+| How many blog posts the home page shows                                                          | `src/_data/home.json` (`writing.count`)                                                                                           |
+| The links under "Elsewhere" (about card and footer)                                              | `src/_data/site.json` (`elsewhere`)                                                                                               |
+| The version tag (footer, and the small row on inner pages)                                       | `src/_data/site.json` (`version`)                                                                                                 |
+| An icon's drawing, or a new icon                                                                 | `src/_data/icons.json`                                                                                                            |
+| Where and how far things move as you scroll                                                      | `src/assets/js/motion.js` (`scroll`)                                                                                              |
+| The city, country or coordinates in the status ticker                                            | `src/_data/site.json`                                                                                                             |
+| How fast the ticker moves, and how much it slows under the pointer                               | `src/assets/js/motion.js`                                                                                                         |
+| How the code is laid out (quotes, line length), which lint rules run, where the tests are        | `vite.config.js`                                                                                                                  |
+| The oldest browser versions the CSS and JavaScript are written for                               | `scripts/lib/bundle.mjs` (`browsers`)                                                                                             |
+| pnpm's settings (exact versions, install scripts)                                                | `pnpm-workspace.yaml`                                                                                                             |
+| A color                                                                                          | `src/assets/css/tokens.css`                                                                                                       |
+| The colors of the gradient bar                                                                   | `src/assets/css/tokens.css` (the four `--color-bar` lines)                                                                        |
+| Which fonts are used for what                                                                    | `src/assets/css/tokens.css` (the `--font` lines)                                                                                  |
+| Spacing, corner size, line thickness                                                             | `src/assets/css/tokens.css`                                                                                                       |
+| How fast a hover or the gradient bar moves                                                       | `src/assets/css/tokens.css` (the `--duration` lines)                                                                              |
+| The color of the ring around whatever has keyboard focus                                         | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks)                                 |
+| How fast the tickers and scroll drift move                                                       | `src/assets/js/motion.js`                                                                                                         |
+| How a page change moves: how long, how far, in what order                                        | `src/assets/js/motion.js` (`pageChange`)                                                                                          |
+| How the headline slides in when the home page opens                                              | `src/assets/js/motion.js` (`intro`, and the letter pace above it)                                                                 |
+| The words screen readers hear on a link that opens a new tab                                     | `src/_data/site.json` (`newTabNote`)                                                                                              |
+| The list of font files, or which ones load first                                                 | `src/_data/fonts.json`, then run `pnpm run fonts`                                                                                 |
+| Which free font stands in for a licensed one                                                     | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `pnpm run fonts:fallback` |
+| Which sections the home page has, and their order                                                | `src/content/index.njk`                                                                                                           |
+| The page title or description shown in browser tabs and search results                           | `src/_data/site.json`, or the top of the page's own file                                                                          |
+| The browser's toolbar color on phones                                                            | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`.                                          |
 
 This table grows as sections are built.
 
@@ -165,9 +200,9 @@ The small grey line in the top banner is separate. It is the bio line, it shows 
 
 Three things to know when changing it:
 
-- **Run `npm run fit` afterwards.** The opening line, the giant line and the serif word are sized to fill their space exactly. `npm run fit` measures the new words and saves the numbers to `src/_data/textWidths.json`. If you forget, `npm run check` tells you.
+- **Run `pnpm run fit` afterwards.** The opening line, the giant line and the serif word are sized to fill their space exactly. `pnpm run fit` measures the new words and saves the numbers to `src/_data/textWidths.json`. If you forget, `pnpm run check` tells you.
 - **Shorter lines are bigger.** A line always fills the same width, so fewer letters means larger letters and a taller hero.
-- **Manuka has few characters.** Letters, digits, comma, hyphen and full stop only. An apostrophe in the giant line works anyway: the site draws it with Manuka's comma, raised into place. Other punctuation would be borrowed from the fallback font, and `npm run check` would report it.
+- **Manuka has few characters.** Letters, digits, comma, hyphen and full stop only. An apostrophe in the giant line works anyway: the site draws it with Manuka's comma, raised into place. Other punctuation would be borrowed from the fallback font, and `pnpm run check` would report it.
 
 The layout has three arrangements, chosen by window width: phone (under 600px), tablet (600 to 899px) and laptop (900px and wider).
 
@@ -195,9 +230,9 @@ Things to know:
   - **On a laptop the About page's piece starts near the bottom of the first screen.** Someone who opens the About page directly and can already see it keeps the built one for that visit; arriving from another page of the site, or on a tablet or phone, they get the newer one.
   - **If the feed cannot be read**, the server keeps answering with the last list it did read, and each page keeps what it has. If the page's script does not run, what it was built with stays.
   - If the blog cannot be reached during a build, the home page's section shows one sentence and a link instead, and the About page leaves its piece out; the build still succeeds. Once the server reads the feed, the pages fill them in.
-  - While `npm run dev` is running, the build keeps the feed for an hour in `.cache/` (the pages still ask the blog for newer posts).
+  - While `pnpm run dev` is running, the build keeps the feed for an hour in `.cache/` (the pages still ask the blog for newer posts).
 - **Movement tied to scroll** (the sliding about heading, the bars beside the giant headings, the project rows) runs on tablets and laptops. It is off on phones and for visitors who asked their system for less motion; there, everything sits in its resting place.
-- **Project rows start somewhere new on every page load**, so the section never looks quite the same twice. `npm run check` uses fixed starting places instead, so its screenshots match from one run to the next.
+- **Project rows start somewhere new on every page load**, so the section never looks quite the same twice. `pnpm run check` uses fixed starting places instead, so its screenshots match from one run to the next.
 
 ## The inner pages
 
@@ -239,13 +274,13 @@ On phones the giant name shrinks until its longest word fits the screen. This is
 An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost at sea", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a close-up of the diver.
 
 - **The page** is `src/content/404.njk`. The build writes it as `404.html`. Its giant name is the `title` at the top of that file; its other words are in `src/_data/pages.json` (`lost`); the picture is `searcher` in `images.json` (a crop of the diver drawing). The words beside Projects and About are the ones from `navigation.json`.
-- **To look at it**, run `npm run dev` and open any address that does not exist, such as http://localhost:8080/nothing-here/.
-- **It is sent with the status 404.** A status is the number a server sends before a page: 200 means "here it is", 404 means "there is no such page". The visitor sees the page either way; the number is what tells browsers and search engines not to treat the address as a real one. The live server does this in `server/index.js`, and `npm run dev` does the same by itself.
+- **To look at it**, run `pnpm run dev` and open any address that does not exist, such as http://localhost:8080/nothing-here/.
+- **It is sent with the status 404.** A status is the number a server sends before a page: 200 means "here it is", 404 means "there is no such page". The visitor sees the page either way; the number is what tells browsers and search engines not to treat the address as a real one. The live server does this in `server/index.js`, and `pnpm run dev` does the same by itself.
   - A missing picture, stylesheet or other file gets a plain `Not found` with the same status, not the page.
 - **Its name slides in when the page opens**, letter by letter, like the home page's headline. It is the second page with an entrance, and uses the same small script (`entrance: true` at the top of its file asks for it). A missing page is almost never reached by a page change, so without this its letters would never move.
-- **A link inside the site that leads to a missing page** also ends here, without a reload: the old page leaves, and "Lost at sea" arrives with its letters and cards, at the missing address. `npm run check` looks for broken links before every commit, so this should only happen with an old link or a typing mistake.
+- **A link inside the site that leads to a missing page** also ends here, without a reload: the old page leaves, and "Lost at sea" arrives with its letters and cards, at the missing address. `pnpm run check` looks for broken links before every commit, so this should only happen with an old link or a typing mistake.
 - **"You are here" on this page** links its last step to wherever the page is being shown (`here: ""` at the top of the file), because it has no address of its own.
-- `npm run check` tests all of it in three browsers: the status, the page, the entrance, the ways back, and a link that leads to a missing page.
+- `pnpm run check` tests all of it in three browsers: the status, the page, the entrance, the ways back, and a link that leads to a missing page.
 
 ### The About page
 
@@ -306,7 +341,7 @@ Writing the write-up:
   ```
 
 - Straight quotes and apostrophes are turned into curly ones for you, because the serif font has no straight apostrophe.
-- **Do not type a slash** in the running text: the serif font has none, and `npm run check` would report a fallback font. Write "test and deploy", not "test/deploy". The tags and the description are in a different font and can contain anything; the `title` is in the serif too, so it follows the same rule.
+- **Do not type a slash** in the running text: the serif font has none, and `pnpm run check` would report a fallback font. Write "test and deploy", not "test/deploy". The tags and the description are in a different font and can contain anything; the `title` is in the serif too, so it follows the same rule.
 
 The six projects there now are samples, each marked with a note at the top of its file and a "Sample project" note on its page.
 
@@ -364,10 +399,10 @@ On the site this design follows, About is a plain fade in every direction. Here 
 - **The small row and "You are here" are in every page's HTML**, hidden on the home page, so the script can show, hide and refill them. Edit them in `partials/page-row.njk` and `partials/crumb.njk` as before.
 - **The tickers and the scroll movement are restarted** for each new page, and the local time is filled in again.
 - **After a change, keyboard focus moves to the new page's heading** and screen readers are told the page's name.
-- **`npm run check` clicks through the page changes** in all three browsers: home to Projects, into a project, back out twice, to About, and back with the browser's back button. It reports a reload, a wrong page, animation pieces left behind, or the small row out of step. It then scrolls two pages and checks that back, forward and a reload return to the same place.
-- **Nothing may move once a page change has finished.** `npm run check` watches each arrival and fails if any letter, any heading's box or the picture frame beside a page name is somewhere else just after the animation than during it, or if the finished page is laid out differently from a fresh load of the same page.
-- **No letter may be cut by its own window.** While a heading slides, each letter is shown through a window (a clip-path from `shapes.js`) that opens around the letter's box: a tenth of the box's height above and below it, and half a letter-height to each side. Ink that reaches further out than that is cut off for as long as the animation runs. Two things follow. Anything drawn out of line, like the raised apostrophe, must be moved _inside_ a box that stays in the line (see `.apostrophe` in `base.css`), not by moving the box. And `npm run check` photographs every sliding heading with its letters' windows fully open and fails if any ink is missing, naming the letter and where it is.
-- **Headings are cut into single letters only while they move.** Afterwards the page's HTML is exactly as it was built. While they are cut, no letter may shift: each word stays whole, on the line where it ends up. `npm run check` tests this for every heading on every page at thirteen window widths in all three browsers, so a new project name or page name is covered automatically. If it ever reports "letters that move", the fix is in `src/assets/js/split.js`.
+- **`pnpm run check` clicks through the page changes** in all three browsers: home to Projects, into a project, back out twice, to About, and back with the browser's back button. It reports a reload, a wrong page, animation pieces left behind, or the small row out of step. It then scrolls two pages and checks that back, forward and a reload return to the same place.
+- **Nothing may move once a page change has finished.** `pnpm run check` watches each arrival and fails if any letter, any heading's box or the picture frame beside a page name is somewhere else just after the animation than during it, or if the finished page is laid out differently from a fresh load of the same page.
+- **No letter may be cut by its own window.** While a heading slides, each letter is shown through a window (a clip-path from `shapes.js`) that opens around the letter's box: a tenth of the box's height above and below it, and half a letter-height to each side. Ink that reaches further out than that is cut off for as long as the animation runs. Two things follow. Anything drawn out of line, like the raised apostrophe, must be moved _inside_ a box that stays in the line (see `.apostrophe` in `base.css`), not by moving the box. And `pnpm run check` photographs every sliding heading with its letters' windows fully open and fails if any ink is missing, naming the letter and where it is.
+- **Headings are cut into single letters only while they move.** Afterwards the page's HTML is exactly as it was built. While they are cut, no letter may shift: each word stays whole, on the line where it ends up. `pnpm run check` tests this for every heading on every page at thirteen window widths in all three browsers, so a new project name or page name is covered automatically. If it ever reports "letters that move", the fix is in `src/assets/js/split.js`.
 
 ## The headline's entrance
 
@@ -387,9 +422,9 @@ It cannot leave the headline hidden:
 - Without scripts the page is never marked either.
 - The mark is removed after three seconds whatever happens, and at once if anything in the small script fails or the fonts cannot be fetched.
 
-`npm run check` tests all of this in three browsers, and that the letters end exactly where a still page has them.
+`pnpm run check` tests all of this in three browsers, and that the letters end exactly where a still page has them.
 
-To measure the cost again, run `npm run speed`. It loads the home page nine times with the entrance and nine times without, on a simulated slow phone and on a fast laptop, and prints both figures and the difference. Run it after changing the entrance, the fonts or the top of the home page.
+To measure the cost again, run `pnpm run speed`. It loads the home page nine times with the entrance and nine times without, on a simulated slow phone and on a fast laptop, and prints both figures and the difference. Run it after changing the entrance, the fonts or the top of the home page.
 
 To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `src/assets/js/motion.js`. They are shared with the page changes, so both stay in step. To switch the entrance off, remove the script in the head of `layouts/base.njk`.
 
@@ -425,7 +460,7 @@ How it works:
   ></script>
   ```
 
-- So the counter is never loaded by `npm run dev`, `npm start` on your computer, or `npm run check`: those view the site at `localhost`. No setting has to be remembered when deploying, and a copy of the site at any other address counts nothing either.
+- So the counter is never loaded by `pnpm run dev`, `pnpm start` on your computer, or `pnpm run check`: those view the site at `localhost`. No setting has to be remembered when deploying, and a copy of the site at any other address counts nothing either.
 - The address and the site number are in `src/_data/site.json` (`analytics`). To switch counting off, delete that `analytics` entry.
 
 Page changes:
@@ -435,7 +470,7 @@ Page changes:
 - **A jump within a page counts nothing.** On a project's page, clicking a line under "Contents" jumps to that section and adds `#section` to the address, so the section can be linked to and the back button returns from it. The browser announces such a jump with two events, and Rybbit would count a view for each jump and for each step back or forward between jumps. The same script in the head that adds the counter stops those two events from travelling any further when the address still belongs to the page being shown. The address, the jump itself and the back and forward buttons work exactly as before; only the counter no longer hears about it.
 - For that, the content slot of every page says which page it holds (`data-path` on `<main>` in `base.njk`). Do not remove it.
 
-`npm run check` tests all of this in three browsers without ever contacting the real counter: that nothing is loaded on this computer, and, with the test browser told it is looking at the live address and a stand-in in place of Rybbit's script, that the tag is right, the script runs once, every page change (by link and by the back button) counts once, and a jump to a section, back out of it and forward into it again count nothing while the address still shows the section.
+`pnpm run check` tests all of this in three browsers without ever contacting the real counter: that nothing is loaded on this computer, and, with the test browser told it is looking at the live address and a stand-in in place of Rybbit's script, that the tag is right, the script runs once, every page change (by link and by the back button) counts once, and a jump to a section, back out of it and forward into it again count nothing while the address still shows the section.
 
 The server sends no rule that limits which scripts may run (no Content-Security-Policy header), so nothing had to be allowed for analytics.romitraj.dev. If such a rule is ever added, on the server or in Cloudflare, it must allow scripts from and connections to `https://analytics.romitraj.dev`, and the small scripts written into each page.
 
@@ -457,7 +492,7 @@ What each kind of link does under the pointer, and when it is reached with the T
 | The track's title in the ticker                                                                                                                               | Nothing (it is already underlined)                                    | The ring only                                         |
 
 - **The ring** is a 2px dashed outline, 2px away from the link: mid grey on paper, a lighter warm grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
-- **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `npm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
+- **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `pnpm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
 - **Lines that break around the tails of letters.** In the "Elsewhere" lists, a project's "Contents" and the Projects page's "Read more", the drawn line does not run through the tail of a g, p or y: it stops beside it. The letters carry an outline in the color of whatever is behind them, painted under the letters themselves, and the line sits under that outline. At rest the outline cannot be seen. The color behind is `--behind`: paper unless a block says otherwise, and the footer sets it to ink. If such a link is ever placed on another background, set `--behind` there to that background's color.
 
 ## The site's icon and the share image
@@ -483,7 +518,7 @@ The small picture in a browser tab, in bookmarks and on a phone's home screen is
 - **Why the first version did not switch:** it was one drawing with a rule inside it for dark tabs. Chrome and Edge draw a tab icon once, when the page loads, and keep that picture: the rule is only looked at again after a reload, and their store of icons can keep the old picture even then. Safari ignores such a rule altogether. A script that changes the page's icon line is something all of them notice at once.
 - **To change the icon**, edit or replace `site-icon.svg` (keep the 64 by 64 grid and the three class names: anything marked `ring` or `mark` takes the main color, anything marked `hub` the other) and rebuild. The README's title icon (`docs/readme/compass-light.svg` and `compass-dark.svg`) is a copy of the same drawing in each color and has to be changed by hand. To change its colors, change the ink and paper colors in `tokens.css`; the whole site follows.
 - **Browsers keep icons for a long time.** Each icon's address carries a fingerprint, so a new icon is fetched at once, but a tab that is already open may show the old one until it is reloaded.
-- **To see it**, look at the tab of http://localhost:8080 while `npm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance: the tab changes at once.
+- **To see it**, look at the tab of http://localhost:8080 while `pnpm run dev` runs. To see the dark version, switch your system (or the browser) to its dark appearance: the tab changes at once.
 
 ### The share image
 
@@ -494,8 +529,8 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
 - **The tags** that the apps read are written into every page's head by `src/_includes/layouts/base.njk`: the Open Graph tags (`og:title`, `og:description`, `og:url`, `og:image` and a few more), which nearly every app reads, and X's own (`twitter:card` and the rest). Addresses in them are full addresses, starting with `https://romitraj.dev`, because the apps do not know which site a tag came from.
 - **To make the picture again**, run:
 
-  ```powershell
-  npm run share
+  ```bash
+  pnpm run share
   ```
 
   It builds the site, draws the card in a real browser with the licensed fonts, and saves it. It also retakes `docs/screenshot.png`, the picture at the top of the README, from the site running on this computer (so that one shows the weather and the track of the moment). Run it after changing the headline, the fonts, the colors or the diver drawing, look at both pictures, and commit them.
@@ -504,7 +539,7 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
 - **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
 - **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
 
-`npm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the page names the ink compass while the browser is light and the paper compass while it is dark, that it swaps them as soon as the browser changes (with no reload), that the right one stays after a page change and the ink one without scripts, and that each drawing is what it should be.
+`pnpm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the page names the ink compass while the browser is light and the paper compass while it is dark, that it swaps them as soon as the browser changes (with no reload), that the right one stays after a page change and the ink one without scripts, and that each drawing is what it should be.
 
 ## Links that leave the site
 
@@ -563,7 +598,7 @@ Where each picture is shown:
 
 ### Changing a picture
 
-- **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `npm run dev` is running: the picture is redone each time you save.
+- **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `pnpm run dev` is running: the picture is redone each time you save.
 - **A photo that works** has one clear subject with a strong outline against a plain background. Busy photos turn into noise.
 - **To add a picture:** add an entry with a new name (with an `alt`, or `"decorative": true` if it is only ornament), then show it with `{% picture "name" %}` in a template, or name it as a project's `image` or a page's `picture`.
 - **The photos there now are placeholders** from Unsplash. Replace them with your own when you have them.
@@ -590,7 +625,7 @@ The hero picture alone sits on a faint surface like thick white paint. It is not
 ### How they are shown
 
 - **One pixel of the file is one block on the page.** The browser enlarges the file without smoothing (`image-rendering: pixelated` in `base.css`), which keeps the edges hard and the files tiny: all the pictures together weigh about 27 KB.
-- **Nothing moves when a picture arrives.** Every picture is laid over a box whose size is already fixed by the styles, and its width and height are written into the page. `npm run check` tests this on every page in three browsers.
+- **Nothing moves when a picture arrives.** Every picture is laid over a box whose size is already fixed by the styles, and its width and height are written into the page. `pnpm run check` tests this on every page in three browsers.
 - **Pictures below the top of a page are fetched only when they come near the window.** The hero picture and the one beside a page's name are fetched at once.
 - **At some window sizes a block is not a whole number of screen pixels**, so now and then one column of blocks is a pixel wider than its neighbours. This is how hard-edged pixel pictures behave at a fluid size.
 - **The compass in the footer rises by 14 pixels** as the footer scrolls into view (`ornamentDistance` in `motion.js`), on tablets and laptops.
@@ -618,7 +653,7 @@ How it fits together:
 - Because the server keeps each answer for a while, a thousand visitors cause the same handful of requests as one.
 - **Every piece fails quietly.** If a service is down, slow (more than 5 seconds), or its keys are missing or expired, the server answers "nothing" and the page hides that piece. The rest of the ticker carries on. Nothing is shown as an error.
 - When nothing is playing (or it is paused, or it is a podcast), the last track played is shown instead. Screen readers hear "Now playing on Spotify:" or "Last played on Spotify:" before it.
-- **All three work in `npm run dev` too**, as well as with `npm run build` and `npm start`.
+- **All three work in `pnpm run dev` too**, as well as with `pnpm run build` and `pnpm start`.
 - The weather needs no key and no account. Open-Meteo is free for sites without ads or subscriptions, up to 10,000 requests a day; this site makes at most 96.
 
 These are there because Spotify's terms ask for them. Do not remove them:
@@ -633,7 +668,7 @@ This was done on 2026-10-11. The steps are here for a new computer or a new Spot
 
 1. **Create the app.** On https://developer.spotify.com/dashboard, logged in with the Spotify account whose listening should show, create an app. Any name and description. Under Redirect URIs enter exactly `http://127.0.0.1:8888/callback`. If asked which API you will use, tick Web API.
 2. **Put its two keys in `.env`.** Copy `.env.example` to `.env` if there is none. In the dashboard open the app, then Settings. Paste the Client ID after `SPOTIFY_CLIENT_ID=` and the Client secret (behind "View client secret") after `SPOTIFY_CLIENT_SECRET=`. No spaces, no quotes.
-3. **Get the refresh token.** Run `npm run spotify`. Your browser opens Spotify's approval page; click Agree. The script saves `SPOTIFY_REFRESH_TOKEN` in `.env` without showing it, tests it, and prints the last track you played and the date the token stops working.
+3. **Get the refresh token.** Run `pnpm run spotify`. Your browser opens Spotify's approval page; click Agree. The script saves `SPOTIFY_REFRESH_TOKEN` in `.env` without showing it, tests it, and prints the last track you played and the date the token stops working.
 
 What the three values are:
 
@@ -655,28 +690,28 @@ The current token was obtained on 2026-10-11 and lasts until about **2027-04-11*
 
 **On your PC**
 
-1. Open PowerShell in the site's folder:
+1. Open a terminal in the site's folder:
 
-   ```powershell
-   cd "D:\My Codes\Personal Website\romitraj.dev"
+   ```bash
+   cd ~/"My Codes/Personal Website/romitraj.dev"
    ```
 
 2. Run:
 
-   ```powershell
-   npm run spotify
+   ```bash
+   pnpm run spotify
    ```
 
 3. Your browser opens Spotify's approval page. Log in with your Spotify account if asked, and click **Agree**.
 4. The browser shows a page saying **Saved**. Close it.
-5. PowerShell prints three lines: that the token was saved, the last track you played (proof that it works), and the new end date. Write the new end date into your calendar.
+5. The terminal prints three lines: that the token was saved, the last track you played (proof that it works), and the new end date. Write the new end date into your calendar.
 6. Open the file to copy the new token:
 
-   ```powershell
-   notepad .env
+   ```bash
+   kwrite .env
    ```
 
-   Select everything after `SPOTIFY_REFRESH_TOKEN=` on that line (a long string of letters and digits) and copy it. Do not change the file. Leave Notepad open until the next part is done.
+   Select everything after `SPOTIFY_REFRESH_TOKEN=` on that line (a long string of letters and digits) and copy it. Do not change the file. Leave the editor open until the next part is done.
 
 **In Dokploy**
 
@@ -692,27 +727,27 @@ The current token was obtained on 2026-10-11 and lasts until about **2027-04-11*
 
 14. Open https://romitraj.dev/api/now-playing in your browser. It should show a line with a track's title. An empty page means the server still has no working token: look at steps 10 to 12 again.
 15. Open https://romitraj.dev and look for the track in the ticker.
-16. Close Notepad without saving.
+16. Close the editor without saving.
 
 Notes:
 
 - The tab names in steps 9, 12 and 13 are from Dokploy's documentation as of October 2026. The save button on the Environment tab is easy to find (see "What your dashboard showed" under "Deploying with Dokploy").
 - The Client ID and Client secret do not change. Only the refresh token is renewed.
-- If `npm run spotify` says the Client ID or secret is wrong, or Spotify's page shows an error about the redirect address, the app's settings on https://developer.spotify.com/dashboard have changed: see "Spotify: the first setup" above.
+- If `pnpm run spotify` says the Client ID or secret is wrong, or Spotify's page shows an error about the redirect address, the app's settings on https://developer.spotify.com/dashboard have changed: see "Spotify: the first setup" above.
 - If the Client secret ever leaks, open the app's Settings in Spotify's dashboard, rotate the secret, put the new one in `.env` and in Dokploy's Environment tab, then do all the steps above.
 
 ### If a widget is missing
 
 | What you see                                                                 | Likely cause                                                                | What to do                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| No now-playing line, locally                                                 | `.env` is missing one of the three Spotify values                           | Check `.env`; run `npm run spotify`                                                                                                                                                                                                                                                                          |
+| No now-playing line, locally                                                 | `.env` is missing one of the three Spotify values                           | Check `.env`; run `pnpm run spotify`                                                                                                                                                                                                                                                                         |
 | No now-playing line, after it worked for months                              | The refresh token is 6 months old                                           | "Spotify: every 6 months" above                                                                                                                                                                                                                                                                              |
 | No now-playing line, and Premium has lapsed                                  | Spotify switches the app off                                                | Resubscribe                                                                                                                                                                                                                                                                                                  |
 | No weather                                                                   | Open-Meteo is unreachable                                                   | Wait; it comes back by itself within a minute of the service returning                                                                                                                                                                                                                                       |
-| Neither, with `npm start`                                                    | The site was not built first                                                | `npm run build`, then `npm start`                                                                                                                                                                                                                                                                            |
+| Neither, with `pnpm start`                                                   | The site was not built first                                                | `pnpm run build`, then `pnpm start`                                                                                                                                                                                                                                                                          |
 | A new blog post is not on the home page or the About page after half an hour | The server could not read the feed, and keeps showing the last list it read | Open https://blog.romitraj.dev/rss.xml: the post must be in it. The server tries again every 5 minutes. If the post is there, check Cloudflare's IP Access rule for your server ("Deploying with Dokploy", step 1.5): without it Bot Fight Mode blocks the server, for example after its IP address changed. |
 
-To see what the server answers, open http://localhost:3000/api/weather, http://localhost:3000/api/now-playing or http://localhost:3000/api/posts while `npm start` is running. An empty page means "nothing to show".
+To see what the server answers, open http://localhost:3000/api/weather, http://localhost:3000/api/now-playing or http://localhost:3000/api/posts while `pnpm start` is running. An empty page means "nothing to show".
 
 ## Fonts
 
@@ -721,17 +756,18 @@ The site uses four licensed font families. Their files are not in this repositor
 ### The licensed fonts
 
 - The original files live in `../romitraj-private/fonts/source/`. Nothing ever edits them.
-- `npm run fonts` reads the list in `src/_data/fonts.json`, keeps only Latin characters, and writes small WOFF2 files to `../romitraj-private/fonts/web/`. Running it twice gives identical files.
+- `pnpm run fonts` and `pnpm run fonts:fallback` run Python scripts (`scripts/fonts.py`, `scripts/fallback_fonts.py`) through `scripts/python.mjs`. The first time, and whenever `scripts/requirements.txt` changes, it makes a Python environment in `.venv` inside the project and installs the two packages listed there (fontTools and brotli) into it, without keeping pip's download cache. Nothing is installed anywhere else. To start afresh, delete `.venv`.
+- `pnpm run fonts` reads the list in `src/_data/fonts.json`, keeps only Latin characters, and writes small WOFF2 files to `../romitraj-private/fonts/web/`. Running it twice gives identical files.
 - It also prints which everyday characters each font cannot draw. Read that list: two of the families have small character sets (see "Missing characters" below).
 - It writes a short fingerprint of every file to `src/_data/fontVersions.json`. The pages add it to each font's address (`manuka-black.woff2?v=e281303c`). When a font changes, its fingerprint changes, so browsers fetch the new file instead of a saved old one. Do not edit this file by hand; commit it whenever it changes.
 
-After `npm run fonts` changes anything, commit both repositories: the fonts in the private one, `fontVersions.json` in this one.
+After `pnpm run fonts` changes anything, commit both repositories: the fonts in the private one, `fontVersions.json` in this one.
 
 ### Where the pages load them from
 
 The address is chosen automatically:
 
-- On a computer that has `../romitraj-private/fonts/web/`, the build copies the fonts into `_site/fonts/` and the pages load them from `/fonts/`. This covers `npm run dev`, `npm run build` with `npm start`, and `npm run check`.
+- On a computer that has `../romitraj-private/fonts/web/`, the build copies the fonts into `_site/fonts/` and the pages load them from `/fonts/`. This covers `pnpm run dev`, `pnpm run build` with `pnpm start`, and `pnpm run check`.
 - Anywhere else, including the live server, the pages load them from the font site named in `site.json` (`fontsUrl`).
 - To force an address, set `FONT_BASE_URL` in `.env`.
 
@@ -745,9 +781,9 @@ The address is chosen automatically:
 
 Free fonts under the SIL Open Font License, kept in `src/assets/fonts/` with their license files: Anton stands in for Manuka, Cormorant for Louize and Louize Display, Inter Tight for Neue Montreal.
 
-- They are a safety net. A browser only fetches one when a licensed font fails to load or lacks a character. `npm run check` reports a problem if that ever happens.
-- Each is scaled to take up the same space as the font it stands in for, so the page keeps its shape. The numbers are in `src/_data/fallbackFonts.json`, written by `npm run fonts:fallback`. Do not edit that file by hand.
-- To see the safety net yourself: add the line `FONT_BASE_URL=http://localhost:9/` to `.env`, run `npm run dev`, and look at the page. Remove the line afterwards.
+- They are a safety net. A browser only fetches one when a licensed font fails to load or lacks a character. `pnpm run check` reports a problem if that ever happens.
+- Each is scaled to take up the same space as the font it stands in for, so the page keeps its shape. The numbers are in `src/_data/fallbackFonts.json`, written by `pnpm run fonts:fallback`. Do not edit that file by hand.
+- To see the safety net yourself: add the line `FONT_BASE_URL=http://localhost:9/` to `.env`, run `pnpm run dev`, and look at the page. Remove the line afterwards.
 
 ### Missing characters
 
@@ -757,7 +793,7 @@ The licensed files as supplied do not contain every character:
 - **Louize and Louize Display** have no straight apostrophe (`'`) and no slash. They do have the curly apostrophe (`’`), curly double quotes, the en dash and the ellipsis. In text set in these fonts, type the curly apostrophe.
 - **Neue Montreal** is complete.
 
-A character a font lacks is drawn from its fallback font, which looks slightly different. `npm run fonts` lists the gaps every time it runs.
+A character a font lacks is drawn from its fallback font, which looks slightly different. `pnpm run fonts` lists the gaps every time it runs.
 
 ### The font site
 
@@ -765,16 +801,16 @@ The live site loads the licensed fonts from fonts.romitraj.dev, a small server i
 
 ### Adding or swapping a font
 
-Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `src/_data/fonts.json` (including which fallback file stands in for it), run `npm run fonts`, then `npm run fonts:fallback`, and reload.
+Put the file in `../romitraj-private/fonts/source/`, add or edit its entry in `src/_data/fonts.json` (including which fallback file stands in for it), run `pnpm run fonts`, then `pnpm run fonts:fallback`, and reload.
 
 ## Comparing with the design reference
 
 The private folder next door has scripts that measure the reference and this site in the same way and list the differences. They live in `../romitraj-private/reference/scripts/`, read rendered values only (sizes, colors, positions, timings as a browser reports them), and are never deployed. Build the site first; the scripts start it themselves, with the stand-in weather and music services.
 
-```powershell
-cd "..\romitraj-private\reference\scripts"
-node compare.mjs out/compare
-node compare-report.mjs out/compare
+```bash
+cd ../romitraj-private/reference/scripts
+pnpm install    # once
+toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj-private/reference/scripts" && node compare.mjs out/compare && node compare-report.mjs out/compare'
 ```
 
 | Script                                                 | What it compares                                                                                                                                    | Time                                 |
@@ -791,17 +827,79 @@ node compare-report.mjs out/compare
 
 ## Checking before a commit
 
-```powershell
-npm run check
+Before every commit, three quick ones (a few seconds each, plus about 20 for the smoke check):
+
+```bash
+pnpm run lint
+pnpm test
+toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj.dev" && pnpm run smoke'
+```
+
+Before pushing anything that changes how the site looks or moves, the full check:
+
+```bash
+toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj.dev" && pnpm run check'
 ```
 
 It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a list of blog posts or an About page's latest post that is not brought up to date, moves anything in sight when it is, forgets the last good list while the feed is failing, or is replaced when nothing changed, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check, the build included, runs against stand-ins for Open-Meteo, Spotify and the blog's feed on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy", "Pretend Song" and five stand-in blog posts, it works without an internet connection for those three, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+
+It runs Chromium, Firefox and WebKit at the same time, each through every test in turn, and prints each browser's results in one piece when that browser is done.
 
 The photographs are taken with hover fades switched off and with fixed starting places for anything the site normally places at random, so the same page gives the same picture every time.
 
 The screenshots go to `../romitraj-private/screenshots/`, in `laptop-1440`, `tablet-768` and `phone-390` folders, split by browser. The laptop and phone folders match the reference screenshots next door, so the two sets can be compared side by side. If that folder is not there, they go to `screenshots/` here, which git ignores.
 
 Open a few of the pictures before committing. The same page should look the same in all three browsers.
+
+## Formatting, linting and tests
+
+Three tools from Vite+, all set up in `vite.config.js`:
+
+- **Oxfmt, the formatter**, lays out the code the same way everywhere (indents, quotes, line breaks). `pnpm run format` does it for you. It covers the JavaScript, CSS, JSON, YAML and Markdown files, not the Nunjucks templates. Three files the scripts write themselves are left alone (`fontVersions.json`, `fallbackFonts.json`, `textWidths.json`).
+- **Oxlint, the linter**, looks for likely mistakes: a variable that is never used, a promise nobody waits for, and so on. When it is wrong about a line, a comment just above that line says so, with the reason (`split.js` has one).
+- **Vitest, the test runner**, runs the small tests in the files ending in `.test.mjs`, each next to the file it tests (`scripts/lib/links.test.mjs` tests `scripts/lib/links.mjs`). Tests import from `vite-plus/test`, never from `vitest`; the linter enforces that.
+
+`pnpm run lint` runs the first two and changes nothing; `pnpm test` runs the tests once. Both should pass before every commit.
+
+**Write the test first.** For any change to the code: a test that fails, then the code that makes it pass. Never change a test to make broken code pass.
+
+The full check (`pnpm run check`) and the smoke check are tests too, but of the whole site in real browsers. Vitest is for the pieces that can be tested on their own.
+
+## Dead links
+
+```bash
+pnpm run links
+```
+
+It builds the site, serves it on your computer for a moment, reads every page (the page for a missing address too), and asks for every address any page points to, once each: links to other pages, links to other websites, pictures, stylesheets, scripts, the preview card's picture, and jumps to a section (`#the-problem` must be a section that exists). Then it prints:
+
+- **Dead links**, with the pages they are on: a page that answers "not found", a website whose name does not exist, or a jump to a section that is not there. The command ends with an error when there are any.
+- **Could not be sure**: websites that turn programs away (LinkedIn, Unsplash's profile pages, Figma and others answer a program with a refusal, or ask it to prove it is a person), or had trouble at that moment. Open those in a browser yourself. They are not counted as dead.
+
+Links to `https://romitraj.dev/...` (the share image, the address in the preview card) are checked against the build on your computer, so a page you have not pushed yet counts as there.
+
+**Any other website**, as it is live:
+
+```bash
+pnpm run links https://blog.romitraj.dev
+pnpm run links https://romitraj.dev
+```
+
+It reads every page of that website it can reach from the address you give, and checks every link on them the same way. It does not open a browser, so it needs no toolbox.
+
+- It asks each website at most three things at a time, waits up to 15 seconds for an answer, and tries a failed one once more.
+- The full check also looks for broken links, but only between this site's own pages and files, and without the internet. This command goes further: other websites, and any website you give it.
+- The code is `scripts/links.mjs` (the command) and `scripts/lib/links.mjs` (finding links and judging answers), with its tests in `scripts/lib/links.test.mjs`.
+
+## How the CSS and JavaScript are bundled
+
+Before every build, `scripts/lib/bundle.mjs` uses Vite+ (Vite, with Rolldown for the scripts and Lightning CSS for the styles) to make:
+
+- `assets/css/main.css`: `src/assets/css/main.css` and every file it imports, as one minified file;
+- `assets/js/main.js`: `src/assets/js/main.js` and everything it imports, as one minified script (with a source map while `pnpm run dev` runs, so the browser's tools can show the original files);
+- the headline's entrance (`src/assets/js/intro.js`), which is written straight into the pages.
+
+Each is written for Chrome and Edge 115, Firefox 115 and Safari 16.4 or newer: newer CSS, such as nesting, is rewritten so those versions understand it. The list is `browsers` in `bundle.mjs`. This was done by esbuild until 2026-11-11; [decisions.md](decisions.md) says why it changed and how the two were compared.
 
 ## Deploying with Dokploy
 
@@ -818,17 +916,19 @@ Both are built by Railpack, Dokploy's builder that reads `package.json` and work
 
 ### What the server will do
 
-Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) and by building and starting clean copies of both repositories on Linux under Node.js 24.21.0, with no `.env` file and no private folder beside the site.
+Checked on 2026-11-11 by reading Railpack's code (versions 0.15.4, Dokploy's default, and 0.43.0, the newest) and by installing, building and starting a clean copy of the site the way Railpack does, with no `.env` file and no private folder beside it. (First checked on 2026-10-11 with Railpack 0.40.1 and npm.)
 
-|                           | The site                                                              | The fonts                          |
-| ------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
-| Node.js                   | 24.21.0, from `"engines": { "node": "24.x" }` in `package.json`       | the same                           |
-| Install                   | `npm install`                                                         | `npm install` (nothing to install) |
-| Build                     | `npm run build` (about 3 seconds)                                     | none                               |
-| Start                     | `npm run start`                                                       | `npm run start`                    |
-| Port inside the container | 3000                                                                  | 3000                               |
-| Settings to enter         | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` | none                               |
+|                           | The site                                                                       | The fonts                     |
+| ------------------------- | ------------------------------------------------------------------------------ | ----------------------------- |
+| Node.js                   | 26, from `"engines": { "node": "26.x" }` in `package.json`                     | the same                      |
+| Package manager           | pnpm 12.18.0, from `"packageManager"` in `package.json`, installed by Corepack | the same                      |
+| Install                   | `pnpm install --frozen-lockfile --prefer-offline`                              | the same (nothing to install) |
+| Build                     | `pnpm run build` (about 3 seconds)                                             | none                          |
+| Start                     | `pnpm run start`                                                               | `pnpm run start`              |
+| Port inside the container | 3000                                                                           | 3000                          |
+| Settings to enter         | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`          | none                          |
 
+- **Nothing changes in Dokploy for pnpm, Node.js 26 or Vite+** (the switch of 2026-11-11). Railpack reads the Node.js line and pnpm's version from `package.json` and picks the install command from `pnpm-lock.yaml` by itself. The first deployment after the switch takes a little longer, as it fetches Node.js 26, pnpm and the new packages once.
 - **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
 - **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
 - **The build needs the internet** for one thing: the list of your latest blog posts. If the blog cannot be reached, the build still succeeds and the section shows a link to the blog, until the running server reads the feed and the page fills in the cards. A new post needs no deploy: see "Blog posts" under "The home page sections". Cloudflare must let your server read the feed: see step 1.5.
@@ -839,7 +939,7 @@ Checked on 2026-10-11 with Railpack 0.40.1 (its own plan for each repository) an
 
 - You can log in to your Dokploy dashboard, to Cloudflare, and to GitHub as `brixdorf`.
 - Both repositories are pushed (`git status` in each folder says there is nothing to commit, and `git push` says everything is up to date).
-- `npm run check` passed on the last commit.
+- `pnpm run check` passed on the last commit.
 - The three Spotify values are in `.env` on your PC. You will copy them from there in step 5. Never paste them anywhere but Dokploy's own page.
 
 ### Step 1: Cloudflare
@@ -893,7 +993,7 @@ If Dokploy can already see both repositories, skip this step.
 5. Check that **Auto Deploy** on the **General** tab is on. It starts switched on for a new application.
 6. The **Environment** tab stays empty for this application.
 7. Click **Deploy**.
-8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 24, `npm install` and `npm run start`, and end without an error. This takes a minute or two.
+8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 26, pnpm (`pnpm install`) and `pnpm run start`, and end without an error. This takes a minute or two.
 9. Open the **Logs** tab. The last line should read `Font server running at http://localhost:3000`.
 10. Open the **Domains** tab and click **Create Domain**:
     - **Host:** `fonts.romitraj.dev`
@@ -924,7 +1024,7 @@ If Dokploy can already see both repositories, skip this step.
 
 3. Choose **Railpack** as the build type and save.
 4. Check that **Auto Deploy** is on (it starts switched on).
-5. Open the **Environment** tab. Type these three lines, each followed by its value from the `.env` file on your PC (open it with `notepad .env` in the site's folder). No spaces around the `=`, no quotes:
+5. Open the **Environment** tab. Type these three lines, each followed by its value from the `.env` file on your PC (open it with `kwrite .env` in the site's folder). No spaces around the `=`, no quotes:
 
    ```
    SPOTIFY_CLIENT_ID=
@@ -932,10 +1032,10 @@ If Dokploy can already see both repositories, skip this step.
    SPOTIFY_REFRESH_TOKEN=
    ```
 
-   Save the settings with the save button on that tab. Close Notepad without saving.
+   Save the settings with the save button on that tab. Close the editor without saving.
 
 6. Go back to **General** and click **Deploy**.
-7. On the **Deployments** tab, watch the newest entry. It should mention Node 24, `npm install`, `npm run build` (with lines beginning `[11ty]`) and `npm run start`.
+7. On the **Deployments** tab, watch the newest entry. It should mention Node 26, `pnpm install`, `pnpm run build` (with lines beginning `[11ty]`) and `pnpm run start`.
 8. On the **Logs** tab the last line should read `Site running at http://localhost:3000`.
 9. On the **Domains** tab click **Create Domain**:
    - **Host:** `romitraj.dev` (never `www.romitraj.dev`: Cloudflare already sends `www` to the plain name)
@@ -963,14 +1063,14 @@ If Dokploy can already see both repositories, skip this step.
 
 ### If something is wrong
 
-| What you see                                                    | What it means                                           | Where to look                                                                                                                                                                                     |
-| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The newest entry on **Deployments** ends in an error            | The build failed                                        | Read the last lines of that entry. A wrong Node version there (not 24) means an old Railpack: type `0.40.1` into **Railpack Version** on **General**, save, deploy again.                         |
-| `404 page not found`                                            | The server has no application for that address          | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://`                                                                                                           |
-| Cloudflare's page "Bad gateway" (502)                           | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains**                                                                                                                                                   |
-| Cloudflare's page "Invalid SSL certificate" (526)               | The server is not presenting the origin certificate     | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.) |
-| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all               | The DNS record's address in Cloudflare, and that the server is running                                                                                                                            |
-| The site shows but the ticker has no track                      | The Spotify settings                                    | **Environment**, then deploy again. See "If a widget is missing".                                                                                                                                 |
+| What you see                                                    | What it means                                           | Where to look                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The newest entry on **Deployments** ends in an error            | The build failed                                        | Read the last lines of that entry. A wrong Node version there (not 26), or npm where pnpm should be, means an old Railpack: type `0.43.0` into **Railpack Version** on **General**, save, deploy again. |
+| `404 page not found`                                            | The server has no application for that address          | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://`                                                                                                                 |
+| Cloudflare's page "Bad gateway" (502)                           | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains**                                                                                                                                                         |
+| Cloudflare's page "Invalid SSL certificate" (526)               | The server is not presenting the origin certificate     | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.)       |
+| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all               | The DNS record's address in Cloudflare, and that the server is running                                                                                                                                  |
+| The site shows but the ticker has no track                      | The Spotify settings                                    | **Environment**, then deploy again. See "If a widget is missing".                                                                                                                                       |
 
 ### After the first deployment
 
@@ -978,7 +1078,7 @@ If Dokploy can already see both repositories, skip this step.
   - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json` and `package-lock.json`. It is not set (your choice, 2026-11-06), and where the field is has not been checked.
 - **A changed setting does nothing until the next deploy.** After saving anything on the **Environment** tab, click **Deploy** on **General**.
 - **Visitors get new files at once.** Pages are never kept by browsers or by Cloudflare. The stylesheet, the script, the pictures and the fonts may be kept, and each carries a fingerprint in its address (`main.css?v=...`) that changes when the file changes.
-- **Push only what you have checked.** There is no test on the server: `npm run check` on your PC is the test.
+- **Push only what you have checked.** There is no test on the server: the checks on your PC (see "Checking before a commit") are the test.
 
 ### What your dashboard showed
 
@@ -995,25 +1095,29 @@ Secret values (the three Spotify values: see "The live widgets") live in a file 
 
 - To confirm git is ignoring it: `git check-ignore -v .env` should print a line naming `.gitignore`, and `git status` should never list `.env`.
 - On the live server the same three values are entered in the host's settings instead of a file.
-- `npm run check` never uses these values: it runs the site against stand-ins for Spotify, Open-Meteo and the blog's feed.
+- `pnpm run check` never uses these values: it runs the site against stand-ins for Spotify, Open-Meteo and the blog's feed.
 
 ## Node.js version
 
-The live server uses the Node.js version named under `engines` in `package.json`. This project follows the newest LTS line (the long-term support releases Node.js recommends for real sites). That is 24 today.
+The live server uses the Node.js version named under `engines` in `package.json`. This project follows the newest LTS line (the long-term support releases Node.js recommends for real sites). That is 26 today (since 2026-11-11; it was 24 before).
 
-A new LTS line arrives every October. Check https://nodejs.org/en/about/previous-releases, and once a newer line is listed as LTS, change `engines` in `package.json` here and in the font server's `package.json`, run `npm run check`, and commit.
+On your computer, Vite+ reads the same line and uses a matching Node.js by itself, downloading it the first time.
 
-If your computer has a different Node.js version than `engines` asks for, `npm install` prints an `EBADENGINE` warning. It is a warning, not an error.
+A new LTS line arrives every October. Check https://nodejs.org/en/about/previous-releases, and once a newer line is listed as LTS, change `engines` in `package.json` here and in the font server's `package.json`, run the checks, and commit.
 
 ## Maintenance routine
 
-- **Every few months:** check the official sources for newer stable versions and run `npm outdated`. Update one package at a time, run `npm run check`, look at the site, commit. Record each version you move to in [decisions.md](decisions.md), with the date and where you checked.
-  - npm packages: `npm view <package> version`
+- **Every few months:** check the official sources for newer stable versions and run `pnpm outdated`. Update a package with `pnpm add <package>@<version>` (or `pnpm add -D` for one under `devDependencies`), run the quick checks, look at the site, commit. Before pushing a visual change, run the full check. Record each version you move to in [decisions.md](decisions.md), with the date and where you checked.
+  - Packages: `pnpm view <package> version`
+  - pnpm itself: change `packageManager` in both repositories' `package.json`.
+  - After updating Playwright, install its browsers again (see "Test browsers on Fedora").
+  - Python packages: change the version numbers in `scripts/requirements.txt`; the next `pnpm run fonts` installs them by itself.
   - Python packages: https://pypi.org
   - Never move to a beta, alpha, RC, canary, nightly or `next` release. Before a new major version, read its upgrade guide first.
 - **GitHub security alerts:** turn on Dependabot alerts in the repository's settings on GitHub, so GitHub emails you when a dependency has a security problem.
 - **Node.js:** move to the new LTS line each October, as described above.
-- **Every 6 months:** renew the Spotify refresh token with `npm run spotify`, and copy the new value into the live site's settings ("Spotify: every 6 months"). The current one lasts until about 2027-04-11.
+- **Every few months:** look for dead links: `pnpm run links`, and `pnpm run links https://blog.romitraj.dev` for the blog.
+- **Every 6 months:** renew the Spotify refresh token with `pnpm run spotify`, and copy the new value into the live site's settings ("Spotify: every 6 months"). The current one lasts until about 2027-04-11.
 - **Yearly:** renew the domain, confirm the weather still shows and that Spotify Premium is still active, and check the expiry date of the Cloudflare origin certificate.
 
 ## Still to come
