@@ -10,7 +10,8 @@ _site/
 # Check screenshots, when they are saved inside this folder
 screenshots/
 
-# Python cache
+# Python: the font scripts' own environment, and its cache
+.venv/
 __pycache__/
 
 # Saved copy of the blog feed, used while developing
