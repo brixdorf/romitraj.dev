@@ -99,6 +99,32 @@ function findBackdrop(light, width, height) {
   return backdrop;
 }
 
+// Removes lone specks of ink: a block with no ink in the eight blocks around it and almost none
+// (at most one other) in the seven by seven blocks around it. That is a stray dot on paper, such as
+// the trace of the faint outline a cut-out photo leaves around its subject. The even dots of a
+// light tone always have more ink near them, so tones, lines and edges are kept. Gives a new
+// picture; the one passed in is not changed.
+export function removeSpecks(dark, width, height, reach = 3, most = 2) {
+  const inkAt = (x, y) => x >= 0 && y >= 0 && x < width && y < height && dark[y * width + x] === 1;
+  const kept = Uint8Array.from(dark);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!inkAt(x, y)) continue;
+      let touching = false;
+      let near = 0;
+      for (let dy = -reach; dy <= reach; dy++) {
+        for (let dx = -reach; dx <= reach; dx++) {
+          if (!inkAt(x + dx, y + dy)) continue;
+          near++;
+          if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1 && (dx || dy)) touching = true;
+        }
+      }
+      if (!touching && near <= most) kept[y * width + x] = 0;
+    }
+  }
+  return kept;
+}
+
 // The part of the source to use: its middle, or the part around "focus", cut to the wanted shape.
 function regionToUse(sourceWidth, sourceHeight, shape, crop = {}) {
   const { x = 0.5, y = 0.5, zoom = 1 } = crop;
@@ -156,7 +182,7 @@ async function convertOne(name, settings, colours) {
   const greys = await image.raw().toBuffer();
 
   // Stretch the greys, then dither.
-  const dark = new Uint8Array(across * down);
+  let dark = new Uint8Array(across * down);
   const light = new Uint8Array(across * down);
   for (let y = 0; y < down; y++) {
     for (let x = 0; x < across; x++) {
@@ -167,6 +193,9 @@ async function convertOne(name, settings, colours) {
       light[index] = value > 0.5 ? 1 : 0;
     }
   }
+
+  // Lone specks of ink on paper go, if the picture asks for it ("despeckle": true).
+  if (settings.despeckle) dark = removeSpecks(dark, across, down);
 
   // Colour the pixels. "tones: ink" draws the dark parts in ink on the ground; "tones: paper"
   // draws the light parts in paper on a clear ground (for pictures that sit on the ink colour).
