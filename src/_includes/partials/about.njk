@@ -28,7 +28,7 @@
         <h3 class="about__label" id="about-elsewhere">{{ home.about.elsewhereLabel }}</h3>
         <ul class="icon-list">
           {%- for item in site.elsewhere %}
-          <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url }}">{{ item.title }}</a></li>
+          <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url | fill | safe }}">{{ item.title | fill | safe }}</a></li>
           {%- endfor %}
         </ul>
       </aside>

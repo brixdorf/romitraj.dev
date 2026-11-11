@@ -53,7 +53,7 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
     <h2 class="about__label" id="elsewhere-label">{{ home.about.elsewhereLabel }}</h2>
     <ul class="icon-list">
       {%- for item in site.elsewhere %}
-      <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url }}">{{ item.title }}</a></li>
+      <li class="icon-list__item">{{ icon(item.icon) }}<a class="icon-list__link" href="{{ item.url | fill | safe }}">{{ item.title | fill | safe }}</a></li>
       {%- endfor %}
     </ul>
   </aside>
