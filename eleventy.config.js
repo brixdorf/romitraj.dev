@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { convertImages } from './scripts/images.mjs';
 import { makeSiteIcons } from './scripts/icons.mjs';
 import { bundleAssets, bundleIntro } from './scripts/lib/bundle.mjs';
+import { missingFacts, projectLink } from './scripts/lib/projects.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -113,18 +114,16 @@ export default function (eleventyConfig) {
     return [title, ''];
   });
 
+  // The project template (content/projects/_template.md) is a file to copy, not a page.
+  eleventyConfig.ignores.add('src/content/projects/_template.md');
+
   // The list of projects, in the order set by "order" at the top of each file in content/projects/.
   // The home page and the Projects page are built from it. A project with a fact missing stops
-  // the build with a message that names the file and the fact.
+  // the build with a message that names the file and the fact (scripts/lib/projects.mjs).
   eleventyConfig.addCollection('projectList', (collection) => {
     const projects = collection.getFilteredByGlob('src/content/projects/*.md');
     for (const project of projects) {
-      const { title, description, tags, year, link, order } = project.data;
-      const missing = Object.entries({ title, description, year, link })
-        .filter(([, value]) => value === undefined || value === '')
-        .map(([name]) => name);
-      if (!Array.isArray(tags) || !tags.length) missing.push('tags (a list)');
-      if (typeof order !== 'number') missing.push('order (a number)');
+      const missing = missingFacts(project.data);
       if (missing.length)
         throw new Error(
           `${project.inputPath} needs these at the top of the file: ${missing.join(', ')}.`,
@@ -134,6 +133,9 @@ export default function (eleventyConfig) {
       (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
     );
   });
+
+  // How a project's link is labelled: "Code: GitHub", or "Live:" and the site's address.
+  eleventyConfig.addFilter('projectLink', projectLink);
 
   // The number of letters in the longest word of a heading. The styles use it to shrink a giant
   // heading on a narrow window until its longest word fits.

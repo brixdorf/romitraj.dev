@@ -23,10 +23,14 @@ layout: layouts/base.njk
           <dt>{{ pages.project.yearLabel }}</dt>
           <dd>{{ year }}</dd>
         </div>
+        {#- The link, if the project has one: its code on GitHub, or the project running live. #}
+        {%- set linkShown = link | projectLink %}
+        {%- if linkShown %}
         <div>
-          <dt>{{ pages.project.codeLabel }}</dt>
-          <dd><a class="link" href="{{ link }}">{{ pages.project.codeLink }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a></dd>
+          <dt>{{ pages.project.codeLabel if linkShown.kind == "code" else pages.project.liveLabel }}</dt>
+          <dd><a class="link" href="{{ link }}">{{ pages.project.codeLink if linkShown.kind == "code" else linkShown.text }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a></dd>
         </div>
+        {%- endif %}
       </dl>
       {%- if sections.length %}
       <nav class="study__contents" aria-labelledby="contents-label" data-part="contents">
