@@ -170,6 +170,8 @@ export function splitLines(element) {
 
   // Wrap every word, find which words share a line, then wrap each line.
   const words = [];
+  // A copy of the list: the loop replaces text nodes, which would change the live list under it.
+  // oxlint-disable-next-line unicorn/no-useless-spread
   for (const node of [...element.childNodes]) {
     if (node.nodeType !== Node.TEXT_NODE) {
       if (node.nodeType === Node.ELEMENT_NODE) words.push(node);

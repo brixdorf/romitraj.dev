@@ -22,10 +22,9 @@ let taxi;
 // (About, Resume: any other page with a giant name). Anything else is "plain".
 const kindOf = (content) => content.dataset.page || 'plain';
 const hasGiantName = (kind) => kind === 'list' || kind === 'page';
-// While the old page is leaving, the next page may not have been fetched yet, so the two kinds
-// that change how a page leaves are recognised by their address. Taxi gives addresses without
-// their last slash, so the home page is the empty address.
-const goingHome = () => taxi.targetLocation.pathname === '';
+// While the old page is leaving, the next page may not have been fetched yet, so a project, the
+// one destination that changes how a page leaves, is recognised by its address. Taxi gives
+// addresses without their last slash.
 const goingToProject = () => /^\/projects\/[^/]+$/.test(taxi.targetLocation.pathname);
 
 // How a page of each kind leaves.
