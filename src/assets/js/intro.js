@@ -1,6 +1,6 @@
 // The headline's entrance when the home page is first opened or reloaded: its letters slide into
 // their lines, as they do when arriving from the Projects page.
-// The page for a missing address ("Lost at sea") has the same entrance for its giant name: that
+// The page for a missing address ("Lost in oblivion") has the same entrance for its giant name: that
 // page is reached by a typed or outside address, never by a page change, so this is the only
 // time its letters can slide in. A page asks for it with "entrance: true" at the top of its file.
 //

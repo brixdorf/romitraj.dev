@@ -30,14 +30,12 @@
     "design": {
       "title": "Design",
       "paragraphs": [
-        "Design based on <a href=\"https://henry.codes\">henry.codes</a> by Henry Desroches. The code, words and pictures here are my own."
+        "Design based on <a href=\"https://henry.codes\">henry.codes</a> by Henry Desroches. The code and words here are my own."
       ]
     },
     "photos": {
       "title": "Photographs",
-      "paragraphs": [
-        "The exception, for now: the photographs are placeholders from Unsplash, standing in until I take my own. Thank you to:"
-      ]
+      "paragraphs": ["A huge thanks to these great folks for their breathtaking photos:"]
     },
     "weather": {
       "title": "Weather",
@@ -56,11 +54,8 @@
   "lost": {
     "note": "The page shown for an address that leads nowhere (src/content/404.njk). Its giant name is the title at the top of that file; it is set in the headline font, which has letters, digits, the comma, the hyphen and the full stop only. The card below is set in the serif font: use the curly apostrophe (’) and no slashes. The descriptions beside Projects and About come from navigation.json.",
     "title": "Off the chart",
-    "paragraphs": [
-      "This page isn’t on any chart I have. It moved, sank, or never existed.",
-      "I’d blame the tide, but it was probably me."
-    ],
-    "waysLabel": "Dry land",
+    "paragraphs": ["This page isn’t at any address I have. It moved, blipped, or never existed."],
+    "waysLabel": "Actual places",
     "homeHint": "Back to where it all starts",
     "caption": "The search party. He hasn’t found it either."
   },

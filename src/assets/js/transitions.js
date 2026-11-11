@@ -98,11 +98,11 @@ function refreshFrame(nextDocument) {
 }
 
 // A link that leads to a page that does not exist. The server answers such an address with the
-// status 404 and the "Lost at sea" page. Taxi takes any answer that is not a success as a
+// status 404 and the page for a missing address. Taxi takes any answer that is not a success as a
 // failure: it reloads the whole page at that address, or, if the visitor clicked while Taxi was
 // still fetching the page ahead of the click, it is left with no content to show at all.
 // So Taxi's own requests are watched here: a 404 that carries a page is handed to Taxi as an
-// answer it accepts, and the "Lost at sea" page then arrives like any other page, with its
+// answer it accepts, and the page for a missing address then arrives like any other page, with its
 // letters and cards. Nothing changes between the browser and the server: the answer is still a
 // 404. Every other request, and every other kind of failure, is passed on untouched.
 function letTaxiShowMissingPages() {

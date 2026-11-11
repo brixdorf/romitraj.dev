@@ -56,7 +56,7 @@ function send(response, status, body) {
   response.end(body);
 }
 
-// The answer for an address that leads nowhere: the site's own "Lost at sea" page, sent with the
+// The answer for an address that leads nowhere: the site's own page for a missing address, sent with the
 // status 404 (not found). The status is what tells browsers, search engines and the page-change
 // script that the address does not exist; the page is what the visitor sees.
 // A missing picture, stylesheet or other file gets two plain words instead: a page is no use there.
@@ -92,7 +92,7 @@ const server = http.createServer(async (request, response) => {
   if (await answerApi(urlPath, request.method, response)) return;
 
   const found = findFile(siteDir, urlPath);
-  // Nothing there, or the "Lost at sea" page asked for by its own file name: either way, not found.
+  // Nothing there, or the page for a missing address asked for by its own file name: either way, not found.
   if (!found || found.filePath === lostPage) return sendNotFound(request, response, urlPath);
 
   // A folder asked for without its closing slash: send the browser to the proper address.
