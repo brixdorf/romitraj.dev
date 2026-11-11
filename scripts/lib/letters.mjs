@@ -12,10 +12,8 @@
 // off for as long as the animation runs. The test photographs each heading cut into letters,
 // once as it is and once with every letter's window fully open, and reports any ink the window
 // took away.
-import path from 'node:path';
-import * as esbuild from 'esbuild';
 import sharp from 'sharp';
-import { root } from './site.mjs';
+import { bundleForPage } from './bundle.mjs';
 
 // The headings that page changes cut into letters, and the paragraphs they cut into lines.
 const letterTargets =
@@ -33,19 +31,11 @@ export const windowWidths = [360, 390, 600, 768, 900, 1440, 1920];
 let bundled = null;
 async function splitScript() {
   if (!bundled) {
-    const result = await esbuild.build({
-      stdin: {
-        contents:
-          "export { splitLetters, splitLines } from './split.js'; export { shape } from './shapes.js';",
-        resolveDir: path.join(root, 'src/assets/js'),
-      },
-      bundle: true,
-      format: 'iife',
-      globalName: 'textSplit',
-      write: false,
-      logLevel: 'silent',
-    });
-    bundled = result.outputFiles[0].text;
+    bundled = await bundleForPage(
+      "export { splitLetters, splitLines } from './split.js'; export { shape } from './shapes.js';",
+      'src/assets/js',
+      'textSplit',
+    );
   }
   return bundled;
 }

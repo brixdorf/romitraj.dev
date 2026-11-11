@@ -3,11 +3,8 @@
 # Write exact version numbers into package.json (3.1.8, not ^3.1.8), so every install is the same.
 saveExact: true
 
-# Packages allowed to run a script when they are installed. pnpm runs none unless it is named
-# here, and stops if an unnamed package asks. esbuild's script only checks that its program for
-# this computer arrived.
-allowBuilds:
-  esbuild: true
+# pnpm runs no package's install script unless it is named here under "allowBuilds", and stops
+# if a package asks to run one. None of this site's packages needs one.
 
 # Vite+ brings its own build of Vite, numbered like Vite+ itself (1.6.0). Vitest asks for Vite 6
 # to 8 and would warn about that number; this tells pnpm the Vite+ build is fine.

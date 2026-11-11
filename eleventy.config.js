@@ -3,9 +3,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import * as esbuild from 'esbuild';
 import { convertImages } from './scripts/images.mjs';
 import { makeSiteIcons } from './scripts/icons.mjs';
+import { bundleAssets, bundleIntro } from './scripts/lib/bundle.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -18,9 +18,6 @@ const site = JSON.parse(fs.readFileSync('src/_data/site.json', 'utf8'));
 const localFonts = '../romitraj-private/fonts/web';
 const hasLocalFonts = fs.existsSync(localFonts);
 const fontBase = process.env.FONT_BASE_URL || (hasLocalFonts ? '/fonts/' : site.fontsUrl);
-
-// Oldest browser versions the bundled CSS and JavaScript are written out for.
-const browsers = ['chrome115', 'edge115', 'firefox115', 'safari16.4'];
 
 const escapeHtml = (text) =>
   String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -209,16 +206,7 @@ export default function (eleventyConfig) {
   let introScript = '';
   eleventyConfig.addShortcode('introScript', () => introScript);
   eleventyConfig.on('eleventy.before', async () => {
-    const result = await esbuild.build({
-      entryPoints: ['src/assets/js/intro.js'],
-      bundle: true,
-      minify: true,
-      format: 'iife',
-      target: browsers,
-      write: false,
-      logLevel: 'warning',
-    });
-    introScript = result.outputFiles[0].text.trim();
+    introScript = await bundleIntro();
   });
 
   // The pictures. Before every build, scripts/images.mjs turns the photos and drawings listed in
@@ -276,7 +264,7 @@ export default function (eleventyConfig) {
     ],
   });
 
-  // Bundle and minify the CSS and JavaScript before every build.
+  // Bundle and minify the CSS and JavaScript before every build (scripts/lib/bundle.mjs, with Vite+).
   // Each of the two files then gets a fingerprint: a few characters worked out from its contents.
   // A template writes a file's address with {% asset "/assets/css/main.css" %}, which adds the
   // fingerprint ("?v=..."). Browsers, and Cloudflare in front of the live site, may keep these
@@ -284,19 +272,7 @@ export default function (eleventyConfig) {
   // nobody is shown a new page with an old stylesheet after a deploy.
   const assetVersions = {};
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {
-    await esbuild.build({
-      entryPoints: {
-        'assets/css/main': 'src/assets/css/main.css',
-        'assets/js/main': 'src/assets/js/main.js',
-      },
-      outdir: directories.output,
-      bundle: true,
-      minify: true,
-      sourcemap: runMode !== 'build',
-      format: 'iife',
-      target: browsers,
-      logLevel: 'warning',
-    });
+    await bundleAssets(directories.output, { sourcemap: runMode !== 'build' });
     for (const address of ['/assets/css/main.css', '/assets/js/main.js']) {
       assetVersions[address] = createHash('sha256')
         .update(fs.readFileSync(path.join(directories.output, address)))
