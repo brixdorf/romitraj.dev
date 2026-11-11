@@ -160,7 +160,9 @@
   color: var(--color-muted-on-paper);
 }
 
-.fact-table td:last-child {
+/* In a table of three columns the last one is a grey aside. In a table of two (the toolbox) the
+   second column is the content itself, so it stays in ink. */
+.fact-table td:nth-child(3):last-child {
   color: var(--color-muted-on-paper);
 }
 
@@ -202,6 +204,12 @@
   .fact-table th:last-child,
   .fact-table td:last-child {
     grid-column: span 8;
+  }
+
+  /* Two columns: the second takes all the room the first leaves. */
+  .fact-table th:nth-child(2):last-child,
+  .fact-table td:nth-child(2):last-child {
+    grid-column: span 12;
   }
 
   .fact-table td:first-child,
