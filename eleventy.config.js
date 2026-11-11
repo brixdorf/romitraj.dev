@@ -9,6 +9,7 @@ import { bundleAssets, bundleIntro } from './scripts/lib/bundle.mjs';
 import { missingFacts, projectLink } from './scripts/lib/projects.mjs';
 import { publishFile } from './scripts/lib/downloads.mjs';
 import { publishKey } from './scripts/lib/pgp.mjs';
+import { photographersToThank } from './scripts/lib/credits.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -42,30 +43,14 @@ export default function (eleventyConfig) {
   // the address it is being viewed at, to count visitors on the live site only (layouts/base.njk).
   eleventyConfig.addGlobalData('liveHost', new URL(site.url).hostname);
 
-  // The photographers to thank on the Credits page, from _data/image-credits.json: one entry per
-  // photographer, with what each photographed. (That file's name has a hyphen in it, which
-  // templates cannot spell, so it is handed to them under this name.)
-  eleventyConfig.addGlobalData('photoCredits', () => {
-    const photos = JSON.parse(fs.readFileSync('src/_data/image-credits.json', 'utf8')).photos;
-    const people = new Map();
-    for (const [file, photo] of Object.entries(photos)) {
-      for (const fact of ['photographer', 'profile', 'subject', 'url']) {
-        if (!photo[fact]) throw new Error(`image-credits.json: ${file} needs "${fact}".`);
-      }
-      if (!photo.profile.startsWith('https://unsplash.com/@'))
-        throw new Error(
-          `image-credits.json: the profile of ${file} should be an address like https://unsplash.com/@name.`,
-        );
-      const person = people.get(photo.profile) || {
-        name: photo.photographer,
-        profile: photo.profile,
-        subjects: [],
-      };
-      person.subjects.push(photo.subject);
-      people.set(photo.profile, person);
-    }
-    return [...people.values()];
-  });
+  // The photographers to thank on the Credits page, from _data/image-credits.json
+  // (scripts/lib/credits.mjs). That file's name has a hyphen in it, which templates cannot spell,
+  // so the list is handed to them under this name.
+  eleventyConfig.addGlobalData('photoCredits', () =>
+    photographersToThank(
+      JSON.parse(fs.readFileSync('src/_data/image-credits.json', 'utf8')).photos,
+    ),
+  );
 
   // The headline font has no apostrophe. This swaps each apostrophe for an empty marker,
   // which the styles fill with that font's own comma, raised into place.
