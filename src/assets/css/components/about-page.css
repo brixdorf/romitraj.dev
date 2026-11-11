@@ -76,6 +76,51 @@
   text-decoration: underline;
 }
 
+/* The OpenPGP key under the Contact card's text: a small grey label, then its facts in two
+   columns (name, value) in the text font, and a link to download it. */
+.key {
+  margin-block: 8px 16px;
+  font-size: var(--type-small);
+  line-height: 19px;
+}
+
+.key__label {
+  margin: 0 0 12px;
+  font-weight: 400;
+  font-size: var(--type-micro);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
+.key__facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px var(--grid-gap);
+  margin: 0 0 16px;
+}
+
+/* Each fact is a name and a value; the grid lines them up across all the facts. */
+.key__facts div {
+  display: contents;
+}
+
+.key__facts dt {
+  color: var(--color-muted-on-paper);
+}
+
+.key__facts dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.key__download {
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
 /* The closing quote: large serif letters, half plain and half italic like the top banner, with
    the author's name in small grey capitals under it. */
 .saying {

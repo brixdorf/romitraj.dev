@@ -34,7 +34,16 @@
       "I’m open to internships and full-time roles. If you have something interesting, say hi.",
       "Email is the fastest way to reach me: <a href=\"mailto:{email}\">{email}</a>. There is also <a href=\"/resume/\">a resume</a>, if you want it."
     ],
-    "link": "Say hi"
+    "link": "Say hi",
+    "key": {
+      "note": "The OpenPGP key under the Contact card. Its facts (fingerprint, key ID, kind, expiry) are read from the key itself, src/assets/files/romitraj-pgp-public.asc; these are only the labels.",
+      "label": "OpenPGP",
+      "fingerprint": "Fingerprint",
+      "keyId": "Key ID",
+      "algorithm": "Type",
+      "expires": "Expires",
+      "download": "Download the key"
+    }
   },
 
   "quote": {

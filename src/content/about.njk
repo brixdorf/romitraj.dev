@@ -84,6 +84,21 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
       <p>{{ paragraph | fill | safe }}</p>
       {%- endfor %}
     </div>
+    {#- The OpenPGP key, for encrypted email: its facts are read from the key file during the build
+        (scripts/lib/pgp.mjs), so they always match the key offered for download. #}
+    {%- set key = downloads.key.facts %}
+    <div class="key">
+      <h3 class="key__label">{{ about.contact.key.label }}</h3>
+      <dl class="key__facts">
+        <div><dt>{{ about.contact.key.fingerprint }}</dt><dd class="key__fingerprint">{{ key.fingerprint }}</dd></div>
+        <div><dt>{{ about.contact.key.keyId }}</dt><dd>{{ key.keyId }}</dd></div>
+        <div><dt>{{ about.contact.key.algorithm }}</dt><dd>{{ key.algorithm }}</dd></div>
+        {%- if key.expires %}
+        <div><dt>{{ about.contact.key.expires }}</dt><dd><time datetime="{{ key.expires }}">{{ key.expires }}</time></dd></div>
+        {%- endif %}
+      </dl>
+      <a class="link key__download" href="{{ downloads.key.url }}" download data-taxi-ignore>{{ about.contact.key.download }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+    </div>
     <a class="link panel__action" href="mailto:{{ site.email }}">{{ about.contact.link }}{{ arrow("mailto:") }}</a>
   </section>
 
