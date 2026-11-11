@@ -7,6 +7,8 @@ import { convertImages } from './scripts/images.mjs';
 import { makeSiteIcons } from './scripts/icons.mjs';
 import { bundleAssets, bundleIntro } from './scripts/lib/bundle.mjs';
 import { missingFacts, projectLink } from './scripts/lib/projects.mjs';
+import { publishFile } from './scripts/lib/downloads.mjs';
+import { publishKey } from './scripts/lib/pgp.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -289,6 +291,22 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addWatchTarget('./src/assets/css/');
   eleventyConfig.addWatchTarget('./src/assets/js/');
+
+  // Files visitors download as they are, from src/assets/files/: the resume at /resume.pdf, and
+  // the OpenPGP key at /romitraj-pgp-public.asc and in the Web Key Directory (/.well-known/
+  // openpgpkey/, see scripts/lib/pgp.mjs). Templates get their addresses, with fingerprints, and
+  // the key's facts as "downloads.resume", "downloads.key.url" and "downloads.key.facts".
+  const downloads = {};
+  eleventyConfig.on('eleventy.before', ({ directories }) => {
+    downloads.resume = publishFile('src/assets/files/resume.pdf', directories.output, 'resume.pdf');
+    downloads.key = publishKey({
+      source: 'src/assets/files/romitraj-pgp-public.asc',
+      email: site.email,
+      outDir: directories.output,
+    });
+  });
+  eleventyConfig.addGlobalData('downloads', () => downloads);
+  eleventyConfig.addWatchTarget('./src/assets/files/');
 
   // The free fallback fonts and their license files ship with the site.
   eleventyConfig.addPassthroughCopy({ 'src/assets/fonts': 'assets/fonts' });

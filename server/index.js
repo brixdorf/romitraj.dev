@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { answerApi } from './api.js';
+import { wkdHeaders } from './wkd.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteDir = path.join(root, '_site');
@@ -33,6 +34,7 @@ const types = {
   '.ico': 'image/x-icon',
   '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.pdf': 'application/pdf',
+  '.asc': 'application/pgp-keys',
   '.woff2': 'font/woff2',
 };
 
@@ -107,6 +109,8 @@ const server = http.createServer(async (request, response) => {
     'Content-Length': found.size,
     'Cache-Control': extension === '.html' ? 'no-cache' : 'public, max-age=3600',
     'X-Content-Type-Options': 'nosniff',
+    // The Web Key Directory's files: raw bytes, readable from any website.
+    ...wkdHeaders(urlPath),
   });
   if (request.method === 'HEAD') return response.end();
   fs.createReadStream(found.filePath).pipe(response);
