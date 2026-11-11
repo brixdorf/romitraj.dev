@@ -86,15 +86,20 @@ src/
                 transitions.js (page changes without a reload), scroll-memory.js (remembers
                 how far each page was scrolled), page-changes.js (what moves
                 during each kind of page change), split.js (cuts text into letters or lines)
+  assets/files/ Files visitors download as they are: resume.pdf (published at /resume.pdf) and
+                romitraj-pgp-public.asc (the OpenPGP key, published at /romitraj-pgp-public.asc
+                and in the Web Key Directory). See "The resume" and "The OpenPGP key"
   assets/fonts/ The free fallback fonts and their license files
   assets/icons/ The license of the icon set
   assets/img/source/  The photos and drawings the pictures are made from
   content/      The pages. index.njk is the home page, about.njk the About page, credits.njk the
                 Credits page, resume.njk the
-                resume note, projects.njk the list of projects. projects/ holds one Markdown
-                file per project (its facts on top, its write-up below), plus
-                projects.11tydata.js, the settings those files share.
-server/         index.js: the small server behind pnpm start. api.js answers the page's three
+                Resume page, projects.njk the list of projects. projects/ holds one Markdown
+                file per project (its facts on top, its write-up below), _template.md (a
+                project to copy, never built), and projects.11tydata.js, the settings those
+                files share.
+server/         index.js: the small server behind pnpm start. wkd.js: the headers for the
+                OpenPGP key's Web Key Directory. api.js answers the page's three
                 questions, weather.js asks Open-Meteo, spotify.js asks Spotify, blog.js reads
                 the blog's feed (for the build too), cache.js keeps their answers for a while
 scripts/        python.mjs (runs the two font scripts with the project's own Python, in .venv),
@@ -114,7 +119,11 @@ scripts/        python.mjs (runs the two font scripts with the project's own Pyt
                 the icon and the preview tags), smoke.mjs (pnpm run smoke), links.mjs and
                 lib/links.mjs (pnpm run links), lib/bundle.mjs (bundles the CSS and JavaScript
                 with Vite+, during every build), lib/venv.mjs (the font scripts' Python
-                environment). Files ending in .test.mjs are the tests (pnpm test).
+                environment), lib/projects.mjs (the checks on a project's facts),
+                lib/credits.mjs (the photographers the Credits page thanks),
+                lib/downloads.mjs and lib/pgp.mjs (publish the resume and the OpenPGP key
+                during every build). Files ending in .test.mjs (and .test.js in server/)
+                are the tests (pnpm test).
 docs/           This guide and the decisions log
 package.json    The packages, the commands, and the Node.js and pnpm versions
 pnpm-lock.yaml  The exact version of every package, written by pnpm. Commit it, never edit it
@@ -144,13 +153,16 @@ Every file starts with a comment saying what it does.
 | Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                           |
 | The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                       |
 | The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                             |
-| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/` (the six there now are samples)                                                               |
+| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/`                                                                                               |
+| A new project                                                                                    | Copy `src/content/projects/_template.md` (see "Adding or changing a project")                                                     |
+| The resume                                                                                       | Replace `src/assets/files/resume.pdf` (keep the name); the card's words are in `src/_data/pages.json` (`resume`)                  |
+| The OpenPGP key                                                                                  | Replace `src/assets/files/romitraj-pgp-public.asc` (keep the name). See "The OpenPGP key"                                         |
+| The quote at the bottom of the About page                                                        | `src/_data/about.json` (`quote`)                                                                                                  |
 | The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                        |
 | The text on the About page                                                                       | `src/_data/about.json`                                                                                                            |
-| The resume note                                                                                  | `src/_data/pages.json` (`resume`)                                                                                                 |
 | The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                  |
 | The picture shown when a link is shared                                                          | Run `pnpm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                 |
-| The page for a missing address ("Lost at sea")                                                   | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                 |
+| The page for a missing address ("Lost in oblivion")                                              | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                 |
 | The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                    |
 | The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                 |
 | Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                            |
@@ -242,14 +254,14 @@ Every page except the home page shares three pieces:
 - **The giant page name** (`partials/page-header.njk`, used through `layouts/page.njk`), with a small framed picture beside it. A project's page has its own top instead: the project's name in very large serif letters.
 - **"You are here"** at the top of the footer (`partials/crumb.njk`): the path from the home page down to the current page.
 
-| Page                              | Its file                            | Its words                                                       |
-| --------------------------------- | ----------------------------------- | --------------------------------------------------------------- |
-| About                             | `src/content/about.njk`             | `about.json`                                                    |
-| Projects (the list)               | `src/content/projects.njk`          | The files in `src/content/projects/`, `pages.json` (`projects`) |
-| One project                       | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/`               |
-| Resume                            | `src/content/resume.njk`            | `pages.json` (`resume`)                                         |
-| Credits                           | `src/content/credits.njk`           | `pages.json` (`credits`), `image-credits.json`                  |
-| A missing address ("Lost at sea") | `src/content/404.njk`               | `pages.json` (`lost`), `navigation.json`                        |
+| Page                                   | Its file                            | Its words                                                       |
+| -------------------------------------- | ----------------------------------- | --------------------------------------------------------------- |
+| About                                  | `src/content/about.njk`             | `about.json`                                                    |
+| Projects (the list)                    | `src/content/projects.njk`          | The files in `src/content/projects/`, `pages.json` (`projects`) |
+| One project                            | `src/_includes/layouts/project.njk` | The project's own file in `src/content/projects/`               |
+| Resume                                 | `src/content/resume.njk`            | `pages.json` (`resume`)                                         |
+| Credits                                | `src/content/credits.njk`           | `pages.json` (`credits`), `image-credits.json`                  |
+| A missing address ("Lost in oblivion") | `src/content/404.njk`               | `pages.json` (`lost`), `navigation.json`                        |
 
 ### A page's settings
 
@@ -271,79 +283,83 @@ On phones the giant name shrinks until its longest word fits the screen. This is
 
 ### The page for a missing address
 
-An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost at sea", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a close-up of the diver.
+An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost in oblivion", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a close-up of the diver.
 
 - **The page** is `src/content/404.njk`. The build writes it as `404.html`. Its giant name is the `title` at the top of that file; its other words are in `src/_data/pages.json` (`lost`); the picture is `searcher` in `images.json` (a crop of the diver drawing). The words beside Projects and About are the ones from `navigation.json`.
 - **To look at it**, run `pnpm run dev` and open any address that does not exist, such as http://localhost:8080/nothing-here/.
 - **It is sent with the status 404.** A status is the number a server sends before a page: 200 means "here it is", 404 means "there is no such page". The visitor sees the page either way; the number is what tells browsers and search engines not to treat the address as a real one. The live server does this in `server/index.js`, and `pnpm run dev` does the same by itself.
   - A missing picture, stylesheet or other file gets a plain `Not found` with the same status, not the page.
 - **Its name slides in when the page opens**, letter by letter, like the home page's headline. It is the second page with an entrance, and uses the same small script (`entrance: true` at the top of its file asks for it). A missing page is almost never reached by a page change, so without this its letters would never move.
-- **A link inside the site that leads to a missing page** also ends here, without a reload: the old page leaves, and "Lost at sea" arrives with its letters and cards, at the missing address. `pnpm run check` looks for broken links before every commit, so this should only happen with an old link or a typing mistake.
+- **A link inside the site that leads to a missing page** also ends here, without a reload: the old page leaves, and "Lost in oblivion" arrives with its letters and cards, at the missing address. `pnpm run check` looks for broken links before every commit, so this should only happen with an old link or a typing mistake.
 - **"You are here" on this page** links its last step to wherever the page is being shown (`here: ""` at the top of the file), because it has no address of its own.
 - `pnpm run check` tests all of it in three browsers: the status, the page, the entrance, the ways back, and a link that leads to a missing page.
 
 ### The About page
 
-Its three framed pictures are named in `src/content/about.njk` (`bust`, `jellyfish`, `swells`) and described in `images.json`. All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering`, `contact`, `toolbox`) and the labels for the latest blog post. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
+Its three framed pictures are named in `src/content/about.njk` (`portrait`, `jellyfish`, `swells`) and described in `images.json`. The portrait is your own photo (see "Pictures"). All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering` (titled "Whereabouts"), `contact`, `toolbox`), the labels for the latest blog post and for the OpenPGP key, and the quote that closes the page (`quote`). The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
 
-The text there now is placeholder text. `<a href="...">` and `{email}` work as in `home.json`.
+`<a href="...">` and `{email}` work as in `home.json`.
+
+- **The toolbox** is a table of two columns, area and skills, matching the skills on the resume. Add a row as `["Area", "Skills"]`. A table of three columns works too: the third is shown as a grey aside.
+- **The quote** (Epictetus) closes the page in large serif letters, under the toolbox. Its two halves, `plain` and `italic`, are set like the top banner: the second half slanted. It is in the large serif, so no straight apostrophe and no slash. It echoes the "Who" card, which says you keep learning about the things you think you already know.
+- **The Contact card shows the OpenPGP key**: its fingerprint, key ID, type and expiry date, and a link to download it. The facts are read from the key file itself during the build, so they cannot drift from the key; only their labels are in `about.json` (`contact.key`). See "The OpenPGP key".
 
 ### Adding or changing a project
 
-A project is one Markdown file in `src/content/projects/`. The file's name is the project's address: `snip.md` becomes `/projects/snip/`. The home page, the Projects page and the project's own page are all built from that one file.
+A project is one Markdown file in `src/content/projects/`. The file's name is the project's address: `watchsheet.md` becomes `/projects/watchsheet/`. The home page, the Projects page and the project's own page are all built from that one file.
 
 The file has two parts. Between the two `---` lines at the top are the project's facts. Below them is the write-up.
 
 ```markdown
 ---
-title: Snip
-description: A tiny URL shortener with click analytics.
+title: Watchsheet
+description: A logbook for the football matches you watch, with stats for each season.
 tags:
-  - Backend
-  - Analytics
-year: 2025
-link: https://github.com/brixdorf/snip
-order: 5
-image: padlock
+  - Full stack
+  - Data sync
+  - Football
+year: 2026
+link: https://watchsheet.romitraj.dev
+order: 3
 ---
 
 The write-up starts here.
 ```
 
-| Fact          | What it is                                                                      | Where it shows                                                   |
-| ------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `title`       | The project's name                                                              | Everywhere, and in the browser tab                               |
-| `description` | One sentence                                                                    | The Projects page, the top of the project's page, search engines |
-| `tags`        | A short list, one per line, each starting with two spaces, a hyphen and a space | The Projects page and the project's page                         |
-| `year`        | A year                                                                          | The Projects page and the project's page                         |
-| `link`        | The address of the code                                                         | "GitHub" on the project's page                                   |
-| `order`       | A number: 1 comes first                                                         | Decides the project's place in both lists                        |
-| `image`       | The name of a picture in `images.json`. Optional                                | The frame beside the project on the Projects page                |
+| Fact          | What it is                                                                      | Where it shows                                                    |
+| ------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `title`       | The project's name                                                              | Everywhere, and in the browser tab                                |
+| `description` | One sentence                                                                    | The Projects page, the top of the project's page, search engines  |
+| `tags`        | A short list, one per line, each starting with two spaces, a hyphen and a space | The Projects page and the project's page                          |
+| `year`        | A year, or words such as `2026 to now`                                          | The Projects page and the project's page                          |
+| `link`        | Optional. The address of the code on GitHub, or of the project running live     | "Code: GitHub", or "Live:" and the address, on the project's page |
+| `order`       | A number: 1 comes first                                                         | Decides the project's place in both lists                         |
+| `image`       | The name of a picture in `images.json`. Optional                                | The frame beside the project on the Projects page                 |
 
-- **To add a project:** copy an existing file, rename it, change the facts and the write-up. Give it the `order` number of the place it should take, and renumber the ones after it.
+- **To add a project:** copy `_template.md` in the same folder and rename the copy (lowercase, hyphens: `my-new-thing.md`). Fill in the facts and the four sections, and delete the lines starting with `#`. Give it the `order` number of the place it should take, and renumber the ones after it. The template itself is never built into a page (`eleventy.config.js` ignores it).
 - **To remove a project:** delete its file.
 - **To reorder:** change the `order` numbers. Two projects with the same number are sorted by name.
-- The first six facts are required. If one is missing, the build stops and names the file and the fact.
+- `title`, `description`, `tags`, `year` and `order` are required. If one is missing, the build stops and names the file and the fact (`scripts/lib/projects.mjs`).
+- `link` is optional. A link to `github.com` shows as "Code: GitHub"; any other link as "Live:" with its address (`aletheia.romitraj.dev`). Without a link that line is left out (My Homelab has none).
 - `image` is optional. On wide windows the Projects page has a frame beside every second project (the 2nd, 4th, 6th and so on), and it shows that project's picture. A project in an odd place has no frame, so a picture given to it is not shown anywhere. A project in an even place without a picture gets an empty frame.
-- If a title or description contains a colon followed by a space, or starts with a quote mark, wrap it in double quotes: `title: "Snip: the sequel"`.
-- A line starting with `#` between the `---` lines is a note to yourself and is never shown. The samples use one to say they are samples.
+- If a title or description contains a colon followed by a space, or starts with a quote mark, wrap it in double quotes: `title: "Watchsheet: the sequel"`.
+- A line starting with `#` between the `---` lines is a note to yourself and is never shown.
 
 Writing the write-up:
 
+- Every write-up opens with a line or two, then has four sections: "What it is", "Why it exists", "How it works" (ending with "Built with:" and the tools) and "What I learned". The template has them.
 - `## A heading` starts a numbered section. The sections are listed under "Contents" at the top of the page, and each entry there jumps to its section.
 - A list (`- item`) and a link (`[words](address)`) work as usual.
 - A quote makes a grey note with a bar beside it. Bold words on its first line become its label:
 
   ```markdown
-  > **Sample project**
+  > **Note**
   >
-  > This write-up is placeholder text.
+  > This project is still growing.
   ```
 
 - Straight quotes and apostrophes are turned into curly ones for you, because the serif font has no straight apostrophe.
 - **Do not type a slash** in the running text: the serif font has none, and `pnpm run check` would report a fallback font. Write "test and deploy", not "test/deploy". The tags and the description are in a different font and can contain anything; the `title` is in the serif too, so it follows the same rule.
-
-The six projects there now are samples, each marked with a note at the top of its file and a "Sample project" note on its page.
 
 ### Widths on the inner pages
 
@@ -395,7 +411,7 @@ On the site this design follows, About is a plain fade in every direction. Here 
 
 - **A new page that uses `layouts/page.njk` is choreographed without any setup**: its name's letters slide in and out. To make its content arrive piece by piece, put `data-part="cards"` on the box that holds the pieces and `data-part="card"` on each piece, as `about.njk` does. Pieces arrive in the order they are written. A page that uses neither that layout nor a `pageKind` gets the plain fade.
 - **Scroll position.** Following a link starts the new page at the top. The browser's back and forward buttons return to where you were on that page, and a reload stays where it was. (The site this design follows does the same on a reload but jumps to the top on back and forward; returning to the old place was Romit's choice.)
-- **A link that must load the ordinary way** (a download such as the future `resume.pdf`) needs `data-taxi-ignore` on it: `<a href="/resume.pdf" data-taxi-ignore>`. Links to other websites, email links and links to a section of the same page are left alone automatically.
+- **A link that must load the ordinary way** (a download, such as the resume or the OpenPGP key) needs `data-taxi-ignore` on it: `<a href="{{ downloads.resume }}" data-taxi-ignore>`. Links to other websites, email links and links to a section of the same page are left alone automatically.
 - **The small row and "You are here" are in every page's HTML**, hidden on the home page, so the script can show, hide and refill them. Edit them in `partials/page-row.njk` and `partials/crumb.njk` as before.
 - **The tickers and the scroll movement are restarted** for each new page, and the local time is filled in again.
 - **After a change, keyboard focus moves to the new page's heading** and screen readers are told the page's name.
@@ -432,8 +448,8 @@ To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `
 
 `/credits/` thanks the people and services the site rests on, in four numbered cards like the About page's:
 
-1. **Design:** the sentence saying the design is based on henry.codes by Henry Desroches, with a link, and that the code, words and pictures are your own.
-2. **Photographs:** every Unsplash photographer by name, linked to their Unsplash profile, with what they photographed.
+1. **Design:** the sentence saying the design is based on henry.codes by Henry Desroches, with a link, and that the code and words are your own.
+2. **Photographs:** a thank-you, then every Unsplash photographer by name, linked to their Unsplash profile, with what they photographed. Your own portrait is not listed.
 3. **Weather:** "Weather data by Open-Meteo.com", linked to open-meteo.com, and a link to its licence (CC BY 4.0).
 4. **Visits:** one sentence saying that visits are counted with Rybbit on your own server, without cookies, with a link to rybbit.com.
 
@@ -441,8 +457,51 @@ Where things are:
 
 - The words are in `src/_data/pages.json` (`credits`). The cards are set in the serif font: use the curly apostrophe and no slashes.
 - **The photographers come from `src/_data/image-credits.json`**, the same file the build uses to make sure every photo is on record. Each photo there has `photographer`, `profile` (their page on Unsplash, `https://unsplash.com/@name`), `subject` (how the page names the photo: "the whale's tail") and `url` (the photo's own page). The build stops if one is missing. A photographer with two photos is listed once, with both subjects.
-- **When you replace a placeholder photo with your own**, delete its entry from `image-credits.json` and the photographer drops off the page. When none are left, the Photographs card can be deleted from `src/content/credits.njk`.
+- **A photo of your own** (the portrait) is still on record in `image-credits.json`, as `"photographer": "Romit Raj Sahu", "own": true`, and needs nothing else; the page leaves it out (`scripts/lib/credits.mjs`). When you replace an Unsplash photo with your own, do the same and its photographer drops off the page. When no Unsplash photo is left, the Photographs card can be deleted from `src/content/credits.njk`.
 - The page is linked from the footer on every page ("Credits", under "Me"). It is not in the hero's list: in `src/_data/navigation.json` it is marked `"footerOnly": true`.
+
+## The resume
+
+The Resume page (`/resume/`) is one card with a few words and a link to the PDF.
+
+- **The PDF** is `src/assets/files/resume.pdf`. The build copies it to `/resume.pdf`, with a fingerprint in the link's address (`/resume.pdf?v=...`), so a new version is fetched at once. **To update it, replace that file, keeping its name,** and rebuild.
+- The card's words are in `src/_data/pages.json` (`resume`).
+- The link opens the PDF the ordinary way, not as a page change (`data-taxi-ignore` in `src/content/resume.njk`).
+
+## The OpenPGP key
+
+Your public OpenPGP key (for encrypted email to hi@romitraj.dev) is on the site in two ways:
+
+1. **On the About page**, in the Contact card: the fingerprint, the key ID, the type and the expiry date, and a link to download the key (`/romitraj-pgp-public.asc`).
+2. **In a Web Key Directory (WKD)**, so that anyone can fetch it straight from your domain with:
+
+   ```bash
+   gpg --locate-external-keys hi@romitraj.dev
+   ```
+
+   Email programs that support WKD (Thunderbird, Proton Mail and others) find it the same way.
+
+How it works:
+
+- **One file is the source:** `src/assets/files/romitraj-pgp-public.asc`, the armored key as `gpg --armor --export` gives it. During every build, `scripts/lib/pgp.mjs` reads it and:
+  - writes it to `/romitraj-pgp-public.asc` for the download link;
+  - writes the key in binary form (what `gpg --dearmor` gives) to `/.well-known/openpgpkey/hu/aeii9rmagouy1owpp7e5ftpxjof7h41n`, the address WKD's "direct method" gives `hi@romitraj.dev` (the part before the `@`, hashed);
+  - writes an empty `/.well-known/openpgpkey/policy`, which says the directory exists;
+  - reads the facts the Contact card shows from the key itself, so they always match it;
+  - stops the build if the key has no user ID for the email address in `site.json`.
+- **The server** (`server/wkd.js`) sends the two WKD files as `application/octet-stream` with `Access-Control-Allow-Origin: *` (any website may read them), as the WKD standard asks. The address also works with `?l=hi` on the end, which GnuPG adds.
+- **`openpgpkey.romitraj.dev` must not exist.** GnuPG first tries the "advanced method" at that name, and only falls back to the direct method above when the name does not resolve. Checked on 2026-11-12: it has no address (Cloudflare answers it exactly as it answers any made-up name). **Never add a DNS record for `openpgpkey`, and never add a wildcard (`*`) record**, or the lookup stops working.
+- **To check it after deploying**, in a terminal (the first line makes a throwaway key store, so your own is not touched):
+
+  ```bash
+  export GNUPGHOME="$(mktemp -d)"
+  gpg --auto-key-locate clear,nodefault,wkd --locate-external-keys hi@romitraj.dev
+  rm -rf "$GNUPGHOME"; unset GNUPGHOME
+  ```
+
+  It should print your key, with the fingerprint shown on the About page.
+
+- **When the key changes** (a new expiry date, a new subkey, a new key): export the public key again with `gpg --armor --export hi@romitraj.dev > src/assets/files/romitraj-pgp-public.asc`, rebuild, check the Contact card, commit and deploy. **The current key expires on 2029-09-28**: extend it (`gpg --quick-set-expire`) well before then, and replace the file.
 
 ## Visitor counting
 
@@ -478,18 +537,18 @@ The server sends no rule that limits which scripts may run (no Content-Security-
 
 What each kind of link does under the pointer, and when it is reached with the Tab key. All of it was measured on the design reference, link by link, in three browsers.
 
-| Link                                                                                                                                                          | Under the pointer                                                     | With keyboard focus                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------- |
-| Navigation links in the hero                                                                                                                                  | A line draws under the name (0.2s) and the description sharpens       | The same, plus the ring                               |
-| Links in the footer, the "Elsewhere" lists, "You are here", the small row under the banner, the bold link that ends a card, the code link on a project's page | A line draws under the words (0.2s)                                   | The ring only                                         |
-| A link inside a sentence (about text, cards, a project's write-up)                                                                                            | Turns grey at once                                                    | The ring only                                         |
-| "View all projects", "Read the blog"                                                                                                                          | Underlined at once                                                    | Underlined, plus the ring                             |
-| The links at the bottom of the About page's first card, and "Read the post"                                                                                   | Underlined at once                                                    | The ring only                                         |
-| A writing card on the home page                                                                                                                               | Its outline darkens at once and a line draws under "Read more" (0.2s) | The same, with the ring around "Read more"            |
-| A project card on the Projects page                                                                                                                           | Its outline darkens at once and a line draws under "Read more" (0.2s) | Its outline darkens, plus the ring around "Read more" |
-| A project row on the home page                                                                                                                                | The name opens near its middle and its faint copies sharpen (0.15s)   | The ring only                                         |
-| A line in a project's "Contents"                                                                                                                              | Turns grey while a line draws under it (0.2s)                         | The ring only                                         |
-| The track's title in the ticker                                                                                                                               | Nothing (it is already underlined)                                    | The ring only                                         |
+| Link                                                                                                                                                                                   | Under the pointer                                                     | With keyboard focus                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------- |
+| Navigation links in the hero                                                                                                                                                           | A line draws under the name (0.2s) and the description sharpens       | The same, plus the ring                               |
+| Links in the footer, the "Elsewhere" lists, "You are here", the small row under the banner, the bold link that ends a card, the code link on a project's page, the key's download link | A line draws under the words (0.2s)                                   | The ring only                                         |
+| A link inside a sentence (about text, cards, a project's write-up)                                                                                                                     | Turns grey at once                                                    | The ring only                                         |
+| "View all projects", "Read the blog"                                                                                                                                                   | Underlined at once                                                    | Underlined, plus the ring                             |
+| The links at the bottom of the About page's first card, and "Read the post"                                                                                                            | Underlined at once                                                    | The ring only                                         |
+| A writing card on the home page                                                                                                                                                        | Its outline darkens at once and a line draws under "Read more" (0.2s) | The same, with the ring around "Read more"            |
+| A project card on the Projects page                                                                                                                                                    | Its outline darkens at once and a line draws under "Read more" (0.2s) | Its outline darkens, plus the ring around "Read more" |
+| A project row on the home page                                                                                                                                                         | The name opens near its middle and its faint copies sharpen (0.15s)   | The ring only                                         |
+| A line in a project's "Contents"                                                                                                                                                       | Turns grey while a line draws under it (0.2s)                         | The ring only                                         |
+| The track's title in the ticker                                                                                                                                                        | Nothing (it is already underlined)                                    | The ring only                                         |
 
 - **The ring** is a 2px dashed outline, 2px away from the link: mid grey on paper, a lighter warm grey on the dark blocks (the letter, the projects section, the footer). The rule is in `base.css` and the two colors are in `tokens.css` (`--color-focus`, `--color-focus-on-ink`). A new dark block needs one line in that rule in `base.css`, or its ring will be the pale one.
 - **Its shape is the reference's; its colors are stronger.** The reference's ring is too faint to see easily, so this one uses greys that differ from their background by a little more than 3 to 1, the least that accessibility guidelines ask of a focus ring. `pnpm run check` works the two contrasts out from `tokens.css` and fails if either falls below 3 to 1, so a new color cannot quietly make the ring too faint again.
@@ -569,39 +628,41 @@ The list of pictures is `src/_data/images.json`. One entry looks like this:
 }
 ```
 
-| Setting          | What it does                                                                                                                                                                                                                                       |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source`         | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops                                                                                                                                                      |
-| `alt`            | The short description screen readers read aloud. Every picture needs either this or `decorative`                                                                                                                                                   |
-| `decorative`     | `true` for a picture that is only decoration (the compass, the sea band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both                                                                 |
-| `across`         | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size                                                                                                                  |
-| `shape`          | Cuts the source to this shape, written width:height. Without it the source's own shape is kept                                                                                                                                                     |
-| `crop`           | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it                                                                                                               |
-| `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker |
-| `sharpen`        | Crisper edges before the picture is reduced to two tones. 0 to 2                                                                                                                                                                                   |
-| `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band)                                                                                                   |
-| `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                           |
-| `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                   |
+| Setting          | What it does                                                                                                                                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source`         | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops                                                                                                                                                                       |
+| `alt`            | The short description screen readers read aloud. Every picture needs either this or `decorative`                                                                                                                                                                    |
+| `decorative`     | `true` for a picture that is only decoration (the compass, the sea band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both                                                                                  |
+| `across`         | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size                                                                                                                                   |
+| `shape`          | Cuts the source to this shape, written width:height. Without it the source's own shape is kept                                                                                                                                                                      |
+| `crop`           | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it                                                                                                                                |
+| `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker                  |
+| `sharpen`        | Crisper edges before the picture is reduced to two tones. 0 to 2                                                                                                                                                                                                    |
+| `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band)                                                                                                                    |
+| `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                                            |
+| `despeckle`      | `true` removes lone specks of ink: a block with no ink touching it and almost none near it. Used by the portrait, whose cut-out left a faint outline that turned into scattered dots. Even tones, lines and edges are kept (`removeSpecks` in `scripts/images.mjs`) |
+| `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                                    |
 
 Where each picture is shown:
 
-| Picture                    | Source                                              | Where                                                                            |
-| -------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `hero`                     | whale-tail.jpg                                      | The frame in the hero                                                            |
-| `diver`                    | diver.svg                                           | Behind the home page's about section                                             |
-| `swells`                   | swells.svg                                          | The band above the footer on the home page, and the wide frame on the About page |
-| `compass`                  | compass.svg                                         | The footer on every page, and beside the About page's name                       |
-| `servers`                  | server-rack.jpg                                     | Beside the Projects page's name                                                  |
-| `padlock`, `ship`, `crane` | padlock.jpg, container-ship.jpg, harbour-cranes.jpg | The frames on the Projects page (Hardened, Ship It, Dokploy Templates)           |
-| `bust`, `jellyfish`        | marble-bust.jpg, diver.svg                          | The About page                                                                   |
-| `fluke`                    | whale-tail.jpg                                      | Beside the Resume page's name                                                    |
+| Picture                 | Source                                   | Where                                                                            |
+| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
+| `hero`                  | whale-tail.jpg                           | The frame in the hero                                                            |
+| `diver`                 | diver.svg                                | Behind the home page's about section                                             |
+| `swells`                | swells.svg                               | The band above the footer on the home page, and the wide frame on the About page |
+| `compass`               | compass.svg                              | The footer on every page, and beside the About page's name                       |
+| `servers`               | server-rack.jpg                          | Beside the Projects page's name                                                  |
+| `padlock`, `crane`      | padlock.jpg, harbour-cranes.jpg          | The frames on the Projects page (Aletheia, My Homelab)                           |
+| `portrait`, `jellyfish` | portrait.jpg (your own photo), diver.svg | The About page                                                                   |
+| `fluke`                 | whale-tail.jpg                           | Beside the Resume page's name                                                    |
 
 ### Changing a picture
 
 - **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `pnpm run dev` is running: the picture is redone each time you save.
 - **A photo that works** has one clear subject with a strong outline against a plain background. Busy photos turn into noise.
 - **To add a picture:** add an entry with a new name (with an `alt`, or `"decorative": true` if it is only ornament), then show it with `{% picture "name" %}` in a template, or name it as a project's `image` or a page's `picture`.
-- **The photos there now are placeholders** from Unsplash. Replace them with your own when you have them.
+- **The photos are from Unsplash**, except the portrait, which is yours.
+- **The portrait** (`portrait` in `images.json`) is your photo, cut out onto white: the white becomes plain paper. It is finely dithered (`"pattern": "fine"`) and cropped from head to crossed arms. On phones and tablets its frame is square and shows the top of it, the face (`about-page.css`). `"despeckle": true` removes the stray dots the cut-out's faint outline left around the shirt.
 
 ### Credits
 
@@ -841,7 +902,7 @@ Before pushing anything that changes how the site looks or moves, the full check
 toolbox run -c playwright bash -lc 'cd ~/"My Codes/Personal Website/romitraj.dev" && pnpm run check'
 ```
 
-It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the "Lost at sea" page, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a list of blog posts or an About page's latest post that is not brought up to date, moves anything in sight when it is, forgets the last good list while the feed is failing, or is replaced when nothing changed, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check, the build included, runs against stand-ins for Open-Meteo, Spotify and the blog's feed on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy", "Pretend Song" and five stand-in blog posts, it works without an internet connection for those three, and your real keys are never used. It also prints how many picture files there are and what they weigh.
+It prints one line per step and ends with `Check passed.` or a list of problems. Besides broken links it reports: a page without the site's icon or without the tags for its preview card (or with the wrong title, description or address in them), a share image of the wrong size, a tab icon that is not the ink compass on light and the paper compass on dark, a missing address that is not answered with the status 404 and the page for a missing address, that page failing to show or to slide in, a link to a missing page that ends anywhere else, a keyboard focus ring too faint to see (less than 3 to 1 against the paper or the ink), a file that fails to load, a script error, a page wider than its window, a fallback font being used, hero lines that no longer fit, page changes that do not work, anything that moves once a page change has finished, a scroll position that is not returned to, heading letters that would jump during a page change, a letter whose ink is cut by the window it slides in (a raised apostrophe, the tail of a comma), a headline entrance that flashes, ends out of place or leaves the headline hidden, and a picture whose description differs from the one in `images.json` (or that is described although it is marked as decoration), a picture without its size written into the page, one that weighs too much, would be smoothed, fails to load, moves the page as it loads, or sits differently from one browser to the next, and a weather or now-playing widget that shows the wrong thing, does not hide when its service is down, moves the page as it arrives, or lets a key slip into an answer, a list of blog posts or an About page's latest post that is not brought up to date, moves anything in sight when it is, forgets the last good list while the feed is failing, or is replaced when nothing changed, a visitor counter that is loaded on this computer or would count a page change twice on the live site, and drawn lines in the ticker that one browser paints thicker than another. The whole check, the build included, runs against stand-ins for Open-Meteo, Spotify and the blog's feed on your own computer (`scripts/lib/pretend.mjs`), so its screenshots always show "23°C, partly cloudy", "Pretend Song" and five stand-in blog posts, it works without an internet connection for those three, and your real keys are never used. It also prints how many picture files there are and what they weigh.
 
 It runs Chromium, Firefox and WebKit at the same time, each through every test in turn, and prints each browser's results in one piece when that browser is done.
 
@@ -1057,7 +1118,8 @@ If Dokploy can already see both repositories, skip this step.
 | Open https://romitraj.dev/api/posts                       | A line listing your latest blog posts                                                                                                                                                    |
 | Click Projects, a project, About, and use the back button | The pages change with their animations and without a reload                                                                                                                              |
 | Open https://www.romitraj.dev                             | You end up on https://romitraj.dev                                                                                                                                                       |
-| Open https://romitraj.dev/nothing-here/                   | The "Lost at sea" page, its name sliding in                                                                                                                                              |
+| Open https://romitraj.dev/nothing-here/                   | The "Lost in oblivion" page, its name sliding in                                                                                                                                         |
+| Run the WKD check in "The OpenPGP key"                    | Your key, with the fingerprint shown on the About page                                                                                                                                   |
 | Open your Rybbit dashboard                                | Your own visit, counted once per page                                                                                                                                                    |
 | Open the site on your phone                               | The same, in the phone arrangement                                                                                                                                                       |
 
@@ -1117,11 +1179,6 @@ A new LTS line arrives every October. Check https://nodejs.org/en/about/previous
 - **GitHub security alerts:** turn on Dependabot alerts in the repository's settings on GitHub, so GitHub emails you when a dependency has a security problem.
 - **Node.js:** move to the new LTS line each October, as described above.
 - **Every few months:** look for dead links: `pnpm run links`, and `pnpm run links https://blog.romitraj.dev` for the blog.
+- **Before 2029-09-28:** extend your OpenPGP key's expiry date and replace the key file ("The OpenPGP key").
 - **Every 6 months:** renew the Spotify refresh token with `pnpm run spotify`, and copy the new value into the live site's settings ("Spotify: every 6 months"). The current one lasts until about 2027-04-11.
 - **Yearly:** renew the domain, confirm the weather still shows and that Spotify Premium is still active, and check the expiry date of the Cloudflare origin certificate.
-
-## Still to come
-
-These parts of the guide are written when the matching part of the site is built:
-
-- The resume itself. Until `resume.pdf` exists, the Resume page is a short note.
