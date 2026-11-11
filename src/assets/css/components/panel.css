@@ -64,6 +64,7 @@
 
 .panel__list li::marker {
   font-family: var(--font-text);
+  font-size: 0;
   color: transparent;
 }
 
