@@ -3,7 +3,7 @@
   romitraj.dev
 </h1>
 
-My corner of the internet. Part portfolio, part proof that I do finish things (eventually).
+My corner on the internet, where I share my thoughts and show my work.
 
 **[romitraj.dev](https://romitraj.dev)**
 
@@ -16,9 +16,9 @@ My corner of the internet. Part portfolio, part proof that I do finish things (e
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/anchor-dark.svg"><img src="docs/readme/anchor-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What this is
 
-This is the code behind my personal website. It has a home page, a list of things I built, a page about me, and a resume I keep promising to finish. The longer writing lives on [my blog](https://blog.romitraj.dev), and the newest posts show up here by themselves.
+This is the code behind my personal website and portfolio. It has a home page, the projects I've built, a page about me, my resume, and my OpenPGP key if you want to send me an encrypted email. The longer writing lives on [my blog](https://blog.romitraj.dev), and the newest posts show up here by themselves.
 
-The headline says _"What we know is a drop, what we don't know is an ocean."_ That is pretty much the mood of the whole place: a lot of sea, one diver, and a compass in the corner.
+The headline says _"What we know is a drop, what we don't know is an ocean."_ That's the idea behind the whole place: there's always more to learn, especially about the things I think I already know.
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/sparkle-dark.svg"><img src="docs/readme/sparkle-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What makes it special
 
@@ -26,7 +26,7 @@ The headline says _"What we know is a drop, what we don't know is an ocean."_ Th
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/weather-dark.svg"><img src="docs/readme/weather-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Live weather and music.** A thin moving strip on the home page shows the weather in Bangalore, my local time, and the song I'm playing on Spotify right now. If one of those services is having a bad day, that bit just hides. No error messages, no drama.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Every photo and drawing is turned into two colours, ink and paper, each time the site is built. The diver, the compass and the waves were drawn just for this site. Even the page you get for a wrong address is in on it: it tells you the page is lost at sea.
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Every photo and drawing, my own portrait included, is turned into two colours, ink and paper, each time the site is built. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
 
 And it looks the same in Chrome, Edge, Firefox and Safari, on a laptop or a phone. One command opens every page in three browsers and complains loudly if anything is off.
 
@@ -57,8 +57,8 @@ Everything else, from changing a sentence to putting it on a server, is in the [
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/heart-dark.svg"><img src="docs/readme/heart-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Credits
 
-- The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code, words and pictures here are my own.
-- The photographs are placeholders from [Unsplash](https://unsplash.com) until I take my own. Each photographer is named on the site's [Credits page](https://romitraj.dev/credits/).
+- The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code and words here are my own.
+- The photographs are from [Unsplash](https://unsplash.com), and each photographer is named on the site's [Credits page](https://romitraj.dev/credits/). The portrait is mine.
 - Weather data by [Open-Meteo.com](https://open-meteo.com). Icons by [Phosphor Icons](https://phosphoricons.com).
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/scales-dark.svg"><img src="docs/readme/scales-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> License
