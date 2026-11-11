@@ -18,7 +18,7 @@ try:
     from fontTools import subset
     from fontTools.ttLib import TTFont
 except ImportError:
-    sys.exit("fontTools is missing. Install it once with: python -m pip install -r scripts/requirements.txt")
+    sys.exit("fontTools is missing. Run the script through: pnpm run fonts (it sets up its own Python environment)")
 
 ROOT = Path(__file__).resolve().parent.parent
 FONT_LIST = ROOT / "src" / "_data" / "fonts.json"
