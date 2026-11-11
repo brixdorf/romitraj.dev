@@ -37,6 +37,13 @@
     "link": "Say hi"
   },
 
+  "quote": {
+    "note": "The large quote that closes the page, set in the large serif: no straight apostrophe, no slash. 'plain' and 'italic' are its two halves, as in the top banner.",
+    "plain": "It is impossible for a man to learn",
+    "italic": "what he thinks he already knows.",
+    "author": "Epictetus, c. 108 AD"
+  },
+
   "toolbox": {
     "title": "Toolbox",
     "columns": ["Area", "Skills"],

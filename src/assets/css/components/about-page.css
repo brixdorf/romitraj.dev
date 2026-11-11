@@ -1,5 +1,5 @@
 /* The About page: where each card and picture frame sits in the page grid at each window width,
-   plus the portrait's caption and the short piece about the latest blog post. */
+   plus the portrait's caption, the short piece about the latest blog post and the closing quote. */
 .about-page__portrait {
   margin: 0 0 32px;
 }
@@ -76,6 +76,32 @@
   text-decoration: underline;
 }
 
+/* The closing quote: large serif letters, half plain and half italic like the top banner, with
+   the author's name in small grey capitals under it. */
+.saying {
+  margin: 48px 0 0;
+}
+
+.saying__text {
+  margin: 0;
+}
+
+.saying__text p {
+  margin: 0;
+  font-family: var(--font-serif-display);
+  font-size: var(--type-list-title);
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.saying__author {
+  margin-block-start: 24px;
+  font-size: var(--type-micro);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-muted-on-paper);
+}
+
 /* Two columns: cards on the left, frames and links on the right. */
 @media (width >= 600px) {
   /* The first row is exactly as tall as a frame, so the two frames stay together at the top
@@ -131,6 +157,11 @@
   .about-page__toolbox {
     grid-column: 1 / -1;
     grid-row: 6;
+  }
+
+  .about-page__saying {
+    grid-column: 1 / -1;
+    grid-row: 7;
   }
 }
 
@@ -194,5 +225,10 @@
   .about-page__toolbox {
     grid-column: 3 / span 10;
     grid-row: 5;
+  }
+
+  .about-page__saying {
+    grid-column: 3 / span 10;
+    grid-row: 6;
   }
 }

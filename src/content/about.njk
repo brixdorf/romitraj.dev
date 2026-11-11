@@ -7,7 +7,7 @@ picture: compass
 frameTone: ink
 ruled: true
 layout: layouts/page.njk
-description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach him.
+description: Who Romit Raj Sahu is, what he is experimenting with, and how to reach him.
 ---
 {#-
   The About page: a grid of cards and picture frames. All of its words are in _data/about.json.
@@ -109,4 +109,12 @@ description: Who Romit Raj Sahu is, what he is tinkering with, and how to reach 
       </tbody>
     </table>
   </section>
+
+  {#- A closing thought in large serif letters. It echoes the "Who" card: learning more about the things you think you already know. #}
+  <figure class="saying about-page__saying" data-part="card">
+    <blockquote class="saying__text">
+      <p>{{ about.quote.plain }} <i>{{ about.quote.italic }}</i></p>
+    </blockquote>
+    <figcaption class="saying__author">{{ about.quote.author }}</figcaption>
+  </figure>
 </div>
