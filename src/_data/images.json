@@ -120,15 +120,6 @@
         "zoom": 1.25
       }
     },
-    "ship": {
-      "source": "container-ship.jpg",
-      "alt": "A container ship under way, seen from above.",
-      "across": 170,
-      "shape": "13:5",
-      "black": 0.27,
-      "white": 0.62,
-      "sharpen": 1
-    },
     "crane": {
       "source": "harbour-cranes.jpg",
       "alt": "Harbour cranes in silhouette against a low sun.",
