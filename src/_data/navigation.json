@@ -6,19 +6,19 @@
       {
         "title": "Blog",
         "url": "https://blog.romitraj.dev",
-        "hint": "Longer thoughts, on a separate site"
+        "hint": "Sometimes technical, sometimes personal"
       }
     ]
   },
   {
     "label": "Me",
     "items": [
-      { "title": "About", "url": "/about/", "hint": "Who I am, minus the buzzwords" },
+      { "title": "About", "url": "/about/", "hint": "Who I really am" },
       { "title": "Resume", "url": "/resume/", "hint": "The formal version of all this" },
       {
         "title": "Credits",
         "url": "/credits/",
-        "hint": "Who to thank for what",
+        "hint": "The great folks who deserve a mention",
         "footerOnly": true
       }
     ]
