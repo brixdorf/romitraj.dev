@@ -16,6 +16,7 @@
     "fit": "node scripts/fit.mjs",
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs",
+    "links": "node scripts/links.mjs",
     "lint": "vp check",
     "format": "vp check --fix",
     "test": "vp test",
