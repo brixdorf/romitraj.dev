@@ -9,7 +9,7 @@ My corner of the internet. Part portfolio, part proof that I do finish things (e
 
 ![Eleventy](https://img.shields.io/badge/Eleventy-2a2722?style=flat-square&logo=eleventy&logoColor=fafafa)
 ![GSAP](https://img.shields.io/badge/GSAP-2a2722?style=flat-square&logo=gsap&logoColor=fafafa)
-![esbuild](https://img.shields.io/badge/esbuild-2a2722?style=flat-square&logo=esbuild&logoColor=fafafa)
+![Vite+](https://img.shields.io/badge/Vite%2B-2a2722?style=flat-square&logo=vite&logoColor=fafafa)
 ![Node.js](https://img.shields.io/badge/Node.js-2a2722?style=flat-square&logo=nodedotjs&logoColor=fafafa)
 
 ![The home page: the headline "What we know is a drop, what we don't know is an ocean" in very large letters, above a pixel picture of a whale's tail](docs/screenshot.png)
@@ -36,19 +36,19 @@ Nothing fancy, on purpose.
 
 - **[Eleventy](https://www.11ty.dev)** turns plain text files into the pages. Changing any text on the site means editing one file.
 - **[GSAP](https://gsap.com)** and **[Taxi.js](https://github.com/craftedbygc/taxi)** do the movement and the page changes.
-- **[esbuild](https://esbuild.github.io)** packs the styles and scripts into two small files.
+- **[Vite+](https://viteplus.dev)** packs the styles and scripts into two small files, keeps the code tidy and runs the tests.
 - **[sharp](https://sharp.pixelplumbing.com)** makes the pixel pictures.
 - A tiny **[Node.js](https://nodejs.org)** server hands out the pages and fetches the weather and the song.
 - **[Playwright](https://playwright.dev)** is the one that opens three browsers and complains.
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/terminal-dark.svg"><img src="docs/readme/terminal-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Run it on your computer
 
-You need [Node.js](https://nodejs.org) 24. Then it's three commands:
+You need [Node.js](https://nodejs.org) 26 and [pnpm](https://pnpm.io) ([Vite+](https://viteplus.dev) brings both). Then it's three commands:
 
 ```
-npm install      # once, to fetch what it needs
-npm run dev      # the site, live at http://localhost:8080
-npm run check    # build it and test it in three browsers
+pnpm install      # once, to fetch what it needs
+pnpm run dev      # the site, live at http://localhost:8080
+pnpm run check    # build it and test it in three browsers
 ```
 
 Two things to know. The site's real fonts are licensed, so they are not in this repository; without them it uses free look-alikes and still works. And the weather shows up on its own, but the song needs Spotify keys of your own.
