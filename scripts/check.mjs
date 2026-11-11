@@ -1,5 +1,6 @@
 // Checks the site before a commit: builds it, looks for broken links between its own pages and
-// files, photographs every page in Chromium, Firefox and WebKit at laptop, tablet and phone widths,
+// files, photographs every page in Chromium, Firefox and WebKit (all three at the same time) at
+// laptop, tablet and phone widths,
 // confirms the hero's big lines still fit their space, clicks from page to page in each browser
 // to confirm the page changes work, that nothing moves once a page change has finished, and that
 // back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
@@ -261,211 +262,219 @@ try {
   }
 
   fs.rmSync(shotsDir, { recursive: true, force: true });
-  for (const [engineName, engine] of Object.entries(engines)) {
-    let browser;
+  // The three browsers run at the same time, each through every test below in turn. What each
+  // one reports is held back and printed in one piece when that browser is done, so the lines of
+  // two browsers never mix.
+  async function oneBrowser(engineName, engine) {
+    const said = [];
+    const say = (...parts) => said.push(parts.join(' '));
     try {
-      browser = await engine.launch(launchOptions(engineName));
-    } catch (error) {
-      console.log(
-        `\nCould not start ${engineName}. Install the browsers once with: pnpm exec playwright install chromium firefox webkit`,
-      );
-      throw error;
-    }
-    for (const [viewportName, settings] of Object.entries(viewports)) {
-      const dir = path.join(shotsDir, viewportName, engineName);
-      fs.mkdirSync(dir, { recursive: true });
-      const options = {
-        viewport: settings.viewport,
-        deviceScaleFactor: settings.deviceScaleFactor,
-      };
-      // Firefox has no phone mode; it still gets the phone-sized window.
-      if (settings.mobile && engineName !== 'firefox')
-        Object.assign(options, { isMobile: true, hasTouch: true });
-      const context = await browser.newContext(options);
-      // Tells the site's scripts to use fixed starting points for anything they would otherwise place
-      // at random, so the same page gives the same picture on every run.
-      await context.addInitScript(() => {
-        window.steadyMotion = true;
-      });
-      // Hover fades are switched off for the photographs. Chromium briefly squeezes the page while it
-      // photographs it, which would otherwise catch labels that only show on phones in the middle of fading out.
-      const noFades = '*, *::before, *::after { transition: none !important; }';
-      const page = await context.newPage();
-      const problems = [];
-      page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));
-      // Nothing here may ever reach the visitor counter: that is for the live site only.
-      page.on('request', (request) => {
-        if (new URL(request.url()).hostname === counterHost)
-          problems.push(
-            `${new URL(page.url()).pathname} asked the visitor counter for ${request.url()}`,
-          );
-      });
-      // The free fallback fonts should never be needed. If one is fetched, a licensed font failed or lacks a character.
-      page.on('request', (request) => {
-        const url = new URL(request.url());
-        if (url.pathname.startsWith('/assets/fonts/') && url.pathname.endsWith('.woff2')) {
-          problems.push(
-            `fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (pnpm run fonts lists the characters each licensed font lacks)`,
-          );
-        }
-      });
-      // (The page for a missing address is photographed at its own file name, which is answered with a 404 on purpose.)
-      page.on('response', (response) => {
-        if (response.status() >= 400 && new URL(response.url()).pathname !== '/404.html')
-          problems.push(`${response.url()} answered ${response.status()}`);
-      });
-      page.on('pageerror', (error) =>
-        problems.push(`script error on ${new URL(page.url()).pathname}: ${error.message}`),
-      );
-      for (const pagePath of pages) {
-        await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
-        await page.addStyleTag({ content: noFades });
-        await page.evaluate(() => document.fonts.ready);
-        // Pictures further down the page are normally fetched only when they come near the window.
-        // For the photograph they are all fetched now.
-        await page.evaluate(() => {
-          for (const image of document.images) image.loading = 'eager';
+      let browser;
+      try {
+        browser = await engine.launch(launchOptions(engineName));
+      } catch (error) {
+        say(
+          `\nCould not start ${engineName}. Install the browsers once with: pnpm exec playwright install chromium firefox webkit`,
+        );
+        throw error;
+      }
+      for (const [viewportName, settings] of Object.entries(viewports)) {
+        const dir = path.join(shotsDir, viewportName, engineName);
+        fs.mkdirSync(dir, { recursive: true });
+        const options = {
+          viewport: settings.viewport,
+          deviceScaleFactor: settings.deviceScaleFactor,
+        };
+        // Firefox has no phone mode; it still gets the phone-sized window.
+        if (settings.mobile && engineName !== 'firefox')
+          Object.assign(options, { isMobile: true, hasTouch: true });
+        const context = await browser.newContext(options);
+        // Tells the site's scripts to use fixed starting points for anything they would otherwise place
+        // at random, so the same page gives the same picture on every run.
+        await context.addInitScript(() => {
+          window.steadyMotion = true;
         });
-        await page
-          .waitForFunction(() => [...document.images].every((image) => image.complete), null, {
-            timeout: 8000,
-          })
-          .catch(() => problems.push(`${pagePath}: some pictures did not finish loading`));
-        // A page should never be wider than its window.
-        const overflow = await page.evaluate(
-          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        // Hover fades are switched off for the photographs. Chromium briefly squeezes the page while it
+        // photographs it, which would otherwise catch labels that only show on phones in the middle of fading out.
+        const noFades = '*, *::before, *::after { transition: none !important; }';
+        const page = await context.newPage();
+        const problems = [];
+        page.on('requestfailed', (request) => problems.push(`${request.url()} failed to load`));
+        // Nothing here may ever reach the visitor counter: that is for the live site only.
+        page.on('request', (request) => {
+          if (new URL(request.url()).hostname === counterHost)
+            problems.push(
+              `${new URL(page.url()).pathname} asked the visitor counter for ${request.url()}`,
+            );
+        });
+        // The free fallback fonts should never be needed. If one is fetched, a licensed font failed or lacks a character.
+        page.on('request', (request) => {
+          const url = new URL(request.url());
+          if (url.pathname.startsWith('/assets/fonts/') && url.pathname.endsWith('.woff2')) {
+            problems.push(
+              `fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (pnpm run fonts lists the characters each licensed font lacks)`,
+            );
+          }
+        });
+        // (The page for a missing address is photographed at its own file name, which is answered with a 404 on purpose.)
+        page.on('response', (response) => {
+          if (response.status() >= 400 && new URL(response.url()).pathname !== '/404.html')
+            problems.push(`${response.url()} answered ${response.status()}`);
+        });
+        page.on('pageerror', (error) =>
+          problems.push(`script error on ${new URL(page.url()).pathname}: ${error.message}`),
         );
-        if (overflow > 0) problems.push(`${pagePath} is ${overflow}px wider than the window`);
-        const name =
-          pagePath === '/'
-            ? 'home'
-            : pagePath
-                .replace(/^\/|\/$/g, '')
-                .replace(/\//g, '-')
-                .replace(/\.html$/, '');
-        await page.screenshot({ path: path.join(dir, `${name}.png`), fullPage: true });
+        for (const pagePath of pages) {
+          await page.goto(`${server.address}${pagePath}`, { waitUntil: 'load' });
+          await page.addStyleTag({ content: noFades });
+          await page.evaluate(() => document.fonts.ready);
+          // Pictures further down the page are normally fetched only when they come near the window.
+          // For the photograph they are all fetched now.
+          await page.evaluate(() => {
+            for (const image of document.images) image.loading = 'eager';
+          });
+          await page
+            .waitForFunction(() => [...document.images].every((image) => image.complete), null, {
+              timeout: 8000,
+            })
+            .catch(() => problems.push(`${pagePath}: some pictures did not finish loading`));
+          // A page should never be wider than its window.
+          const overflow = await page.evaluate(
+            () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          );
+          if (overflow > 0) problems.push(`${pagePath} is ${overflow}px wider than the window`);
+          const name =
+            pagePath === '/'
+              ? 'home'
+              : pagePath
+                  .replace(/^\/|\/$/g, '')
+                  .replace(/\//g, '-')
+                  .replace(/\.html$/, '');
+          await page.screenshot({ path: path.join(dir, `${name}.png`), fullPage: true });
+        }
+        if (problems.length) {
+          say(
+            `\nPROBLEMS in ${engineName} at ${viewportName}:\n  ` +
+              [...new Set(problems)].join('\n  '),
+          );
+          process.exitCode = 1;
+        }
+        await context.close();
       }
-      if (problems.length) {
-        console.log(
-          `\nPROBLEMS in ${engineName} at ${viewportName}:\n  ` +
-            [...new Set(problems)].join('\n  '),
-        );
-        process.exitCode = 1;
-      }
-      await context.close();
-    }
 
-    // ---- 5. Do the hero's big lines still fit? (measured once, in Chromium) ----
-    if (engineName === 'chromium') {
-      const saved = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
-      const measured = await measureTextWidths(await browser.newPage(), server.address);
-      const off = Object.keys(measured).filter(
-        (name) => Math.abs(measured[name] - saved[name]) / measured[name] > 0.005,
-      );
-      if (off.length) {
-        console.log(
-          `\nHERO LINES NO LONGER FIT: ${off.join(', ')}. The headline's words or fonts changed. Run: pnpm run fit`,
+      // ---- 5. Do the hero's big lines still fit? (measured once, in Chromium) ----
+      if (engineName === 'chromium') {
+        const saved = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
+        const measured = await measureTextWidths(await browser.newPage(), server.address);
+        const off = Object.keys(measured).filter(
+          (name) => Math.abs(measured[name] - saved[name]) / measured[name] > 0.005,
+        );
+        if (off.length) {
+          say(
+            `\nHERO LINES NO LONGER FIT: ${off.join(', ')}. The headline's words or fonts changed. Run: pnpm run fit`,
+          );
+          process.exitCode = 1;
+        } else {
+          say('Hero lines: all fit their space.');
+        }
+      }
+      // ---- 6. Page changes: click from page to page the way a visitor would ----
+      const walkProblems = await walkThePages(browser, server.address);
+      if (walkProblems.length) {
+        say(`\nPAGE CHANGE PROBLEMS in ${engineName}:\n  ` + walkProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- 7. Headings cut into letters: does any letter move? ----
+      const letterProblems = await lettersOnEveryPage(browser, server.address, pages);
+      if (letterProblems.length) {
+        say(
+          `\nLETTERS THAT MOVE in ${engineName} (they would jump during a page change):\n  ` +
+            letterProblems.slice(0, 20).join('\n  ') +
+            (letterProblems.length > 20 ? `\n  ... and ${letterProblems.length - 20} more` : ''),
         );
         process.exitCode = 1;
-      } else {
-        console.log('Hero lines: all fit their space.');
       }
-    }
-    // ---- 6. Page changes: click from page to page the way a visitor would ----
-    const walkProblems = await walkThePages(browser, server.address);
-    if (walkProblems.length) {
-      console.log(`\nPAGE CHANGE PROBLEMS in ${engineName}:\n  ` + walkProblems.join('\n  '));
-      process.exitCode = 1;
-    }
-    // ---- 7. Headings cut into letters: does any letter move? ----
-    const letterProblems = await lettersOnEveryPage(browser, server.address, pages);
-    if (letterProblems.length) {
-      console.log(
-        `\nLETTERS THAT MOVE in ${engineName} (they would jump during a page change):\n  ` +
-          letterProblems.slice(0, 20).join('\n  ') +
-          (letterProblems.length > 20 ? `\n  ... and ${letterProblems.length - 20} more` : ''),
+      const cutProblems = await wholeLettersOnEveryPage(browser, server.address, pages);
+      if (cutProblems.length) {
+        say(
+          `\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` +
+            cutProblems.slice(0, 20).join('\n  ') +
+            (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''),
+        );
+        process.exitCode = 1;
+      }
+      // ---- The site's icon: is it served, and is it the ink compass on a light tab and the paper compass on a dark one? ----
+      const iconProblems = await siteIconInBrowser(browser, server.address);
+      if (iconProblems.length) {
+        say(`\nSITE ICON PROBLEMS in ${engineName}:\n  ` + iconProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- The page for a missing address: its entrance, its ways back, and links that lead to it ----
+      const lostProblems = await lostPage(browser, server.address);
+      if (lostProblems.length) {
+        say(`\nMISSING PAGE PROBLEMS in ${engineName}:\n  ` + lostProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- 8. The headline's entrance on the home page ----
+      const entranceProblems = await headlineEntrance(browser, server.address);
+      if (entranceProblems.length) {
+        say(`\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- Widgets on the page: shown when all is well, hidden quietly when not ----
+      const widgetProblems = await widgetsOnThePage(browser, server.address, quietServer.address);
+      if (widgetProblems.length) {
+        say(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- The blog's posts on the home page and the About page: brought up to date, moving nothing in sight ----
+      const postAddresses = {
+        sameAddress: server.address,
+        newerAddress: newerServer.address,
+        quietAddress: quietServer.address,
+        shown: postsShown,
+      };
+      const postProblems = [
+        ...(await postsOnThePage(browser, postAddresses)),
+        ...(await latestOnTheAboutPage(browser, postAddresses)),
+      ];
+      if (postProblems.length) {
+        say(`\nBLOG POST PROBLEMS in ${engineName}:\n  ` + postProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- The visitor counter: absent here, loaded once and counting once on the live site ----
+      const countingProblems = await visitorCounting(browser, server.address);
+      if (countingProblems.length) {
+        say(`\nVISITOR COUNTER PROBLEMS in ${engineName}:\n  ` + countingProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- 9. Pictures: sized, described, sharp, and moving nothing as they load ----
+      const { problems: pictureProblems, where } = await picturesHoldStill(
+        browser,
+        server.address,
+        pages,
       );
-      process.exitCode = 1;
-    }
-    const cutProblems = await wholeLettersOnEveryPage(browser, server.address, pages);
-    if (cutProblems.length) {
-      console.log(
-        `\nLETTERS CUT BY THEIR VISIBLE WINDOW in ${engineName}:\n  ` +
-          cutProblems.slice(0, 20).join('\n  ') +
-          (cutProblems.length > 20 ? `\n  ... and ${cutProblems.length - 20} more` : ''),
+      pictureWhere[engineName] = where;
+      dashRows[engineName] = await dashThickness(browser, server.address);
+      if (pictureProblems.length) {
+        say(
+          `\nPICTURE PROBLEMS in ${engineName}:\n  ` +
+            pictureProblems.slice(0, 20).join('\n  ') +
+            (pictureProblems.length > 20 ? `\n  ... and ${pictureProblems.length - 20} more` : ''),
+        );
+        process.exitCode = 1;
+      }
+      await browser.close();
+      say(
+        `Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, blog posts, visitor counter and pictures: ${engineName} done.`,
       );
-      process.exitCode = 1;
+    } finally {
+      if (said.length) console.log(said.join('\n'));
     }
-    // ---- The site's icon: is it served, and is it the ink compass on a light tab and the paper compass on a dark one? ----
-    const iconProblems = await siteIconInBrowser(browser, server.address);
-    if (iconProblems.length) {
-      console.log(`\nSITE ICON PROBLEMS in ${engineName}:\n  ` + iconProblems.join('\n  '));
-      process.exitCode = 1;
-    }
-    // ---- The page for a missing address: its entrance, its ways back, and links that lead to it ----
-    const lostProblems = await lostPage(browser, server.address);
-    if (lostProblems.length) {
-      console.log(`\nMISSING PAGE PROBLEMS in ${engineName}:\n  ` + lostProblems.join('\n  '));
-      process.exitCode = 1;
-    }
-    // ---- 8. The headline's entrance on the home page ----
-    const entranceProblems = await headlineEntrance(browser, server.address);
-    if (entranceProblems.length) {
-      console.log(
-        `\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '),
-      );
-      process.exitCode = 1;
-    }
-    // ---- Widgets on the page: shown when all is well, hidden quietly when not ----
-    const widgetProblems = await widgetsOnThePage(browser, server.address, quietServer.address);
-    if (widgetProblems.length) {
-      console.log(`\nWIDGET PROBLEMS in ${engineName}:\n  ` + widgetProblems.join('\n  '));
-      process.exitCode = 1;
-    }
-    // ---- The blog's posts on the home page and the About page: brought up to date, moving nothing in sight ----
-    const postAddresses = {
-      sameAddress: server.address,
-      newerAddress: newerServer.address,
-      quietAddress: quietServer.address,
-      shown: postsShown,
-    };
-    const postProblems = [
-      ...(await postsOnThePage(browser, postAddresses)),
-      ...(await latestOnTheAboutPage(browser, postAddresses)),
-    ];
-    if (postProblems.length) {
-      console.log(`\nBLOG POST PROBLEMS in ${engineName}:\n  ` + postProblems.join('\n  '));
-      process.exitCode = 1;
-    }
-    // ---- The visitor counter: absent here, loaded once and counting once on the live site ----
-    const countingProblems = await visitorCounting(browser, server.address);
-    if (countingProblems.length) {
-      console.log(
-        `\nVISITOR COUNTER PROBLEMS in ${engineName}:\n  ` + countingProblems.join('\n  '),
-      );
-      process.exitCode = 1;
-    }
-    // ---- 9. Pictures: sized, described, sharp, and moving nothing as they load ----
-    const { problems: pictureProblems, where } = await picturesHoldStill(
-      browser,
-      server.address,
-      pages,
-    );
-    pictureWhere[engineName] = where;
-    dashRows[engineName] = await dashThickness(browser, server.address);
-    if (pictureProblems.length) {
-      console.log(
-        `\nPICTURE PROBLEMS in ${engineName}:\n  ` +
-          pictureProblems.slice(0, 20).join('\n  ') +
-          (pictureProblems.length > 20 ? `\n  ... and ${pictureProblems.length - 20} more` : ''),
-      );
-      process.exitCode = 1;
-    }
-    await browser.close();
-    console.log(
-      `Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, blog posts, visitor counter and pictures: ${engineName} done.`,
-    );
   }
+  await Promise.all(
+    Object.entries(engines).map(([engineName, engine]) => oneBrowser(engineName, engine)),
+  );
   // ---- 10. Does every browser show the same part of each picture in the same place? ----
   const differences = picturesDiffer(pictureWhere);
   if (differences.length) {
