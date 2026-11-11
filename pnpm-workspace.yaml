@@ -8,3 +8,23 @@ saveExact: true
 # this computer arrived.
 allowBuilds:
   esbuild: true
+
+# Vite+ brings its own build of Vite, numbered like Vite+ itself (1.6.0). Vitest asks for Vite 6
+# to 8 and would warn about that number; this tells pnpm the Vite+ build is fine.
+peerDependencyRules:
+  allowAny:
+    - vite
+
+# pnpm waits a day before installing a new release. Vite+ 1.6.0 was hours old when it was added,
+# so it is let through by name. These lines can go at the next update of Vite+.
+minimumReleaseAgeExclude:
+  - '@voidzero-dev/vite-plus-core@1.6.0'
+  - '@voidzero-dev/vite-plus-darwin-arm64@1.6.0'
+  - '@voidzero-dev/vite-plus-darwin-x64@1.6.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.6.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.6.0'
+  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.6.0'
+  - '@voidzero-dev/vite-plus-linux-x64-musl@1.6.0'
+  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.6.0'
+  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.6.0'
+  - vite-plus@1.6.0

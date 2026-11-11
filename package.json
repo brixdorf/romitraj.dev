@@ -20,6 +20,9 @@
     "fit": "node scripts/fit.mjs",
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs",
+    "lint": "vp check",
+    "format": "vp check --fix",
+    "test": "vp test",
     "speed": "node scripts/speed.mjs",
     "spotify": "node scripts/spotify.mjs",
     "share": "node scripts/share.mjs"
@@ -32,6 +35,7 @@
     "sharp": "0.35.5"
   },
   "devDependencies": {
-    "playwright": "1.65.0"
+    "playwright": "1.65.0",
+    "vite-plus": "1.6.0"
   }
 }
