@@ -9,7 +9,7 @@
 // not depend on them.
 // Run it with: npm run speed     (add a page, for example: npm run speed -- /about/)
 import { chromium } from 'playwright';
-import { buildSite, startServer } from './lib/site.mjs';
+import { buildSite, startServer, launchOptions } from './lib/site.mjs';
 import { startPretend } from './lib/pretend.mjs';
 
 const pagePath = process.argv[2] || '/';
@@ -55,7 +55,7 @@ const pretend = await startPretend(4176);
 process.env.BLOG_FEED_URL = pretend.env.BLOG_FEED_URL;
 await buildSite();
 const server = await startServer(4175, pretend.env);
-const browser = await chromium.launch();
+const browser = await chromium.launch(launchOptions('chromium'));
 try {
   const compare = pagePath === '/';
   for (const [name, setting] of Object.entries(settings)) {

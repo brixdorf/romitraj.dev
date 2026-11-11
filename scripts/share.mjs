@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import sharp from 'sharp';
-import { root, siteDir, buildSite, startServer } from './lib/site.mjs';
+import { root, siteDir, buildSite, startServer, launchOptions } from './lib/site.mjs';
 
 const read = (file) => JSON.parse(fs.readFileSync(path.join(root, 'src', '_data', file), 'utf8'));
 const site = read('site.json');
@@ -39,7 +39,7 @@ if (!fs.existsSync(path.join(siteDir, 'fonts'))) {
   throw new Error('The licensed fonts are not on this computer (the private folder next door is missing), so the share image cannot be drawn. The one in src/assets/img/share.png stays as it is.');
 }
 const server = await startServer(4178);
-const browser = await chromium.launch();
+const browser = await chromium.launch(launchOptions('chromium'));
 try {
   // ---- The share image ----
   // The page borrows the head of the built home page: the fonts and the site's stylesheet.

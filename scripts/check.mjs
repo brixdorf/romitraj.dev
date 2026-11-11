@@ -20,7 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium, firefox, webkit } from 'playwright';
-import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidths } from './lib/site.mjs';
+import { root, siteDir, textWidthsFile, buildSite, startServer, measureTextWidths, launchOptions } from './lib/site.mjs';
 import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.mjs';
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
@@ -216,7 +216,7 @@ try {
   for (const [engineName, engine] of Object.entries(engines)) {
     let browser;
     try {
-      browser = await engine.launch();
+      browser = await engine.launch(launchOptions(engineName));
     } catch (error) {
       console.log(`\nCould not start ${engineName}. Install the browsers once with: npx playwright install chromium firefox webkit`);
       throw error;

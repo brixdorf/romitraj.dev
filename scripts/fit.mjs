@@ -4,11 +4,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { root, textWidthsFile, buildSite, startServer, measureTextWidths } from './lib/site.mjs';
+import { root, textWidthsFile, buildSite, startServer, measureTextWidths, launchOptions } from './lib/site.mjs';
 
 await buildSite();
 const server = await startServer(4174);
-const browser = await chromium.launch();
+const browser = await chromium.launch(launchOptions('chromium'));
 try {
   const before = JSON.parse(fs.readFileSync(textWidthsFile, 'utf8'));
   const measured = await measureTextWidths(await browser.newPage(), server.address);

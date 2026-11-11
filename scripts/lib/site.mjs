@@ -10,6 +10,12 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 export const siteDir = path.join(root, '_site');
 export const textWidthsFile = path.join(root, 'src', '_data', 'textWidths.json');
 
+// How every script here starts a test browser. On Linux, Chromium rounds the width of each letter
+// to whole pixels (font hinting), so its lines run a pixel shorter or longer than in Firefox,
+// WebKit, or Chrome on Windows and macOS, and a long text can wrap one line differently. With
+// hinting off, it lays text out like the others. The setting does nothing on Windows and macOS.
+export const launchOptions = (engineName) => (engineName === 'chromium' ? { args: ['--font-render-hinting=none'] } : {});
+
 // Builds the site from scratch into _site/.
 export async function buildSite() {
   process.chdir(root);
