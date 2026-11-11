@@ -1,5 +1,5 @@
 {
-  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. All are placeholder photos from Unsplash, free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the whale’s tail'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. The drawings (the .svg files) are the site's own and need none.",
+  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. The photos from Unsplash are free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the whale’s tail'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. A photo of the site's own (the portrait) is marked \"own\": true and needs only its photographer; the Credits page leaves it out. The drawings (the .svg files) are the site's own and need no entry.",
   "photos": {
     "whale-tail.jpg": {
       "photographer": "Zac Bowling",
@@ -7,11 +7,9 @@
       "subject": "the whale’s tail",
       "url": "https://unsplash.com/photos/a-whale-tail-flups-out-of-the-water-1QF3rWzi7CM"
     },
-    "marble-bust.jpg": {
-      "photographer": "Ian Noble",
-      "profile": "https://unsplash.com/@i_m_noble",
-      "subject": "the marble bust",
-      "url": "https://unsplash.com/photos/ancient-man-statue-jpBx2YFfVAU"
+    "portrait.jpg": {
+      "photographer": "Romit Raj Sahu",
+      "own": true
     },
     "server-rack.jpg": {
       "photographer": "Domaintechnik",

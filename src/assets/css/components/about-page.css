@@ -9,6 +9,11 @@
   aspect-ratio: 1;
 }
 
+/* The square frame on phones and tablets shows the top of the tall portrait: the face. */
+.about-page__portrait-frame .picture {
+  object-position: 50% 10%;
+}
+
 .about-page__caption {
   margin-block-start: 8px;
   font-size: var(--type-micro);
