@@ -4,7 +4,7 @@ picture: fluke
 layout: layouts/page.njk
 description: The resume of Romit Raj Sahu.
 ---
-{#- Shown until resume.pdf exists: a short note and the contact email. Its words are in _data/pages.json ("resume"). -#}
+{#- One card with a few words and the link to the resume itself (src/assets/files/resume.pdf, published at /resume.pdf). Its words are in _data/pages.json ("resume"). The link loads the PDF the ordinary way (data-taxi-ignore), not as a page change. -#}
 <div class="page-grid" data-part="cards">
   <section class="panel page-grid__main" data-part="card">
     <h2 class="panel__title">{{ pages.resume.title }}</h2>
@@ -13,6 +13,6 @@ description: The resume of Romit Raj Sahu.
       <p>{{ paragraph | fill | safe }}</p>
       {%- endfor %}
     </div>
-    <a class="link panel__action" href="mailto:{{ site.email }}">{{ pages.resume.link }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+    <a class="link panel__action" href="{{ downloads.resume }}" data-taxi-ignore>{{ pages.resume.link }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
   </section>
 </div>
