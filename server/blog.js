@@ -15,7 +15,7 @@ const site = JSON.parse(fs.readFileSync(path.join(data, 'site.json'), 'utf8'));
 const shown = JSON.parse(fs.readFileSync(path.join(data, 'home.json'), 'utf8')).writing.count;
 const blogHost = new URL(site.blogUrl).host;
 
-// BLOG_FEED_URL is only set by npm run check and npm run speed, which point it at a stand-in on this computer.
+// BLOG_FEED_URL is only set by pnpm run check and pnpm run speed, which point it at a stand-in on this computer.
 export const feedAddress = () => process.env.BLOG_FEED_URL || new URL('/rss.xml', site.blogUrl).href;
 
 // Pulls the text of one tag out of a piece of the feed, and tidies it for display.

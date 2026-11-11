@@ -5,7 +5,7 @@ Reads the list of fonts from src/_data/fonts.json, takes each source file from
 and writes the result to ../romitraj-private/fonts/web/. The source files are only
 read, never changed. It also writes a short fingerprint of every converted file to
 src/_data/fontVersions.json, so browsers fetch a font again when it changes.
-Run it with: npm run fonts
+Run it with: pnpm run fonts
 """
 
 import hashlib

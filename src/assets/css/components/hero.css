@@ -3,7 +3,7 @@
    lists sit in its grid too.
 
    Sizing the big lines: a script measures how wide each line runs, in units of its own font size
-   (npm run fit writes these to _data/textWidths.json). The font size is then the space the line
+   (pnpm run fit writes these to _data/textWidths.json). The font size is then the space the line
    should fill, divided by that number. "100cqw" below means the full width of the hero's content. */
 .hero {
   container-type: inline-size;

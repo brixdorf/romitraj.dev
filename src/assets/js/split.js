@@ -2,7 +2,7 @@
 // single letters, or a paragraph into its lines as they wrap on screen. Each function returns the
 // parts and a "restore" function that puts the original text back.
 // Cutting must not move anything: every letter and every line stays exactly where it was.
-// (npm run check tests this on every page at many window widths.)
+// (pnpm run check tests this on every page at many window widths.)
 
 // Text normally runs across and lines stack downward. The phone's headline is set on its side:
 // there the text runs down and the lines stack sideways. These read a box's place along its

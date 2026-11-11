@@ -10,7 +10,7 @@
 // - To the sides it reaches half a letter-height past the box. The slide is up or down, so the
 //   sides play no part in it, and ink that leans out of a narrow box sideways (the tail of an
 //   italic comma under the letter before it) must not be cut off.
-// "npm run check" tests that no letter's ink reaches outside "all" (scripts/lib/letters.mjs).
+// "pnpm run check" tests that no letter's ink reaches outside "all" (scripts/lib/letters.mjs).
 export const shape = {
   all: 'inset(-10% -0.5em -10% -0.5em)',
   topEdge: 'inset(-10% -0.5em 110% -0.5em)',

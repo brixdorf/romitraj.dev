@@ -150,7 +150,7 @@ export const scroll = {
   // ...each starting somewhere between these two points, as a share of the row's width (minus is left).
   // Every page load picks new starting points.
   rowOffsetRange: [-0.5, 0.25],
-  // The fixed starting points used instead while npm run check photographs the pages, so that
+  // The fixed starting points used instead while pnpm run check photographs the pages, so that
   // screenshots can be compared from one run to the next. The list repeats if there are more rows.
   rowOffsetsForChecks: [0.3, -0.24, 0.4, -0.32, 0.26, -0.38],
   // A row fades away as it leaves through the top of the window.

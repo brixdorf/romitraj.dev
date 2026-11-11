@@ -60,10 +60,10 @@ export default function (eleventyConfig) {
 
   // The share image: the card that WhatsApp, LinkedIn, X and similar apps show beside a link to
   // the site. It is a picture kept in the repository (src/assets/img/share.png, made by
-  // "npm run share"), copied into the built site as it is. Those apps need its full address, and
+  // "pnpm run share"), copied into the built site as it is. Those apps need its full address, and
   // its fingerprint makes them fetch a changed picture again.
   const shareFile = 'src/assets/img/share.png';
-  if (!fs.existsSync(shareFile)) throw new Error(`${shareFile} is missing. Make it with: npm run share`);
+  if (!fs.existsSync(shareFile)) throw new Error(`${shareFile} is missing. Make it with: pnpm run share`);
   eleventyConfig.addPassthroughCopy({ [shareFile]: 'assets/img/share.png' });
   eleventyConfig.addGlobalData('shareImage', {
     url: `${site.url}/assets/img/share.png?v=${createHash('sha256').update(fs.readFileSync(shareFile)).digest('hex').slice(0, 8)}`,
@@ -197,7 +197,7 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addWatchTarget('./scripts/icons.mjs');
 
-  // The local preview (npm run dev) answers the widgets' questions the same way the live
+  // The local preview (pnpm run dev) answers the widgets' questions the same way the live
   // server does, so the weather, the now-playing line and the latest posts show while developing too.
   eleventyConfig.setServerOptions({
     middleware: [

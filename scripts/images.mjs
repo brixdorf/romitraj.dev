@@ -162,7 +162,7 @@ async function makeTexture(settings, shape) {
 
 const fingerprint = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 8);
 
-// Pictures already converted in this run of the build, so that "npm run dev" only redoes a
+// Pictures already converted in this run of the build, so that "pnpm run dev" only redoes a
 // picture when its source file or its settings change.
 const remembered = new Map();
 

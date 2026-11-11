@@ -7,7 +7,7 @@ Latin characters, and saves them with their license files in src/assets/fonts/.
 It then measures each one against the licensed font it stands in for, and writes
 how much to scale it to src/_data/fallbackFonts.json, so the page keeps its shape
 if a fallback is ever used.
-Run it with: npm run fonts:fallback   (only needed when the font list changes)
+Run it with: pnpm run fonts:fallback   (only needed when the font list changes)
 """
 
 import io
@@ -65,7 +65,7 @@ def percent(value: float) -> str:
 def main() -> None:
     fonts = json.loads(FONT_LIST.read_text(encoding="utf-8"))
     if not all((WEB_DIR / font["file"]).is_file() for font in fonts):
-        sys.exit("The licensed web fonts are missing. Run npm run fonts first.")
+        sys.exit("The licensed web fonts are missing. Run pnpm run fonts first.")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Download, cut down and save each fallback font, with its license.

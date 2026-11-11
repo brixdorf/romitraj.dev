@@ -7,7 +7,7 @@
 // Like the check, it builds and serves the site with stand-ins for the weather, the music and the
 // blog's feed, so it never contacts the real ones or uses the keys in .env, and the numbers do
 // not depend on them.
-// Run it with: npm run speed     (add a page, for example: npm run speed -- /about/)
+// Run it with: pnpm run speed     (add a page, for example: pnpm run speed /about/)
 import { chromium } from 'playwright';
 import { buildSite, startServer, launchOptions } from './lib/site.mjs';
 import { startPretend } from './lib/pretend.mjs';

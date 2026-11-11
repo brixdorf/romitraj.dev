@@ -2,7 +2,7 @@
 // loaded and nothing is ever sent to it: every request for it is caught inside the test browser.
 //
 // It checks two things.
-// 1. On this computer (how npm run dev and npm run check see the site) the counter's tag is not
+// 1. On this computer (how pnpm run dev and pnpm run check see the site) the counter's tag is not
 //    added to the page and nothing is asked of the counter's address, before or after a page change.
 // 2. Seen as the live site, the tag is added once, exactly as Rybbit gives it, the counter's
 //    script runs once however many page changes follow, and every page change counts once.

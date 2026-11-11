@@ -11,7 +11,7 @@ const cacheFile = '.cache/blog.json';
 const cacheMinutes = 60;
 
 export default async function () {
-  // Only the real feed is kept, and only while developing: a stand-in feed (npm run check) is never saved.
+  // Only the real feed is kept, and only while developing: a stand-in feed (pnpm run check) is never saved.
   const keeping = process.env.ELEVENTY_RUN_MODE === 'serve' && !process.env.BLOG_FEED_URL;
   if (keeping && fs.existsSync(cacheFile) && Date.now() - fs.statSync(cacheFile).mtimeMs < cacheMinutes * 60000) {
     return JSON.parse(fs.readFileSync(cacheFile, 'utf8'));

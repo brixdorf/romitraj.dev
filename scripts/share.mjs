@@ -2,7 +2,7 @@
 //   src/assets/img/share.png   The share image: the 1200 by 630 pixel card that WhatsApp, LinkedIn,
 //                              X and similar apps show when a link to the site is shared.
 //   docs/screenshot.png        The picture of the home page at the top of the README.
-// Run it with: npm run share
+// Run it with: pnpm run share
 // Run it again after changing the headline, the fonts, the colors or the diver drawing, then
 // commit the two pictures.
 //
@@ -15,7 +15,7 @@
 // apostrophe are the site's), the headline's words from _data/headline.json, the sizes that make
 // each big line fill its space from _data/textWidths.json, the gradient bar's colors, and the
 // close-up of the diver drawing ("searcher" in _data/images.json).
-// The screenshot is taken from the site as "npm start" serves it on this computer, so it shows
+// The screenshot is taken from the site as "pnpm start" serves it on this computer, so it shows
 // the real weather and track if the keys in .env are there, and simply no track if they are not.
 import fs from 'node:fs';
 import path from 'node:path';

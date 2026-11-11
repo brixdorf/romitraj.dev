@@ -1,5 +1,5 @@
 // Gets the Spotify refresh token that the now-playing widget needs, and saves it in .env.
-// Run it with: npm run spotify
+// Run it with: pnpm run spotify
 //
 // What it does: it opens Spotify's approval page in your browser. When you click Agree, Spotify
 // sends the browser back to this script (which is listening on this computer only) with a
@@ -52,7 +52,7 @@ function saveToken(token) {
   const until = new Date(today);
   until.setMonth(until.getMonth() + 6);
   const day = (date) => date.toISOString().slice(0, 10);
-  const note = `# Spotify refresh token: obtained on ${day(today)}. It stops working about ${day(until)}. Run "npm run spotify" again before then.`;
+  const note = `# Spotify refresh token: obtained on ${day(today)}. It stops working about ${day(until)}. Run "pnpm run spotify" again before then.`;
   const lines = text.split(/\r?\n/).filter((line) => !line.startsWith('# Spotify refresh token: obtained on'));
   const at = lines.findIndex((line) => /^\s*SPOTIFY_REFRESH_TOKEN\s*=/.test(line));
   if (at === -1) {
@@ -108,7 +108,7 @@ const server = http.createServer(async (request, response) => {
     response.end(page(title, words));
   };
   try {
-    if (url.searchParams.get('state') !== state) throw new Error('The answer did not belong to this run. Close this tab and run "npm run spotify" again.');
+    if (url.searchParams.get('state') !== state) throw new Error('The answer did not belong to this run. Close this tab and run "pnpm run spotify" again.');
     if (url.searchParams.get('error')) throw new Error(url.searchParams.get('error') === 'access_denied' ? 'You clicked Cancel on Spotify\'s page, so nothing was saved.' : `Spotify answered with an error: ${url.searchParams.get('error')}.`);
     const tokens = await tokensFor(url.searchParams.get('code'));
     const granted = (tokens.scope || '').split(' ');
@@ -117,7 +117,7 @@ const server = http.createServer(async (request, response) => {
     const until = saveToken(tokens.refresh_token);
     const result = await proof(tokens.access_token);
     show(200, 'Saved', 'The refresh token is in your .env file. You can close this tab and go back to the terminal.');
-    console.log(`\nSaved SPOTIFY_REFRESH_TOKEN in .env (it is not shown here).\n${result}\nThis token stops working about ${until}. Run "npm run spotify" again before then.\n`);
+    console.log(`\nSaved SPOTIFY_REFRESH_TOKEN in .env (it is not shown here).\n${result}\nThis token stops working about ${until}. Run "pnpm run spotify" again before then.\n`);
     server.close();
     setTimeout(() => process.exit(0), 300);
   } catch (error) {
@@ -139,4 +139,4 @@ server.listen(port, host, () => {
     // Nothing to do: the address is printed.
   }
 });
-setTimeout(() => stop(`No answer after ${patienceMinutes} minutes. Nothing was saved. Run "npm run spotify" again when you are ready.`), patienceMinutes * 60000).unref();
+setTimeout(() => stop(`No answer after ${patienceMinutes} minutes. Nothing was saved. Run "pnpm run spotify" again when you are ready.`), patienceMinutes * 60000).unref();

@@ -1,6 +1,6 @@
 // Production server: serves the built site from _site/, and answers the small questions the
 // page asks (the weather, what is playing and the latest blog posts: see api.js). Uses only Node's built-in modules.
-// Start it with: npm start
+// Start it with: pnpm start
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';

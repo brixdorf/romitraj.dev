@@ -1,5 +1,5 @@
-// A stand-in for Open-Meteo, Spotify and the blog's feed that runs on this computer, for npm run
-// check (and npm run speed). The check builds the site and starts its server with the addresses
+// A stand-in for Open-Meteo, Spotify and the blog's feed that runs on this computer, for pnpm run
+// check (and pnpm run speed). The check builds the site and starts its server with the addresses
 // and keys below, so that every page it opens gets the same weather, the same track and the same
 // blog posts on every run, nothing is asked of the real services, and the real keys in .env are
 // never used.

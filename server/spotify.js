@@ -3,7 +3,7 @@
 // open, Spotify is asked at most a few times a minute.
 //
 // It needs three values from .env (locally) or the host's settings (live): SPOTIFY_CLIENT_ID,
-// SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN. "npm run spotify" gets the third one.
+// SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN. "pnpm run spotify" gets the third one.
 // With the refresh token, Spotify hands out a short-lived access token (an hour or so), and with
 // that the two questions below can be asked. None of the three values, and neither token, is
 // ever sent to a visitor.
@@ -11,7 +11,7 @@
 // If anything is missing or fails, the answer is nothing and the ticker hides its piece.
 import { remembered } from './cache.js';
 
-// The two addresses are only changed by npm run check, which points them at a stand-in on this computer.
+// The two addresses are only changed by pnpm run check, which points them at a stand-in on this computer.
 const tokenUrl = () => process.env.SPOTIFY_TOKEN_URL || 'https://accounts.spotify.com/api/token';
 const apiUrl = () => process.env.SPOTIFY_API_URL || 'https://api.spotify.com/v1';
 const patience = () => AbortSignal.timeout(5000);
@@ -37,7 +37,7 @@ async function accessToken() {
   if (!response.ok || !answer.access_token) {
     if (answer.error === 'invalid_grant') {
       refusedUntil = Date.now() + 60 * 60 * 1000;
-      console.error('Spotify no longer accepts the refresh token (they stop working after 6 months). Run "npm run spotify" and update SPOTIFY_REFRESH_TOKEN. The now-playing line stays hidden until then.');
+      console.error('Spotify no longer accepts the refresh token (they stop working after 6 months). Run "pnpm run spotify" and update SPOTIFY_REFRESH_TOKEN. The now-playing line stays hidden until then.');
     }
     return null;
   }

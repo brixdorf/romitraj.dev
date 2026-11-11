@@ -1,6 +1,6 @@
 // Tests used by the check script, about what every page carries in its head for the world outside
 // the page: the site's icon (scripts/icons.mjs) and the tags that sharing apps read to draw a
-// preview card (layouts/base.njk, with the share image made by "npm run share").
+// preview card (layouts/base.njk, with the share image made by "pnpm run share").
 //
 // "headOfEveryPage" reads the built pages and files and confirms that
 //   - every page names the icon files, and each exists and is what it should be: the ink compass

@@ -16,7 +16,7 @@
 // this computer, and that on the live site it would be loaded once and count each page change
 // once (lib/analytics.mjs); the real counter is never contacted. Last, it compares how thick each browser paints the drawn lines
 // in the ticker (lib/dashes.mjs).
-// Run it with: npm run check
+// Run it with: pnpm run check
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium, firefox, webkit } from 'playwright';
@@ -218,7 +218,7 @@ try {
     try {
       browser = await engine.launch(launchOptions(engineName));
     } catch (error) {
-      console.log(`\nCould not start ${engineName}. Install the browsers once with: npx playwright install chromium firefox webkit`);
+      console.log(`\nCould not start ${engineName}. Install the browsers once with: pnpm exec playwright install chromium firefox webkit`);
       throw error;
     }
     for (const [viewportName, settings] of Object.entries(viewports)) {
@@ -243,7 +243,7 @@ try {
       page.on('request', (request) => {
         const url = new URL(request.url());
         if (url.pathname.startsWith('/assets/fonts/') && url.pathname.endsWith('.woff2')) {
-          problems.push(`fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (npm run fonts lists the characters each licensed font lacks)`);
+          problems.push(`fallback font ${path.posix.basename(url.pathname)} was used on ${new URL(page.url()).pathname} (pnpm run fonts lists the characters each licensed font lacks)`);
         }
       });
       // (The page for a missing address is photographed at its own file name, which is answered with a 404 on purpose.)
@@ -276,7 +276,7 @@ try {
       const measured = await measureTextWidths(await browser.newPage(), server.address);
       const off = Object.keys(measured).filter((name) => Math.abs(measured[name] - saved[name]) / measured[name] > 0.005);
       if (off.length) {
-        console.log(`\nHERO LINES NO LONGER FIT: ${off.join(', ')}. The headline's words or fonts changed. Run: npm run fit`);
+        console.log(`\nHERO LINES NO LONGER FIT: ${off.join(', ')}. The headline's words or fonts changed. Run: pnpm run fit`);
         process.exitCode = 1;
       } else {
         console.log('Hero lines: all fit their space.');
