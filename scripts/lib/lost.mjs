@@ -2,7 +2,7 @@
 // sea", src/content/404.njk) and the server's answer for such an address (server/index.js).
 //
 // "lostAnswers" asks the server directly and confirms that
-//   - a missing page is answered with the status 404 and the "Lost at sea" page, never with 200;
+//   - a missing page is answered with the status 404 and the page for a missing address, never with 200;
 //   - so is that page asked for by its own file name;
 //   - a missing picture or other file is answered 404 with two plain words, not with a page.
 // "lostPage" opens a missing address in a browser and confirms that
@@ -11,15 +11,20 @@
 //     still page has it, and put back as plain text at the visitor's first click;
 //   - there is no entrance for visitors who asked for less motion, and the name is visible
 //     without scripts;
-//   - a link inside the site that leads to a missing page ends on the "Lost at sea" page, at the
+//   - a link inside the site that leads to a missing page ends on the page for a missing address, at the
 //     missing address, and every answer the server gave for that address was a 404;
 //   - the ways back work as ordinary page changes, without a reload, and the back button
 //     returns to the missing address.
+import fs from 'node:fs';
 import { letterPlaces, furthest } from './entrance.mjs';
 
 const missing = '/the-kraken-took-it/';
 const name = '[data-part="title"]';
-const words = 'Lost at sea';
+// The page's giant name, read from the top of its own file, so that renaming the page needs no
+// change here.
+const words = /^title:\s*(.+)$/m
+  .exec(fs.readFileSync(new URL('../../src/content/404.njk', import.meta.url), 'utf8'))[1]
+  .trim();
 
 export async function lostAnswers(address) {
   const problems = [];

@@ -250,14 +250,14 @@ const quietServer = await startServer(4176, unreachable(4177));
 const newerPretend = await startPretend(4178, { blog: 'newer' });
 const newerServer = await startServer(4179, newerPretend.env);
 try {
-  // ---- A missing address: is it answered with a real 404 and the "Lost at sea" page? ----
+  // ---- A missing address: is it answered with a real 404 and the page for a missing address? ----
   const lostAnswerProblems = await lostAnswers(server.address);
   if (lostAnswerProblems.length) {
     console.log('\nMISSING ADDRESS PROBLEMS:\n  ' + lostAnswerProblems.join('\n  '));
     process.exitCode = 1;
   } else {
     console.log(
-      'Missing addresses: answered with status 404 and the "Lost at sea" page; missing files with a plain 404.',
+      'Missing addresses: answered with status 404 and the page for a missing address; missing files with a plain 404.',
     );
   }
 
