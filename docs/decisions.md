@@ -2,6 +2,102 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-11: Updates, pnpm, Vite+, a dead-link checker, and a new computer
+
+Part 1 of the overhaul: setup, updates and tooling. Nothing a visitor sees changed, except list items in Firefox on Linux (see below).
+
+### Versions and sources checked
+
+| What                                           | Version                                                                                  | Source, read on 2026-11-11                                                                                                              | Notes                                                                                                                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js, newest LTS line                       | 26 (26.13.1, "Lithium")                                                                  | https://nodejs.org/dist/index.json; https://nodejs.org/en/about/previous-releases ("v26.13.1 Latest LTS")                               | `engines` moved from `24.x` to `26.x` in both repositories                                                                                                        |
+| @11ty/eleventy                                 | 3.1.8 (was 3.1.6)                                                                        | `npm view`; its GitHub releases                                                                                                         | 3.1.7 replaced the dependency behind the 9 audit warnings logged on 2026-10-09; 3.1.8 undid one alias from 3.1.7. No breaking change. The audit now finds nothing |
+| gsap                                           | 3.15.1 (was 3.15.0)                                                                      | `npm view`                                                                                                                              | A patch release; the bundled script is 0.5 KB smaller                                                                                                             |
+| playwright                                     | 1.65.0 (was 1.64.0)                                                                      | `npm view`; its GitHub release                                                                                                          | Its browsers: Chrome for Testing 158, Firefox 159, WebKit 27.2                                                                                                    |
+| @unseenco/taxi, sharp                          | 2.0.0, 0.35.5 (unchanged)                                                                | `npm view`                                                                                                                              | Already the newest                                                                                                                                                |
+| esbuild                                        | 0.28.2 (newest; then removed)                                                            | `npm view`                                                                                                                              | See "esbuild or Vite+" below                                                                                                                                      |
+| pnpm                                           | 12.18.0                                                                                  | `npm view pnpm dist-tags` (12.19.0, out the day before, was only on `next`)                                                             |                                                                                                                                                                   |
+| vite-plus                                      | 1.6.0                                                                                    | `npm view`; viteplus.dev guide (check, fmt, lint, test, build, migrate, config)                                                         | Published the same day, 04:16 UTC. Brings Vite 8.3.7, Rolldown 1.2.18, Oxfmt 0.78.0, Oxlint 1.93.0, Vitest 5.1.0                                                  |
+| corepack                                       | 0.36.0                                                                                   | `npm view`                                                                                                                              | What Railpack uses to install pnpm                                                                                                                                |
+| fonttools, brotli                              | 4.68.0, 1.2.1 (were 4.66.1, 1.2.0)                                                       | pypi.org                                                                                                                                | brotli 1.2.0 has no ready-built package for Python 3.15 and failed to build; 1.2.1 has one. The converted fonts came out byte for byte the same                   |
+| Python                                         | 3.15.2 (this computer's)                                                                 |                                                                                                                                         |                                                                                                                                                                   |
+| Railpack                                       | 0.43.0 newest; 0.15.4 is the default Dokploy 0.31.0 puts in its "Railpack Version" field | GitHub releases; Railpack's code (`core/providers/node/`) at 0.15.4, 0.40.1 and 0.43.0; Dokploy's code at v0.31.0; railpack.com, "Node" | How Railpack finds pnpm and its version, and installs it                                                                                                          |
+| Fallback fonts (Anton, Cormorant, Inter Tight) | snapshot of 2026-10-09 (unchanged)                                                       | GitHub, the last change to each font's folder in google/fonts                                                                           | Each last changed in March or April 2026, before the snapshot, so it already holds the newest files                                                               |
+
+### A new computer: Fedora
+
+Romit moved to Fedora KDE. Node.js and pnpm come from Vite+ (`vp`), which picks Node.js from `engines`. Playwright does not support Fedora, so everything that opens a test browser runs in an Ubuntu 24.04 toolbox named `playwright` (the guide, "Test browsers on Fedora").
+
+**The full check failed on the new computer before anything was changed**, in the cross-browser picture test: the footer's compass sat up to 50px lower in Firefox and WebKit than in Chromium on the project pages. Two causes, both of Linux:
+
+- **Chromium rounds each letter's width to whole pixels on Linux** (font hinting), so its text ran a pixel shorter or longer per line than in Firefox and WebKit, and a long write-up wrapped one line differently. Chrome on Windows and macOS does not do this. Every script that starts a test browser now starts Chromium with `--font-render-hinting=none` (`launchOptions` in `scripts/lib/site.mjs`). With it, Chromium and WebKit placed every piece of the project pages identically.
+- **Firefox made each list item 24.5px tall instead of 24px.** The invisible list bullet is set in Neue Montreal (so that Safari does not fetch a fallback font, see 2026-10-10), and Neue Montreal's taller line added half a pixel in Firefox. The bullet now has a size of 0 (`study.css`, `panel.css`). It was invisible before and still is; list items are exactly 24px in all three browsers. This is the one change a visitor could notice: lists in Firefox on Linux are a few pixels shorter.
+- After both fixes the full check passed in all three browsers. That was the last full check of this part: see "Change of plan" below.
+
+### Updates
+
+- **Node.js 26, Eleventy, GSAP and Playwright were updated together**, as Romit asked, then checked with the build and the quick checks. The built pages came out the same apart from the script's fingerprint.
+- **The Python font scripts got their own environment** in `.venv` inside the project, which `scripts/python.mjs` makes and fills by itself on the first `pnpm run fonts` and whenever `scripts/requirements.txt` changes, without pip's download cache. Before, the packages had to be installed by hand into the computer's own Python. A first try with the old brotli left a pip cache in the home folder; it was removed.
+
+### pnpm instead of npm
+
+- **`"packageManager": "pnpm@12.18.0"` in `package.json`, `pnpm-lock.yaml` in place of `package-lock.json`** (converted with `pnpm import`, so every version stayed), in both repositories and in the private reference scripts.
+- **`.npmrc` is gone.** pnpm 12 reads only login and network settings from it, so `save-exact` moved to `pnpm-workspace.yaml` as `saveExact: true`.
+- **pnpm runs no package's install script unless it is named** (`allowBuilds`) and stops the install if one asks. esbuild's was allowed until esbuild was removed; no package needs one now.
+- **Railpack builds it.** Reading its code: when `packageManager` names pnpm, Railpack installs Corepack (`npm i -g corepack@latest`, needed since Node.js 25 no longer ships it) and Corepack installs the named pnpm; the install is `pnpm install --frozen-lockfile --prefer-offline`. Both 0.15.4 and 0.43.0 do this. Tested here: Corepack 0.36.0 runs pnpm 12.18.0 from the field, and a clean copy of the repository (no `.env`, no private folder beside it) installs with that exact command, builds, and serves every page, a 404 for a missing one and nothing for the track without keys. Running Railpack itself here was not possible (downloading its program was blocked on this computer), so its code was read instead.
+- **Node.js 26 on the server** comes from `engines`, as Node.js 24 did.
+
+### Vite+: formatting, linting and tests
+
+- **Set up by hand rather than with `vp migrate`.** `vp migrate` was tried on a throwaway copy, with editor settings, agent files and Git hooks all declined. It adds `vite-plus`, a config file, a catalog and overrides for Vite (which nothing here uses on its own), and type-aware linting. The hand setup keeps what is useful: `vite-plus` itself, `vite.config.js`, and Vite+'s lint rule that tests import from `vite-plus/test`. No editor configuration was written.
+- **Type-aware linting is off.** It needs type information that a plain JavaScript project does not have, and gave a screenful of warnings about it (promises nobody waits for, and so on), none of them a fault. Without it the linter found two things: an unused helper in `transitions.js` (removed) and a copy of a list in `split.js` that it called needless. That copy is needed (the loop replaces nodes in a live list), so the line says so in a comment that switches the rule off for it.
+- **Two more pnpm settings for Vite+:** it ships its own build of Vite numbered 1.6.0, which Vitest's request for Vite 6 to 8 would warn about (`peerDependencyRules`); and pnpm waits a day before installing a new release, so the hours-old Vite+ 1.6.0 is let through by name (`minimumReleaseAgeExclude`, which can go at the next update).
+- **The reformat is its own commit.** Oxfmt with single quotes (as the code was written) changed 67 files. The site built from before and after the reformat is identical, byte for byte, in every file.
+- **Commands:** `pnpm run lint` (`vp check`), `pnpm run format` (`vp check --fix`), `pnpm test` (`vp test`).
+- **Tests, written first and seen failing before the code:** the dead-link checker, the font scripts' Python environment, and the bundling.
+
+### esbuild or Vite+ for the CSS and JavaScript
+
+Romit's rule: keep Vite+ only if the result is identical to the pixel, written for the same browsers and not bigger. Following his change of plan, the comparison was made in Chromium only.
+
+- **How:** the site was built with esbuild; then the same three entry files (the stylesheet, the main script, the headline's entrance) were bundled by Vite+ (Rolldown for scripts, Lightning CSS for styles) for the same browser list (Chrome and Edge 115, Firefox 115, Safari 16.4) and swapped into a copy. Both copies were photographed, every page at 390, 768 and 1440px, with the clock frozen, the stand-in services, and every animation at rest, and the photographs compared pixel by pixel. The esbuild copy photographed twice came out identical, and a 4-pixel change planted in one photograph was found, so the comparison can be trusted.
+- **Pixels:** 36 of 36 photographs identical.
+- **Browsers:** the same list; nesting is flattened the same way (464 rules in each, no nesting, no `@import` left).
+- **Size**, in bytes:
+
+  | File                | esbuild (gzip, brotli)       | Vite+ (gzip, brotli)         |
+  | ------------------- | ---------------------------- | ---------------------------- |
+  | main.css            | 41,008 (7,702, 6,942)        | 40,277 (7,767, 6,991)        |
+  | main.js             | 156,647 (58,501, 52,623)     | 154,192 (56,713, 51,129)     |
+  | the entrance script | 4,872 (2,106, 1,882)         | 4,839 (2,029, 1,806)         |
+  | **All three**       | **202,527 (68,309, 61,447)** | **199,308 (66,509, 59,926)** |
+
+- **Decision: Vite+.** Every file is smaller as written, and all three together are smaller as sent (about 1.5 KB less with brotli, 1.8 KB less with gzip). The one figure that went the other way: the stylesheet alone is 49 bytes bigger with brotli and 65 with gzip, because Lightning CSS shortens colors (`#666666` to `#666`), which compresses a little less well. Counted as "not bigger" because what a visitor downloads in total is smaller; if Romit reads the rule file by file, going back is one commit.
+- **As built:** `scripts/lib/bundle.mjs` does the bundling for the build and for the letters test (which bundled `split.js` with esbuild for the test browser). The real build gives exactly the trial's files, and its photographs are again identical to esbuild's. A build takes about as long (1.75s against 1.62s). esbuild is no longer a dependency; `vite-plus` is a regular dependency, because the live server's build needs it.
+- **Still to confirm:** the same in Firefox and WebKit. That is part of the full check at the end of Part 3.
+
+### Change of plan: quick checks now, the full check once at the end
+
+Romit asked mid-way to skip the slow three-browser runs: after each step only the build, `vp check`, `vp test` and a quick check in Chromium.
+
+- **`pnpm run smoke`** (new, `scripts/smoke.mjs`): builds with the stand-in services and opens every page in Chromium at three widths, reporting a page that fails to load, a file that fails or answers with an error, a script error or console error, and a page wider than its window. About 20 seconds. A planted console error was reported on every page.
+- **The full check now runs the three browsers at the same time**, each through its tests in turn, printing each browser's results in one piece. Every server the browser tests use is started before them and only read from, so they cannot get in each other's way. **It has not been run in this form yet:** it runs once, at the end of Part 3, and also confirms the bundling in all three browsers.
+
+### The dead-link checker
+
+`pnpm run links` checks every link, picture, stylesheet and script on every page of the built site (served on this computer for a moment), inside the site and out, and every jump to a section; `pnpm run links <address>` does the same for any live website. It sorts the answers into dead (not found, a name that does not exist, a missing section) and "could not be sure" (sites that turn programs away or ask them to prove they are people: LinkedIn, Unsplash profiles, Figma), and asks each website at most three things at a time. Only Node's built-in `fetch`; no package.
+
+First runs:
+
+- **This site:** 86 addresses on 12 pages. Dead: the six sample projects' GitHub links (placeholders; replaced in Part 2). Not sure: LinkedIn and the six Unsplash profile pages.
+- **The blog** (`pnpm run links https://blog.romitraj.dev`): two dead links. `https://didiread.romitraj.dev/` (on "Finishing off what I started") has no address at all, and `https://pngfolio.com/arrow-png-transparent-images` (on "Why you should own a server") answers "not found". Not sure: Unsplash photo pages, Figma and LinkedIn's share links.
+
+### Known issues
+
+- **The full check has not run since the bundling and the parallel browsers came in**, by Romit's choice; the quick checks passed after every step.
+- **The letters test writes a small temporary file** into `src/assets/js/` while it bundles `split.js`, and removes it at once. A running `pnpm run dev` would notice it and rebuild once.
+- **While a test browser is open in the toolbox, Chromium uses the hinting setting above.** Real Chrome on Linux still rounds letter widths, so a visitor on Linux may see a long text wrap a word differently. That has always been so and is not something a page can change.
+
 ## 2026-11-06: The site is live; Cloudflare lets the server read the blog's feed
 
 Romit deployed both applications himself in the Dokploy dashboard, following "Deploying with Dokploy" in the guide: the site at https://romitraj.dev and the fonts at https://fonts.romitraj.dev. Nothing in the code changed for it.
