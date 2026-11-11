@@ -18,6 +18,7 @@
     "fonts:fallback": "python scripts/fallback_fonts.py",
     "fit": "node scripts/fit.mjs",
     "check": "node scripts/check.mjs",
+    "smoke": "node scripts/smoke.mjs",
     "speed": "node scripts/speed.mjs",
     "spotify": "node scripts/spotify.mjs",
     "share": "node scripts/share.mjs"
