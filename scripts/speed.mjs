@@ -2,8 +2,9 @@
 // anything first appears) and Largest Contentful Paint (when the biggest piece of content
 // appears, the figure search engines use for "loading speed"). It builds the site, serves it, and
 // loads the page several times on a simulated phone connection and on a fast one.
-// On the home page it measures twice, with and without the headline's entrance, and prints the
-// difference, so the cost of the entrance is always known.
+// It measures twice, with and without the page's entrance (the home page's headline, the About
+// page's quote), and prints the difference, so the cost of an entrance is always known. On a page
+// without one, the two agree.
 // Like the check, it builds and serves the site with stand-ins for the weather, the music and the
 // blog's feed, so it never contacts the real ones or uses the keys in .env, and the numbers do
 // not depend on them.
@@ -43,7 +44,7 @@ async function load(browser, address, setting, entrance) {
   if (setting.network)
     await session.send('Network.emulateNetworkConditions', { offline: false, ...setting.network });
   await session.send('Emulation.setCPUThrottlingRate', { rate: setting.cpuSlowdown });
-  // "steadyMotion" is the site's own switch for a still page: with it, the headline does not slide in.
+  // "steadyMotion" is the site's own switch for a still page: with it, nothing slides in on opening.
   if (!entrance)
     await page.addInitScript(() => {
       window.steadyMotion = true;
@@ -79,7 +80,7 @@ await buildSite();
 const server = await startServer(4175, pretend.env);
 const browser = await chromium.launch(launchOptions('chromium'));
 try {
-  const compare = pagePath === '/';
+  const compare = true;
   for (const [name, setting] of Object.entries(settings)) {
     // The two kinds of load take turns, so that both see the same conditions on this computer.
     const results = { with: [], without: [] };
@@ -103,8 +104,8 @@ try {
         )[0];
       const label = compare
         ? kind === 'with'
-          ? 'With the headline entrance:   '
-          : 'Without the headline entrance:'
+          ? 'With the entrance:   '
+          : 'Without the entrance:'
         : 'Measured:';
       console.log(
         `  ${label} First Contentful Paint ${Math.round(median(first))}ms (${Math.round(Math.min(...first))} to ${Math.round(Math.max(...first))}), Largest Contentful Paint ${Math.round(median(largest))}ms (${Math.round(Math.min(...largest))} to ${Math.round(Math.max(...largest))}), largest piece: ${what}`,
