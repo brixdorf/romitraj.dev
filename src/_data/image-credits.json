@@ -1,6 +1,14 @@
 {
   "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. 'subject' is how the Credits page names it ('the globe'), 'title' is the photo's title on its page (with the object's date where the museum gives one), 'photographer' is who took it, 'collection' is where it is shared (Unsplash, or the Smithsonian museum that keeps the object), 'licence' is Unsplash License, Public domain or CC0, and 'url' is the photo's own page. The build stops if a photo is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry. The Credits page is set in a serif font with no straight apostrophe and no slash: use the curly apostrophe (’).",
   "pictures": {
+    "radial-engine.jpg": {
+      "subject": "the radial engine",
+      "title": "Pitcairn-Brewer Model F nine-cylinder radial engine, about 1927",
+      "photographer": "the Smithsonian",
+      "collection": "National Air and Space Museum",
+      "licence": "Public domain",
+      "url": "https://unsplash.com/photos/h6zYGd-dEK4"
+    },
     "theodolite.jpg": {
       "subject": "the theodolites",
       "title": "Black telescope",
@@ -8,30 +16,6 @@
       "collection": "Unsplash",
       "licence": "Unsplash License",
       "url": "https://unsplash.com/photos/black-telescope-gCeH4z9m7bg"
-    },
-    "globe.jpg": {
-      "subject": "the black globe",
-      "title": "A black globe sitting on top of a white table",
-      "photographer": "charlesdeluvio",
-      "collection": "Unsplash",
-      "licence": "Unsplash License",
-      "url": "https://unsplash.com/photos/a-black-globe-sitting-on-top-of-a-white-table-RDjZh9dqlP4"
-    },
-    "telephone.jpg": {
-      "subject": "the telephone",
-      "title": "Alexander Graham Bell’s experimental telephone, 1876",
-      "photographer": "the Smithsonian",
-      "collection": "National Museum of American History",
-      "licence": "Public domain",
-      "url": "https://unsplash.com/photos/d74abIkBrrw"
-    },
-    "typewriter.jpg": {
-      "subject": "the typewriter",
-      "title": "Lucien S. Crandall’s typewriter patent model, 1881",
-      "photographer": "the Smithsonian",
-      "collection": "National Museum of American History",
-      "licence": "Public domain",
-      "url": "https://unsplash.com/photos/kJTo5r1NuSE"
     },
     "camera.jpg": {
       "subject": "the camera",
@@ -41,13 +25,29 @@
       "licence": "Unsplash License",
       "url": "https://unsplash.com/photos/an-old-fashioned-camera-on-a-white-background-mmX2DXEgXDA"
     },
-    "press-camera.jpg": {
-      "subject": "the press camera",
-      "title": "Folding camera on white surface",
-      "photographer": "Jonathan Talbert",
+    "computer.jpg": {
+      "subject": "the computer",
+      "title": "Apple computer (a Lisa 2, modified to a Macintosh XL)",
+      "photographer": "Museums Victoria",
       "collection": "Unsplash",
       "licence": "Unsplash License",
-      "url": "https://unsplash.com/photos/folding-camera-on-white-surface-1NAXTpRVyo4"
+      "url": "https://unsplash.com/photos/apple-computer-HFo5k0rnoDo"
+    },
+    "key.jpg": {
+      "subject": "the keys",
+      "title": "Grey skeleton key",
+      "photographer": "Tom Joseph",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/grey-skeleton-key-Q27HmRKdHPQ"
+    },
+    "magnifying-glass.jpg": {
+      "subject": "the magnifying glass",
+      "title": "A magnifying glass on a pink background",
+      "photographer": "Sasun Bughdaryan",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/a-magnifying-glass-on-a-pink-background-iNlMseQIlEM"
     }
   }
 }

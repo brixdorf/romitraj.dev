@@ -40,21 +40,20 @@
       "widths": [240, 480, 720, 960],
       "target": 0.98
     },
-    "globe": {
-      "source": "globe.jpg",
-      "alt": "A desk globe painted solid black, with no countries on it at all, on a brass stand.",
+    "engine": {
+      "source": "radial-engine.jpg",
+      "alt": "A 1920s aircraft engine seen from the front: nine cylinders bursting out of a round hub like the points of a star.",
       "across": 234,
       "shape": "26:25",
       "crop": {
-        "x": 0.5,
-        "y": 0.47,
-        "zoom": 1
+        "x": 0.45,
+        "y": 0.56,
+        "zoom": 0.68
       },
-      "black": 0.25,
-      "white": 0.8,
+      "black": 0.5,
+      "white": 0.92,
       "stretch": true,
-      "cutout": 0.012,
-      "gamma": 1.4
+      "cutout": 0.03
     },
     "theodolites": {
       "source": "theodolite.jpg",
@@ -76,18 +75,18 @@
         }
       }
     },
-    "telephone": {
-      "source": "telephone.jpg",
-      "alt": "Alexander Graham Bell’s experimental telephone from 1876: a dark cone fixed to a brass ring on a wooden base.",
+    "computer": {
+      "source": "computer.jpg",
+      "alt": "An Apple Lisa 2 from the 1980s: a chunky beige computer with a small dark screen, a keyboard and a mouse.",
       "across": 120,
       "shape": "5:2",
       "crop": {
         "x": 0.5,
-        "y": 0.52,
-        "zoom": 1
+        "y": 0.5,
+        "zoom": 0.75
       },
-      "black": 0.22,
-      "white": 0.62,
+      "black": 0.25,
+      "white": 0.75,
       "stretch": true,
       "cutout": 0.03
     },
@@ -111,26 +110,25 @@
         }
       }
     },
-    "typewriter": {
-      "source": "typewriter.jpg",
-      "alt": "A row of 1881 typewriters, each with round keys in neat rows and a wooden roller across the top.",
+    "keys": {
+      "source": "key.jpg",
+      "alt": "A row of old skeleton keys, each with a curly ornate bow, standing side by side.",
       "across": 300,
       "shape": "6:1",
-      "black": 0.32,
-      "white": 0.75,
+      "black": 0.25,
+      "white": 0.7,
       "stretch": true,
       "cutout": 0.03,
       "repeat": {
-        "count": 6,
-        "gap": 0.1,
+        "count": 14,
+        "gap": 0.3,
         "part": {
-          "x": 0.15,
-          "y": 0.18,
-          "width": 0.7,
-          "height": 0.75
+          "x": 0.3,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.84
         }
-      },
-      "sharpen": 1
+      }
     },
     "theodolite": {
       "source": "theodolite.jpg",
@@ -162,20 +160,20 @@
       "stretch": true,
       "cutout": 0.03
     },
-    "presscamera": {
-      "source": "press-camera.jpg",
-      "alt": "An old folding press camera, black leather and chrome, with a round flash reflector clipped to its side.",
+    "magnifier": {
+      "source": "magnifying-glass.jpg",
+      "alt": "An old magnifying glass with a thick brass ring and a dark wooden handle, lying on its side.",
       "across": 110,
       "shape": "2:1",
       "crop": {
-        "x": 0.55,
-        "y": 0.66,
-        "zoom": 0.72
+        "x": 0.33,
+        "y": 0.57,
+        "zoom": 1.4
       },
-      "black": 0.25,
-      "white": 0.82,
+      "black": 0.3,
+      "white": 0.75,
       "stretch": true,
-      "cutout": 0.02
+      "cutout": 0.03
     }
   }
 }
