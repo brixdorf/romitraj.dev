@@ -1,59 +1,53 @@
 {
-  "note": "Where each picture in src/assets/img/source/ came from, and what the Credits page says about it. They are old prints, free to use: in the public domain, or shared by their museum under CC0 (no rights kept). 'subject' is how the Credits page names the picture ('the orrery'), 'title', 'artist' and 'year' describe the work, 'collection' is who keeps the original and shares the scan, 'licence' is Public domain, CC0 or Unsplash License, and 'url' is the picture's own page. The build stops if a picture is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry.",
+  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. 'subject' is how the Credits page names it ('the globe'), 'title' is the photo's title on its page (with the object's date where the museum gives one), 'photographer' is who took it, 'collection' is where it is shared (Unsplash, or the Smithsonian museum that keeps the object), 'licence' is Unsplash License, Public domain or CC0, and 'url' is the photo's own page. The build stops if a photo is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry. The Credits page is set in a serif font with no straight apostrophe and no slash: use the curly apostrophe (’).",
   "pictures": {
-    "orrery.jpg": {
-      "subject": "the orrery",
-      "title": "A Philosopher Giving a Lecture on the Orrery",
-      "artist": "William Pether, after Joseph Wright of Derby",
-      "year": "1768",
-      "collection": "National Gallery of Art, Washington",
-      "licence": "CC0",
-      "url": "https://commons.wikimedia.org/wiki/File:William_Pether_after_Joseph_Wright,_A_Philosopher_Giving_a_Lecture_on_the_Orrery,_1768,_NGA_119599.jpg"
+    "theodolite.jpg": {
+      "subject": "the theodolites",
+      "title": "Black telescope",
+      "photographer": "Uriel Soberanes",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/black-telescope-gCeH4z9m7bg"
     },
-    "alchemist.jpg": {
-      "subject": "the alchemist",
-      "title": "The Alchymist, in Search of the Philosopher’s Stone, Discovers Phosphorus",
-      "artist": "William Pether, after Joseph Wright of Derby",
-      "year": "1775",
-      "collection": "Cleveland Museum of Art",
-      "licence": "CC0",
-      "url": "https://clevelandart.org/art/1995.2"
+    "globe.jpg": {
+      "subject": "the black globe",
+      "title": "A black globe sitting on top of a white table",
+      "photographer": "charlesdeluvio",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/a-black-globe-sitting-on-top-of-a-white-table-RDjZh9dqlP4"
     },
-    "diogenes.jpg": {
-      "subject": "Diogenes",
-      "title": "Diogenes, Holding a Lantern",
-      "artist": "P.-F. Basan, after Jusepe de Ribera",
-      "year": "1750 to 1769",
-      "collection": "The Metropolitan Museum of Art",
-      "licence": "CC0",
-      "url": "https://commons.wikimedia.org/wiki/File:Diogenes,_bust-length,_and_turned_to_the_right,_holding_a_lantern_MET_DP836615.jpg"
-    },
-    "locomotive.jpg": {
-      "subject": "the locomotives",
-      "title": "A Locomotive Engine Similar to the Planet",
-      "artist": "William Miller, after J. Kindar",
-      "year": "1832",
-      "collection": "Wikimedia Commons",
+    "telephone.jpg": {
+      "subject": "the telephone",
+      "title": "Alexander Graham Bell’s experimental telephone, 1876",
+      "photographer": "the Smithsonian",
+      "collection": "National Museum of American History",
       "licence": "Public domain",
-      "url": "https://commons.wikimedia.org/wiki/File:Planet_locomotive_engraving_by_William_Miller_after_J_Kindar.jpg"
+      "url": "https://unsplash.com/photos/d74abIkBrrw"
     },
-    "printing-press.jpg": {
-      "subject": "the printing presses",
-      "title": "The Columbian Press",
-      "artist": "an unknown engraver, for Charles Timperley’s printers’ manual",
-      "year": "1842",
-      "collection": "Wikimedia Commons",
+    "typewriter.jpg": {
+      "subject": "the typewriter",
+      "title": "Lucien S. Crandall’s typewriter patent model, 1881",
+      "photographer": "the Smithsonian",
+      "collection": "National Museum of American History",
       "licence": "Public domain",
-      "url": "https://commons.wikimedia.org/wiki/File:George_E_Clymer%27s_printing_press_advertisment.jpg"
+      "url": "https://unsplash.com/photos/kJTo5r1NuSE"
     },
-    "steam-hammer.jpg": {
-      "subject": "the steam hammers",
-      "title": "Nasmyth’s Patent Steam Hammer",
-      "artist": "an unknown engraver, for Charles Tomlinson’s Cyclopaedia of Useful Arts",
-      "year": "1854",
-      "collection": "Library of Congress",
-      "licence": "Public domain",
-      "url": "https://commons.wikimedia.org/wiki/File:Nasmyth%27s_patent_steam_hammer,_copied_by_permission_of_the_inventor_from_the_machine_in_the_great_exhibition_LCCN2006691796.jpg"
+    "camera.jpg": {
+      "subject": "the camera",
+      "title": "An old fashioned camera on a white background",
+      "photographer": "JJ Shev",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/an-old-fashioned-camera-on-a-white-background-mmX2DXEgXDA"
+    },
+    "press-camera.jpg": {
+      "subject": "the press camera",
+      "title": "Folding camera on white surface",
+      "photographer": "Jonathan Talbert",
+      "collection": "Unsplash",
+      "licence": "Unsplash License",
+      "url": "https://unsplash.com/photos/folding-camera-on-white-surface-1NAXTpRVyo4"
     }
   }
 }

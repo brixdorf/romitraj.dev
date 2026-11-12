@@ -1,12 +1,12 @@
 ---
 title: Credits
-picture: hammerrow
+picture: theodoliterow
 layout: layouts/page.njk
 description: The people and services that helped make this site.
 ---
 {#-
   The Credits page: four numbered cards. Their words are in _data/pages.json ("credits"); the
-  pictures come from _data/image-credits.json (as "pictureCredits": see eleventy.config.js).
+  photos come from _data/image-credits.json (as "pictureCredits": see eleventy.config.js).
   Each card is marked data-part="card": during a page change they arrive one after another.
 -#}
 <div class="page-grid" data-part="cards">
@@ -27,7 +27,7 @@ description: The people and services that helped make this site.
       {%- endfor %}
       <ul class="panel__list">
         {%- for picture in pictureCredits %}
-        <li>{{ picture.subject | capitalize }}: <a href="{{ picture.url }}">{{ picture.title }}</a> ({{ picture.year }}), by {{ picture.artist }}. {{ picture.collection }}, {{ picture.licence }}.</li>
+        <li>{{ picture.subject | capitalize }}: <a href="{{ picture.url }}">{{ picture.title }}</a>, by {{ picture.photographer }}. {{ picture.collection }}, {{ picture.licence }}.</li>
         {%- endfor %}
       </ul>
     </div>

@@ -10,26 +10,6 @@
       "white": 0.7,
       "credit": false
     },
-    "orrery": {
-      "source": "orrery.jpg",
-      "alt": "An old print of a candle-lit room: a man explains a brass model of the planets while two children lean in close to watch.",
-      "across": 234,
-      "shape": "26:25",
-      "crop": {
-        "x": 0.49,
-        "y": 0.47,
-        "zoom": 1.12
-      },
-      "black": 0.12,
-      "white": 0.58,
-      "stretch": true,
-      "fade": {
-        "amount": 0.12,
-        "x": 0.5,
-        "y": 0.5,
-        "size": 0.88
-      }
-    },
     "compass": {
       "source": "compass.svg",
       "decorative": true,
@@ -60,126 +40,142 @@
       "widths": [240, 480, 720, 960],
       "target": 0.98
     },
-    "diogenes": {
-      "source": "diogenes.jpg",
-      "alt": "An old print of Diogenes, a bearded man in a heavy cloak, holding up a small lantern.",
+    "globe": {
+      "source": "globe.jpg",
+      "alt": "A desk globe painted solid black, with no countries on it at all, on a brass stand.",
+      "across": 234,
+      "shape": "26:25",
+      "crop": {
+        "x": 0.5,
+        "y": 0.47,
+        "zoom": 1
+      },
+      "black": 0.25,
+      "white": 0.8,
+      "stretch": true,
+      "cutout": 0.012,
+      "gamma": 1.4
+    },
+    "theodolites": {
+      "source": "theodolite.jpg",
+      "alt": "A row of old surveyor’s theodolites: small brass telescopes on top of round stands, the kind used to map new land.",
+      "across": 240,
+      "shape": "22:5",
+      "black": 0.25,
+      "white": 0.7,
+      "stretch": true,
+      "cutout": 0.03,
+      "repeat": {
+        "count": 6,
+        "gap": 0.08,
+        "part": {
+          "x": 0.25,
+          "y": 0.15,
+          "width": 0.58,
+          "height": 0.4
+        }
+      }
+    },
+    "telephone": {
+      "source": "telephone.jpg",
+      "alt": "Alexander Graham Bell’s experimental telephone from 1876: a dark cone fixed to a brass ring on a wooden base.",
+      "across": 120,
+      "shape": "5:2",
+      "crop": {
+        "x": 0.5,
+        "y": 0.52,
+        "zoom": 1
+      },
+      "black": 0.22,
+      "white": 0.62,
+      "stretch": true,
+      "cutout": 0.03
+    },
+    "theodoliterow": {
+      "source": "theodolite.jpg",
+      "alt": "A long row of old surveyor’s theodolites, small brass telescopes on round stands.",
+      "across": 320,
+      "shape": "5:1",
+      "black": 0.25,
+      "white": 0.7,
+      "stretch": true,
+      "cutout": 0.03,
+      "repeat": {
+        "count": 9,
+        "gap": 0.08,
+        "part": {
+          "x": 0.25,
+          "y": 0.15,
+          "width": 0.58,
+          "height": 0.4
+        }
+      }
+    },
+    "typewriter": {
+      "source": "typewriter.jpg",
+      "alt": "A row of 1881 typewriters, each with round keys in neat rows and a wooden roller across the top.",
+      "across": 300,
+      "shape": "6:1",
+      "black": 0.32,
+      "white": 0.75,
+      "stretch": true,
+      "cutout": 0.03,
+      "repeat": {
+        "count": 6,
+        "gap": 0.1,
+        "part": {
+          "x": 0.15,
+          "y": 0.18,
+          "width": 0.7,
+          "height": 0.75
+        }
+      },
+      "sharpen": 1
+    },
+    "theodolite": {
+      "source": "theodolite.jpg",
+      "alt": "An old surveyor’s theodolite on a wooden tripod: a small brass telescope on a round stand, the kind used to map new land.",
       "across": 96,
       "shape": "4:5",
       "crop": {
-        "x": 0.56,
-        "y": 0.56,
-        "zoom": 1.35
+        "x": 0.5,
+        "y": 0.5,
+        "zoom": 1.1
       },
       "black": 0.25,
-      "white": 0.6,
-      "stretch": true
+      "white": 0.7,
+      "stretch": true,
+      "cutout": 0.03
     },
-    "alchemist": {
-      "source": "alchemist.jpg",
-      "alt": "An old print of an alchemist in a dark workshop, staring at a flask that glows with a strange light.",
-      "across": 110,
-      "shape": "2:1",
-      "crop": {
-        "x": 0.38,
-        "y": 0.62,
-        "zoom": 3
-      },
-      "black": 0.12,
-      "white": 0.55,
-      "stretch": true
-    },
-    "lamplight": {
-      "source": "orrery.jpg",
-      "alt": "Two children lit by a lamp, leaning over the brass rings of a model of the planets.",
+    "camera": {
+      "source": "camera.jpg",
+      "alt": "An old Kodak box camera, chrome and black, its two round lenses staring straight ahead.",
       "across": 74,
       "shape": "3:4",
       "crop": {
-        "x": 0.42,
-        "y": 0.6,
-        "zoom": 3
+        "x": 0.5,
+        "y": 0.47,
+        "zoom": 1.1
       },
-      "black": 0.12,
-      "white": 0.55,
-      "stretch": true
-    },
-    "locomotives": {
-      "source": "locomotive.jpg",
-      "alt": "A row of early steam locomotives, tall chimneys and big spoked wheels, drawn side on.",
-      "across": 192,
-      "shape": "22:5",
-      "black": 0.3,
-      "white": 0.75,
+      "black": 0.25,
+      "white": 0.8,
       "stretch": true,
-      "cutout": 0.05,
-      "repeat": {
-        "count": 4,
-        "gap": 0.04,
-        "part": {
-          "x": 0.08,
-          "y": 0.2,
-          "width": 0.58,
-          "height": 0.72
-        }
-      }
+      "cutout": 0.03
     },
-    "presses": {
-      "source": "printing-press.jpg",
-      "alt": "A row of old iron printing presses, each with an eagle perched on top.",
-      "across": 192,
-      "shape": "22:5",
-      "black": 0.26,
-      "white": 0.56,
+    "presscamera": {
+      "source": "press-camera.jpg",
+      "alt": "An old folding press camera, black leather and chrome, with a round flash reflector clipped to its side.",
+      "across": 110,
+      "shape": "2:1",
+      "crop": {
+        "x": 0.55,
+        "y": 0.66,
+        "zoom": 0.72
+      },
+      "black": 0.25,
+      "white": 0.82,
       "stretch": true,
-      "repeat": {
-        "count": 7,
-        "gap": 0.06,
-        "part": {
-          "x": 0.05,
-          "y": 0,
-          "width": 0.9,
-          "height": 0.72
-        }
-      }
-    },
-    "hammers": {
-      "source": "steam-hammer.jpg",
-      "alt": "A row of steam hammers: big arched iron machines that beat red-hot metal into shape.",
-      "across": 120,
-      "shape": "5:2",
-      "black": 0.3,
-      "white": 0.66,
-      "stretch": true,
-      "cutout": 0.04,
-      "repeat": {
-        "count": 4,
-        "gap": 0.05,
-        "part": {
-          "x": 0.12,
-          "y": 0.04,
-          "width": 0.56,
-          "height": 0.85
-        }
-      }
-    },
-    "hammerrow": {
-      "source": "steam-hammer.jpg",
-      "alt": "A long row of steam hammers, the big arched iron machines of the age of steam.",
-      "across": 288,
-      "shape": "5:1",
-      "black": 0.3,
-      "white": 0.66,
-      "stretch": true,
-      "cutout": 0.04,
-      "repeat": {
-        "count": 8,
-        "gap": 0.05,
-        "part": {
-          "x": 0.12,
-          "y": 0.04,
-          "width": 0.56,
-          "height": 0.85
-        }
-      }
+      "cutout": 0.02
     }
   }
 }

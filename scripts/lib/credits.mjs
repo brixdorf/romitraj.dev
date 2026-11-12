@@ -1,8 +1,8 @@
-// The pictures the Credits page thanks, from src/_data/image-credits.json: for each source
-// picture, what it shows, the work's title, artist, year, the collection that shares it, its
-// licence and its page. The build stops if a fact is missing or the licence is not one that
-// allows free use.
-const facts = ['subject', 'title', 'artist', 'year', 'collection', 'licence', 'url'];
+// The photos the Credits page thanks, from src/_data/image-credits.json: for each source photo,
+// what it shows, its title, who took it, where it is shared (Unsplash, or the museum that keeps
+// the object), its licence and its page. The build stops if a fact is missing or the licence is
+// not one that allows free use.
+const facts = ['subject', 'title', 'photographer', 'collection', 'licence', 'url'];
 const freeLicences = ['Public domain', 'CC0', 'Unsplash License'];
 
 export function picturesToThank(pictures) {
