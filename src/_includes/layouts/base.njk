@@ -25,6 +25,7 @@
       The "og:" tags are the Open Graph tags most apps read; the "twitter:" ones are X's own.
       The page for a missing address gives no address, as it has none of its own. #}
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="{{ site.locale }}">
   <meta property="og:site_name" content="{{ site.name }}">
   <meta property="og:title" content="{{ title or site.name }}">
   <meta property="og:description" content="{{ description or site.description }}">
@@ -42,6 +43,7 @@
   <meta name="twitter:image" content="{{ shareImage.url }}">
   <meta name="twitter:image:alt" content="{{ site.shareImageAlt }}">
   {%- if xHandle %}
+  <meta name="twitter:site" content="{{ xHandle }}">
   <meta name="twitter:creator" content="{{ xHandle }}">
   {%- endif %}
   <meta name="theme-color" content="{{ site.themeColor }}">
