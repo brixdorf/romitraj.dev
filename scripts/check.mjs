@@ -6,7 +6,7 @@
 // back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
 // cutting headings into letters for those changes moves nothing and that no letter is cut by the
 // window it slides in (lib/letters.mjs), confirms that the headline's entrance on the home page
-// is safe (lib/entrance.mjs), and confirms that every picture is described or marked as
+// is safe (lib/entrance.mjs), and so is the entrance of the About page's quote (lib/saying.mjs), and confirms that every picture is described or marked as
 // decoration, stays small, moves nothing as it loads and looks the same in every browser
 // (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
 // facts and hide quietly when a service is down (lib/widgets.mjs), and that the blog's posts on
@@ -33,6 +33,7 @@ import {
 import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.mjs';
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
+import { sayingEntrance } from './lib/saying.mjs';
 import { lostAnswers, lostPage } from './lib/lost.mjs';
 import { headOfEveryPage, siteIconInBrowser } from './lib/head.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
@@ -421,6 +422,12 @@ try {
         say(`\nHEADLINE ENTRANCE PROBLEMS in ${engineName}:\n  ` + entranceProblems.join('\n  '));
         process.exitCode = 1;
       }
+      // ---- The entrance of the quote at the top of the About page ----
+      const sayingProblems = await sayingEntrance(browser, server.address);
+      if (sayingProblems.length) {
+        say(`\nQUOTE ENTRANCE PROBLEMS in ${engineName}:\n  ` + sayingProblems.join('\n  '));
+        process.exitCode = 1;
+      }
       // ---- Widgets on the page: shown when all is well, hidden quietly when not ----
       const widgetProblems = await widgetsOnThePage(browser, server.address, quietServer.address);
       if (widgetProblems.length) {
@@ -466,7 +473,7 @@ try {
       }
       await browser.close();
       say(
-        `Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, missing page, site icon, widgets, blog posts, visitor counter and pictures: ${engineName} done.`,
+        `Screenshots, page changes, letters (${pages.length} pages at ${testWidths.length} widths), headline entrance, quote entrance, missing page, site icon, widgets, blog posts, visitor counter and pictures: ${engineName} done.`,
       );
     } finally {
       if (said.length) console.log(said.join('\n'));
