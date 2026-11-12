@@ -98,8 +98,9 @@ src/
                 file per project (its facts on top, its write-up below), _template.md (a
                 project to copy, never built), and projects.11tydata.js, the settings those
                 files share.
-server/         index.js: the small server behind pnpm start. wkd.js: the headers for the
-                OpenPGP key's Web Key Directory. api.js answers the page's three
+server/         index.js: the small server behind pnpm start. files.js: how each file is sent
+                (its type, how long it may be kept). wkd.js: the headers for the OpenPGP key's
+                Web Key Directory. api.js answers the page's three
                 questions, weather.js asks Open-Meteo, spotify.js asks Spotify, blog.js reads
                 the blog's feed (for the build too), cache.js keeps their answers for a while
 scripts/        python.mjs (runs the two font scripts with the project's own Python, in .venv),
@@ -122,7 +123,9 @@ scripts/        python.mjs (runs the two font scripts with the project's own Pyt
                 environment), lib/projects.mjs (the checks on a project's facts),
                 lib/credits.mjs (the photographers the Credits page thanks),
                 lib/downloads.mjs and lib/pgp.mjs (publish the resume and the OpenPGP key
-                during every build). Files ending in .test.mjs (and .test.js in server/)
+                during every build), lib/photo.mjs (turns a photo into grey JPEG XL, AVIF
+                and JPEG files), lib/saying.mjs (the check's test of the About page quote's
+                entrance). Files ending in .test.mjs (and .test.js in server/)
                 are the tests (pnpm test).
 docs/           This guide and the decisions log
 package.json    The packages, the commands, and the Node.js and pnpm versions
@@ -136,61 +139,63 @@ Every file starts with a comment saying what it does.
 
 ## How do I change...?
 
-| I want to change                                                                                 | Open this file                                                                                                                    |
-| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| My name, email, city, social links, blog address                                                 | `src/_data/site.json`                                                                                                             |
-| The words on the Credits page                                                                    | `src/_data/pages.json` (`credits`)                                                                                                |
-| A photographer's name, profile or what they are thanked for                                      | `src/_data/image-credits.json`                                                                                                    |
-| The visitor counter's address or site number, or switching it off                                | `src/_data/site.json` (`analytics`)                                                                                               |
-| The bio line in the top banner                                                                   | `src/_data/site.json` (`banner`)                                                                                                  |
-| The headline's words (opening serif line, giant line, italic words, serif word)                  | `src/_data/headline.json`, then run `pnpm run fit`                                                                                |
-| The introduction sentence, the scroll note                                                       | `src/_data/home.json`                                                                                                             |
-| The ticker's small words, and how the weather is worded                                          | `src/_data/home.json` (`ticker`)                                                                                                  |
-| The words for the sky ("partly cloudy")                                                          | `src/_data/weather.json`                                                                                                          |
-| The city whose weather and time are shown                                                        | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`)                                                               |
-| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below)                                                                                    |
-| Which picture a project shows                                                                    | `image` at the top of the project's file                                                                                          |
-| Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                           |
-| The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                       |
-| The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                             |
-| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/`                                                                                               |
-| A new project                                                                                    | Copy `src/content/projects/_template.md` (see "Adding or changing a project")                                                     |
-| The resume                                                                                       | Replace `src/assets/files/resume.pdf` (keep the name); the card's words are in `src/_data/pages.json` (`resume`)                  |
-| The OpenPGP key                                                                                  | Replace `src/assets/files/romitraj-pgp-public.asc` (keep the name). See "The OpenPGP key"                                         |
-| The quote at the bottom of the About page                                                        | `src/_data/about.json` (`quote`)                                                                                                  |
-| The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                        |
-| The text on the About page                                                                       | `src/_data/about.json`                                                                                                            |
-| The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                  |
-| The picture shown when a link is shared                                                          | Run `pnpm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                 |
-| The page for a missing address ("Lost in oblivion")                                              | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                 |
-| The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                    |
-| The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                 |
-| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                            |
-| How many blog posts the home page shows                                                          | `src/_data/home.json` (`writing.count`)                                                                                           |
-| The links under "Elsewhere" (about card and footer)                                              | `src/_data/site.json` (`elsewhere`)                                                                                               |
-| The version tag (footer, and the small row on inner pages)                                       | `src/_data/site.json` (`version`)                                                                                                 |
-| An icon's drawing, or a new icon                                                                 | `src/_data/icons.json`                                                                                                            |
-| Where and how far things move as you scroll                                                      | `src/assets/js/motion.js` (`scroll`)                                                                                              |
-| The city, country or coordinates in the status ticker                                            | `src/_data/site.json`                                                                                                             |
-| How fast the ticker moves, and how much it slows under the pointer                               | `src/assets/js/motion.js`                                                                                                         |
-| How the code is laid out (quotes, line length), which lint rules run, where the tests are        | `vite.config.js`                                                                                                                  |
-| The oldest browser versions the CSS and JavaScript are written for                               | `scripts/lib/bundle.mjs` (`browsers`)                                                                                             |
-| pnpm's settings (exact versions, install scripts)                                                | `pnpm-workspace.yaml`                                                                                                             |
-| A color                                                                                          | `src/assets/css/tokens.css`                                                                                                       |
-| The colors of the gradient bar                                                                   | `src/assets/css/tokens.css` (the four `--color-bar` lines)                                                                        |
-| Which fonts are used for what                                                                    | `src/assets/css/tokens.css` (the `--font` lines)                                                                                  |
-| Spacing, corner size, line thickness                                                             | `src/assets/css/tokens.css`                                                                                                       |
-| How fast a hover or the gradient bar moves                                                       | `src/assets/css/tokens.css` (the `--duration` lines)                                                                              |
-| The color of the ring around whatever has keyboard focus                                         | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks)                                 |
-| How fast the tickers and scroll drift move                                                       | `src/assets/js/motion.js`                                                                                                         |
-| How a page change moves: how long, how far, in what order                                        | `src/assets/js/motion.js` (`pageChange`)                                                                                          |
-| How the headline slides in when the home page opens                                              | `src/assets/js/motion.js` (`intro`, and the letter pace above it)                                                                 |
-| The words screen readers hear on a link that opens a new tab                                     | `src/_data/site.json` (`newTabNote`)                                                                                              |
-| The list of font files, or which ones load first                                                 | `src/_data/fonts.json`, then run `pnpm run fonts`                                                                                 |
-| Which free font stands in for a licensed one                                                     | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `pnpm run fonts:fallback` |
-| Which sections the home page has, and their order                                                | `src/content/index.njk`                                                                                                           |
-| The page title or description shown in browser tabs and search results                           | `src/_data/site.json`, or the top of the page's own file                                                                          |
-| The browser's toolbar color on phones                                                            | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`.                                          |
+| I want to change                                                                                 | Open this file                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| My name, email, city, social links, blog address                                                 | `src/_data/site.json`                                                                                                                                                              |
+| The words on the Credits page                                                                    | `src/_data/pages.json` (`credits`)                                                                                                                                                 |
+| A photographer's name, profile or what they are thanked for                                      | `src/_data/image-credits.json`                                                                                                                                                     |
+| The visitor counter's address or site number, or switching it off                                | `src/_data/site.json` (`analytics`)                                                                                                                                                |
+| The bio line in the top banner                                                                   | `src/_data/site.json` (`banner`)                                                                                                                                                   |
+| The headline's words (opening serif line, giant line, italic words, serif word)                  | `src/_data/headline.json`, then run `pnpm run fit`                                                                                                                                 |
+| The introduction sentence, the scroll note                                                       | `src/_data/home.json`                                                                                                                                                              |
+| The ticker's small words, and how the weather is worded                                          | `src/_data/home.json` (`ticker`)                                                                                                                                                   |
+| The words for the sky ("partly cloudy")                                                          | `src/_data/weather.json`                                                                                                                                                           |
+| The city whose weather and time are shown                                                        | `src/_data/site.json` (`city`, `latitude`, `longitude`, `timeZone`)                                                                                                                |
+| The portrait on the About page                                                                   | Replace `src/assets/img/source/portrait.jpg` (keep the name); its framing is `portrait` in `src/_data/images.json`                                                                 |
+| A search description, a tab name, a screen-reader label                                          | The page's own file (`title`, `description`); `src/_data/site.json` (`description`, `newTabNote`); `src/_data/home.json` and `src/_data/pages.json` (the labels ending in `Label`) |
+| A picture: which photo or drawing it uses, its alt text, how it is cut and how dark it comes out | `src/_data/images.json` (see "Pictures" below)                                                                                                                                     |
+| Which picture a project shows                                                                    | `image` at the top of the project's file                                                                                                                                           |
+| Which picture sits beside a page's giant name                                                    | `picture` at the top of the page's file                                                                                                                                            |
+| The page links and their descriptions (hero and footer)                                          | `src/_data/navigation.json`                                                                                                                                                        |
+| The intro letter, the about text, section headings, button labels, the footer sign-off           | `src/_data/home.json`                                                                                                                                                              |
+| A project's name, one-line description, tags, year, link or write-up                             | Its file in `src/content/projects/`                                                                                                                                                |
+| A new project                                                                                    | Copy `src/content/projects/_template.md` (see "Adding or changing a project")                                                                                                      |
+| The resume                                                                                       | Replace `src/assets/files/resume.pdf` (keep the name); the card's words are in `src/_data/pages.json` (`resume`)                                                                   |
+| The OpenPGP key                                                                                  | Replace `src/assets/files/romitraj-pgp-public.asc` (keep the name). See "The OpenPGP key"                                                                                          |
+| The quote under the About page's name                                                            | `src/_data/about.json` (`quote`)                                                                                                                                                   |
+| The order of the projects                                                                        | `order` at the top of each file in `src/content/projects/`                                                                                                                         |
+| The text on the About page                                                                       | `src/_data/about.json`                                                                                                                                                             |
+| The site's icon (the compass in the browser tab)                                                 | `src/assets/icons/site-icon.svg`; its colors follow `tokens.css`                                                                                                                   |
+| The picture shown when a link is shared                                                          | Run `pnpm run share`; its description is `shareImageAlt` in `src/_data/site.json`                                                                                                  |
+| The page for a missing address ("Lost in oblivion")                                              | Its giant name: `src/content/404.njk` (`title`). Its other words: `src/_data/pages.json` (`lost`)                                                                                  |
+| The giant name at the top of an inner page                                                       | The top of that page's file in `src/content/` (`heading`, or `title` if there is no `heading`)                                                                                     |
+| The line beside the version tag on inner pages                                                   | `src/_data/site.json` (`tagline`)                                                                                                                                                  |
+| Small labels on inner pages ("Go home", "You are here", "Read more", "Contents")                 | `src/_data/pages.json`                                                                                                                                                             |
+| How many blog posts the home page shows                                                          | `src/_data/home.json` (`writing.count`)                                                                                                                                            |
+| The links under "Elsewhere" (about card and footer)                                              | `src/_data/site.json` (`elsewhere`)                                                                                                                                                |
+| The version tag (footer, and the small row on inner pages)                                       | `src/_data/site.json` (`version`)                                                                                                                                                  |
+| An icon's drawing, or a new icon                                                                 | `src/_data/icons.json`                                                                                                                                                             |
+| Where and how far things move as you scroll                                                      | `src/assets/js/motion.js` (`scroll`)                                                                                                                                               |
+| The city, country or coordinates in the status ticker                                            | `src/_data/site.json`                                                                                                                                                              |
+| How fast the ticker moves, and how much it slows under the pointer                               | `src/assets/js/motion.js`                                                                                                                                                          |
+| How the code is laid out (quotes, line length), which lint rules run, where the tests are        | `vite.config.js`                                                                                                                                                                   |
+| The oldest browser versions the CSS and JavaScript are written for                               | `scripts/lib/bundle.mjs` (`browsers`)                                                                                                                                              |
+| pnpm's settings (exact versions, install scripts)                                                | `pnpm-workspace.yaml`                                                                                                                                                              |
+| A color                                                                                          | `src/assets/css/tokens.css`                                                                                                                                                        |
+| The colors of the gradient bar                                                                   | `src/assets/css/tokens.css` (the four `--color-bar` lines)                                                                                                                         |
+| Which fonts are used for what                                                                    | `src/assets/css/tokens.css` (the `--font` lines)                                                                                                                                   |
+| Spacing, corner size, line thickness                                                             | `src/assets/css/tokens.css`                                                                                                                                                        |
+| How fast a hover or the gradient bar moves                                                       | `src/assets/css/tokens.css` (the `--duration` lines)                                                                                                                               |
+| The color of the ring around whatever has keyboard focus                                         | `src/assets/css/tokens.css` (`--color-focus` on paper, `--color-focus-on-ink` on the dark blocks)                                                                                  |
+| How fast the tickers and scroll drift move                                                       | `src/assets/js/motion.js`                                                                                                                                                          |
+| How a page change moves: how long, how far, in what order                                        | `src/assets/js/motion.js` (`pageChange`)                                                                                                                                           |
+| How the headline slides in when the home page opens                                              | `src/assets/js/motion.js` (`intro`, and the letter pace above it)                                                                                                                  |
+| The words screen readers hear on a link that opens a new tab                                     | `src/_data/site.json` (`newTabNote`)                                                                                                                                               |
+| The list of font files, or which ones load first                                                 | `src/_data/fonts.json`, then run `pnpm run fonts`                                                                                                                                  |
+| Which free font stands in for a licensed one                                                     | `src/_data/fonts.json` (`fallback`) and the recipes at the top of `scripts/fallback_fonts.py`, then run `pnpm run fonts:fallback`                                                  |
+| Which sections the home page has, and their order                                                | `src/content/index.njk`                                                                                                                                                            |
+| The page title or description shown in browser tabs and search results                           | `src/_data/site.json`, or the top of the page's own file                                                                                                                           |
+| The browser's toolbar color on phones                                                            | `src/_data/site.json` (`themeColor`). Keep it the same as `--color-ink` in `tokens.css`.                                                                                           |
 
 This table grows as sections are built.
 
@@ -296,13 +301,14 @@ An address that leads nowhere (a mistyped address, an old link from another site
 
 ### The About page
 
-Its three framed pictures are named in `src/content/about.njk` (`portrait`, `jellyfish`, `swells`) and described in `images.json`. The portrait is your own photo (see "Pictures"). All of its text is in `src/_data/about.json`: the portrait's caption, four numbered cards (`who`, `tinkering` (titled "Whereabouts"), `contact`, `toolbox`), the labels for the latest blog post and for the OpenPGP key, and the quote that closes the page (`quote`). The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
+Its three framed pictures are named in `src/content/about.njk` (`portrait`, `jellyfish`, `swells`) and described in `images.json`. The portrait is a grey photo, not pixel art (see "Photos" under "Pictures"). All of its text is in `src/_data/about.json`: the quote under the page's name (`quote`), the portrait's caption, four numbered cards (`who`, `tinkering` (titled "Whereabouts"), `contact`, `toolbox`), and the words around the latest blog post and the OpenPGP key. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
 
 `<a href="...">` and `{email}` work as in `home.json`.
 
 - **The toolbox** is a table of two columns, area and skills, matching the skills on the resume. Add a row as `["Area", "Skills"]`. A table of three columns works too: the third is shown as a grey aside.
-- **The quote** (Epictetus) closes the page in large serif letters, under the toolbox. Its two halves, `plain` and `italic`, are set like the top banner: the second half slanted. It is in the large serif, so no straight apostrophe and no slash. It echoes the "Who" card, which says you keep learning about the things you think you already know.
-- **The Contact card shows the OpenPGP key**: its fingerprint, key ID, type and expiry date, and a link to download it. The facts are read from the key file itself during the build, so they cannot drift from the key; only their labels are in `about.json` (`contact.key`). See "The OpenPGP key".
+- **The quote** (Epictetus) sits right under "About the human", in large serif letters (`--type-saying` in `tokens.css`). Its two halves, `plain` and `italic`, are two lines, the second slanted. It is in the large serif, so no straight apostrophe and no slash. It echoes the "Who" card, which says you keep learning about the things you think you already know.
+  - **It has an entrance:** when the page is opened, its two lines slide up into place one after the other, solid, through a window at their top edge, as the page's name does when it arrives (`entrance: saying` at the top of `about.njk`; see "The headline's entrance"). Arriving from another page, the same happens while the name is still sliding in (`pageIn` in `page-changes.js`, `pageChange.pageIn.saying` in `motion.js`). The page's name itself does not move on opening. No entrance for visitors who asked for less motion.
+- **The Contact card shows the OpenPGP key**: its fingerprint, key ID, algorithms ("Ed25519 (signing) and Curve25519 (encryption)") and expiry date, a "Download key" button, and the command that fetches it from the domain, in a framed box where one click selects all of it. The facts are read from the key file itself during the build, so they cannot drift from the key; only their labels are in `about.json` (`contact.key`). See "The OpenPGP key".
 
 ### Adding or changing a project
 
@@ -422,7 +428,9 @@ On the site this design follows, About is a plain fade in every direction. Here 
 
 ## The headline's entrance
 
-When the home page is opened directly or reloaded, the headline slides in: the letters of the three big lines one after another, and the outlined italic words from the left. It is the same movement as arriving from the Projects page. Other pages have no entrance.
+When the home page is opened directly or reloaded, the headline slides in: the letters of the three big lines one after another, and the outlined italic words from the left. It is the same movement as arriving from the Projects page.
+
+Two other pages have an entrance of their own, through the same small script: the page for a missing address (its giant name, `entrance: true`) and the About page (only its quote, `entrance: saying`: a page can name the pieces that enter, and the others stay still). The rest have none.
 
 How it works:
 
@@ -462,17 +470,19 @@ Where things are:
 
 ## The resume
 
-The Resume page (`/resume/`) is one card with a few words and a link to the PDF.
+The Resume page (`/resume/`) is one card, without a number or title: a line, the email line, a link that opens the PDF and a button that downloads it.
 
-- **The PDF** is `src/assets/files/resume.pdf`. The build copies it to `/resume.pdf`, with a fingerprint in the link's address (`/resume.pdf?v=...`), so a new version is fetched at once. **To update it, replace that file, keeping its name,** and rebuild.
+- **The PDF** is `src/assets/files/resume.pdf`. The build copies it to `/resume.pdf`, a plain address with nothing after it. **To update it, replace that file, keeping its name,** and rebuild.
+- **It opens in the browser**, readable there, rather than downloading at once: the server sends it as `application/pdf` with `Content-Disposition: inline` (`server/files.js`). The "Download PDF" button asks the browser to save it instead (the `download` attribute).
+- **A new version shows at once** although the address never changes: the server tells browsers and Cloudflare to check with it each time (`Cache-Control: no-cache`), and answers "not modified" with no body when they already have the latest version (an ETag: a short tag that changes with the file). See "How files are sent".
 - The card's words are in `src/_data/pages.json` (`resume`).
-- The link opens the PDF the ordinary way, not as a page change (`data-taxi-ignore` in `src/content/resume.njk`).
+- Both links load the PDF the ordinary way, not as a page change (`data-taxi-ignore` in `src/content/resume.njk`).
 
 ## The OpenPGP key
 
 Your public OpenPGP key (for encrypted email to hi@romitraj.dev) is on the site in two ways:
 
-1. **On the About page**, in the Contact card: the fingerprint, the key ID, the type and the expiry date, and a link to download the key (`/romitraj-pgp-public.asc`).
+1. **On the About page**, in the Contact card: the fingerprint, the key ID, the algorithms of its two parts (Ed25519 for signing, Curve25519 for encryption), the expiry date, a "Download key" button (`/romitraj-pgp-public.asc`, a plain address) and the command below.
 2. **In a Web Key Directory (WKD)**, so that anyone can fetch it straight from your domain with:
 
    ```bash
@@ -487,9 +497,9 @@ How it works:
   - writes it to `/romitraj-pgp-public.asc` for the download link;
   - writes the key in binary form (what `gpg --dearmor` gives) to `/.well-known/openpgpkey/hu/aeii9rmagouy1owpp7e5ftpxjof7h41n`, the address WKD's "direct method" gives `hi@romitraj.dev` (the part before the `@`, hashed);
   - writes an empty `/.well-known/openpgpkey/policy`, which says the directory exists;
-  - reads the facts the Contact card shows from the key itself, so they always match it;
+  - reads the facts the Contact card shows from the key itself (each part's algorithm and use come from the key's own flags), so they always match it;
   - stops the build if the key has no user ID for the email address in `site.json`.
-- **The server** (`server/wkd.js`) sends the two WKD files as `application/octet-stream` with `Access-Control-Allow-Origin: *` (any website may read them), as the WKD standard asks. The address also works with `?l=hi` on the end, which GnuPG adds.
+- **The server** (`server/wkd.js`, through `server/files.js`) sends the two WKD files as `application/octet-stream` with `Access-Control-Allow-Origin: *` (any website may read them), as the WKD standard asks. The address also works with `?l=hi` on the end, which GnuPG adds.
 - **`openpgpkey.romitraj.dev` must not exist.** GnuPG first tries the "advanced method" at that name, and only falls back to the direct method above when the name does not resolve. Checked on 2026-11-12: it has no address (Cloudflare answers it exactly as it answers any made-up name). **Never add a DNS record for `openpgpkey`, and never add a wildcard (`*`) record**, or the lookup stops working.
 - **To check it after deploying**, in a terminal (the first line makes a throwaway key store, so your own is not touched):
 
@@ -611,7 +621,7 @@ Every link to another website opens in a new tab. The build does this by itself 
 
 ## Pictures
 
-Every picture on the site is made by the build from a file in `src/assets/img/source/`: either a photo (`.jpg`) or a drawing (`.svg`). The build turns each one into a tiny two-tone picture made of square pixel blocks, in the ink colour on the paper colour, and writes it into `_site/assets/img/`. The finished pictures are never committed; only the sources are.
+Every picture on the site is made by the build from a file in `src/assets/img/source/`: either a photo (`.jpg`) or a drawing (`.svg`). The build turns each one into a tiny two-tone picture made of square pixel blocks, in the ink colour on the paper colour, and writes it into `_site/assets/img/`. The one exception is a picture marked `"kind": "photo"` (the portrait), which stays a photo: see "Photos" below. The finished pictures are never committed; only the sources are.
 
 The list of pictures is `src/_data/images.json`. One entry looks like this:
 
@@ -641,28 +651,44 @@ The list of pictures is `src/_data/images.json`. One entry looks like this:
 | `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the sea band)                                                                                                                    |
 | `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                                            |
 | `despeckle`      | `true` removes lone specks of ink: a block with no ink touching it and almost none near it. Used by the portrait, whose cut-out left a faint outline that turned into scattered dots. Even tones, lines and edges are kept (`removeSpecks` in `scripts/images.mjs`) |
+| `kind`           | `"photo"` keeps the picture a photo, in shades of grey, instead of pixel art. See "Photos" below                                                                                                                                                                    |
+| `credit`         | `false` for a photo that needs no entry in `image-credits.json` (the portrait). Every other photo needs one                                                                                                                                                         |
 | `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                                    |
 
 Where each picture is shown:
 
-| Picture                 | Source                                   | Where                                                                            |
-| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
-| `hero`                  | whale-tail.jpg                           | The frame in the hero                                                            |
-| `diver`                 | diver.svg                                | Behind the home page's about section                                             |
-| `swells`                | swells.svg                               | The band above the footer on the home page, and the wide frame on the About page |
-| `compass`               | compass.svg                              | The footer on every page, and beside the About page's name                       |
-| `servers`               | server-rack.jpg                          | Beside the Projects page's name                                                  |
-| `padlock`, `crane`      | padlock.jpg, harbour-cranes.jpg          | The frames on the Projects page (Aletheia, My Homelab)                           |
-| `portrait`, `jellyfish` | portrait.jpg (your own photo), diver.svg | The About page                                                                   |
-| `fluke`                 | whale-tail.jpg                           | Beside the Resume page's name                                                    |
+| Picture                 | Source                            | Where                                                                            |
+| ----------------------- | --------------------------------- | -------------------------------------------------------------------------------- |
+| `hero`                  | whale-tail.jpg                    | The frame in the hero                                                            |
+| `diver`                 | diver.svg                         | Behind the home page's about section                                             |
+| `swells`                | swells.svg                        | The band above the footer on the home page, and the wide frame on the About page |
+| `compass`               | compass.svg                       | The footer on every page, and beside the About page's name                       |
+| `servers`               | server-rack.jpg                   | Beside the Projects page's name                                                  |
+| `padlock`, `crane`      | padlock.jpg, harbour-cranes.jpg   | The frames on the Projects page (Aletheia, My Homelab)                           |
+| `portrait`, `jellyfish` | portrait.jpg (a photo), diver.svg | The About page                                                                   |
+| `fluke`                 | whale-tail.jpg                    | Beside the Resume page's name                                                    |
 
 ### Changing a picture
 
 - **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `pnpm run dev` is running: the picture is redone each time you save.
 - **A photo that works** has one clear subject with a strong outline against a plain background. Busy photos turn into noise.
 - **To add a picture:** add an entry with a new name (with an `alt`, or `"decorative": true` if it is only ornament), then show it with `{% picture "name" %}` in a template, or name it as a project's `image` or a page's `picture`.
-- **The photos are from Unsplash**, except the portrait, which is yours.
-- **The portrait** (`portrait` in `images.json`) is your photo, cut out onto white: the white becomes plain paper. It is finely dithered (`"pattern": "fine"`) and cropped from head to crossed arms. On phones and tablets its frame is square and shows the top of it, the face (`about-page.css`). `"despeckle": true` removes the stray dots the cut-out's faint outline left around the shirt.
+- **The photos are from Unsplash**, except the portrait, which needs no credit (`"credit": false`).
+
+### Photos
+
+A picture marked `"kind": "photo"` (the About page's portrait) stays a photo. `scripts/lib/photo.mjs` turns it into shades of grey (baked into the files, not a filter in the styles), cuts it to its `shape` and `crop`, and makes it at each of its `widths` (240, 480, 720 and 960 pixels) in three formats:
+
+- **JPEG XL and AVIF**, two newer formats that make much smaller files than JPEG. Browsers that know them take one; the page lists the smaller of the two first (for the portrait AVIF: 24 KB against JPEG XL's 32 KB at 480 pixels).
+- **JPEG**, last, for any browser that knows neither.
+
+**Same quality in every format.** Each format is saved at the lowest quality setting whose result still scores `target` (0.98) on SSIM, a standard measure of how close a picture is to the original (1 is identical). So the three look the same and only their sizes differ. The search tries a few settings, which takes about 25 seconds for the portrait; the results are kept in `.cache/photos/` and reused until the photo or its settings change, so later builds take a second.
+
+**Sharp on every screen.** The page tells the browser how wide the photo is shown (`sizes`, in `src/content/about.njk`), and the browser fetches the smallest file that is still sharp there: 240 pixels on an ordinary laptop screen, 480 on a sharper one, 720 on a phone.
+
+To change the portrait, replace `src/assets/img/source/portrait.jpg` (keep the name) and rebuild. To change its framing, change `crop` in `images.json`. On phones and tablets its frame is square and shows its top, the face (`about-page.css`).
+
+JPEG XL is made by `@jsquash/jxl` (the libjxl encoder, as WebAssembly), AVIF and JPEG by sharp. Safari and Chrome (from version 155) show JPEG XL; Firefox is still switching it on; every current browser shows AVIF.
 
 ### Credits
 
@@ -685,7 +711,7 @@ The hero picture alone sits on a faint surface like thick white paint. It is not
 
 ### How they are shown
 
-- **One pixel of the file is one block on the page.** The browser enlarges the file without smoothing (`image-rendering: pixelated` in `base.css`), which keeps the edges hard and the files tiny: all the pictures together weigh about 27 KB.
+- **One pixel of the file is one block on the page.** The browser enlarges the file without smoothing (`image-rendering: pixelated` in `base.css`), which keeps the edges hard and the files tiny. (A photo is the exception: it is shown smooth, at the width that suits the screen.)
 - **Nothing moves when a picture arrives.** Every picture is laid over a box whose size is already fixed by the styles, and its width and height are written into the page. `pnpm run check` tests this on every page in three browsers.
 - **Pictures below the top of a page are fetched only when they come near the window.** The hero picture and the one beside a page's name are fetched at once.
 - **At some window sizes a block is not a whole number of screen pixels**, so now and then one column of blocks is a pixel wider than its neighbours. This is how hard-edged pixel pictures behave at a fluid size.
@@ -961,6 +987,17 @@ Before every build, `scripts/lib/bundle.mjs` uses Vite+ (Vite, with Rolldown for
 - the headline's entrance (`src/assets/js/intro.js`), which is written straight into the pages.
 
 Each is written for Chrome and Edge 115, Firefox 115 and Safari 16.4 or newer: newer CSS, such as nesting, is rewritten so those versions understand it. The list is `browsers` in `bundle.mjs`. This was done by esbuild until 2026-11-11; [decisions.md](decisions.md) says why it changed and how the two were compared.
+
+## How files are sent
+
+`server/files.js` decides, for every file the live server sends, its type and how long it may be kept:
+
+- **A file asked for with a fingerprint** (`main.css?v=1a2b3c4d`: the stylesheet, the scripts, the icons, the pictures) may be kept for an hour by browsers and Cloudflare. A changed file gets a new fingerprint, so a new address.
+- **Everything with a plain address** (every page, `/resume.pdf`, `/romitraj-pgp-public.asc`, the Web Key Directory) is checked with the server on every visit (`no-cache`), so a new version shows at once. The server sends an ETag with each file; when the browser already has that version, the answer is a short "not modified" (304) with no body.
+- **Links a visitor follows or downloads have plain addresses**, with no `?v=` in them.
+- **A PDF opens in the browser** (`Content-Disposition: inline`).
+
+`server/files.test.js` tests all of this (`pnpm test`).
 
 ## Deploying with Dokploy
 
