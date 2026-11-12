@@ -23,11 +23,15 @@ function stopWaiting(name) {
 }
 
 // Where everything the visitor can see is on the screen: only the part inside the window counts,
-// so a box that holds a piece (the page's content as a whole) may grow below the window.
+// so a box that holds a piece (the page's content as a whole) may grow below the window. What
+// moves inside a ticker is left out (the ticker's own box is not): it slides all the time, and
+// Safari's engine moves it even between two measurements in the same instant, which would look
+// like the change had moved something.
 function placesInSight() {
   const height = window.innerHeight;
   const places = [];
   for (const element of document.body.querySelectorAll('*')) {
+    if (element.parentElement?.closest('[data-ticker]')) continue;
     const rect = element.getBoundingClientRect();
     if (rect.bottom <= 0 || rect.top >= height || (!rect.width && !rect.height)) continue;
     places.push([
