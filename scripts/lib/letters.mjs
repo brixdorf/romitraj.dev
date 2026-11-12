@@ -184,10 +184,14 @@ export async function lettersStayInPlace(page, pagePath) {
           range.setEnd(node, end);
           return range.getBoundingClientRect();
         };
-        // Where every other piece of the page sits: everything in the content that is not inside "except".
+        // Where every other piece of the page sits: everything in the content that is not inside
+        // "except". What moves inside a ticker is left out: it slides all the time, and Safari's
+        // engine moves it even between two measurements in the same instant.
         const others = (except) =>
           [...document.querySelectorAll('main *')]
-            .filter((other) => !except.contains(other))
+            .filter(
+              (other) => !except.contains(other) && !other.parentElement?.closest('[data-ticker]'),
+            )
             .map((other) => other.getBoundingClientRect());
         const moved = (before, after) =>
           before.filter((rect, index) =>
