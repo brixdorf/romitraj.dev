@@ -10,20 +10,25 @@
       "white": 0.7,
       "credit": false
     },
-    "sewing": {
-      "source": "sewing-machine.jpg",
-      "alt": "An old black sewing machine with gold scrollwork along its arm and a big hand wheel on the side.",
+    "orrery": {
+      "source": "orrery.jpg",
+      "alt": "An old print of a candle-lit room: a man explains a brass model of the planets while two children lean in close to watch.",
       "across": 234,
       "shape": "26:25",
       "crop": {
-        "x": 0.47,
-        "y": 0.56,
-        "zoom": 1.75
+        "x": 0.49,
+        "y": 0.47,
+        "zoom": 1.12
       },
-      "black": 0.3,
-      "white": 0.65,
-      "sharpen": 1,
-      "cutout": 0.035
+      "black": 0.12,
+      "white": 0.58,
+      "stretch": true,
+      "fade": {
+        "amount": 0.12,
+        "x": 0.5,
+        "y": 0.5,
+        "size": 0.88
+      }
     },
     "compass": {
       "source": "compass.svg",
@@ -41,48 +46,6 @@
       "white": 0.96,
       "pattern": "grain"
     },
-    "hourglass": {
-      "source": "hourglass.jpg",
-      "alt": "An old hourglass on a wooden stand, its sand still running.",
-      "across": 74,
-      "shape": "3:4",
-      "crop": {
-        "x": 0.5,
-        "y": 0.45,
-        "zoom": 1.1
-      },
-      "black": 0.12,
-      "white": 0.55,
-      "sharpen": 1
-    },
-    "lantern": {
-      "source": "lantern.jpg",
-      "alt": "An old oil lantern hanging against a pale sky, the kind a search party carries.",
-      "across": 96,
-      "shape": "4:5",
-      "crop": {
-        "x": 0.5,
-        "y": 0.55,
-        "zoom": 1.05
-      },
-      "black": 0.25,
-      "white": 0.52,
-      "sharpen": 1
-    },
-    "keys": {
-      "source": "typewriter.jpg",
-      "alt": "Rows of round keys on an old typewriter.",
-      "across": 192,
-      "shape": "22:5",
-      "crop": {
-        "x": 0.5,
-        "y": 0.77,
-        "zoom": 1
-      },
-      "black": 0.3,
-      "white": 0.62,
-      "sharpen": 1
-    },
     "portrait": {
       "kind": "photo",
       "source": "portrait.jpg",
@@ -97,63 +60,126 @@
       "widths": [240, 480, 720, 960],
       "target": 0.98
     },
-    "typebars": {
-      "source": "typewriter.jpg",
-      "alt": "The inside of an old typewriter: dozens of type bars fanned out in a half circle, each waiting for its key.",
-      "across": 192,
-      "shape": "22:5",
+    "diogenes": {
+      "source": "diogenes.jpg",
+      "alt": "An old print of Diogenes, a bearded man in a heavy cloak, holding up a small lantern.",
+      "across": 96,
+      "shape": "4:5",
       "crop": {
-        "x": 0.5,
-        "y": 0.47,
-        "zoom": 1.1
+        "x": 0.56,
+        "y": 0.56,
+        "zoom": 1.35
       },
-      "black": 0.22,
+      "black": 0.25,
       "white": 0.6,
-      "sharpen": 1.5
+      "stretch": true
     },
-    "binoculars": {
-      "source": "binoculars.jpg",
-      "alt": "A pair of black binoculars seen from above, staring right back at you.",
+    "alchemist": {
+      "source": "alchemist.jpg",
+      "alt": "An old print of an alchemist in a dark workshop, staring at a flask that glows with a strange light.",
       "across": 110,
       "shape": "2:1",
       "crop": {
-        "x": 0.5,
-        "y": 0.5,
-        "zoom": 1
+        "x": 0.38,
+        "y": 0.62,
+        "zoom": 3
       },
-      "black": 0.3,
-      "white": 0.7,
-      "sharpen": 1
+      "black": 0.12,
+      "white": 0.55,
+      "stretch": true
     },
-    "radio": {
-      "source": "radio.jpg",
-      "alt": "An old portable radio with a round speaker, a row of dials and a carry handle on top.",
+    "lamplight": {
+      "source": "orrery.jpg",
+      "alt": "Two children lit by a lamp, leaning over the brass rings of a model of the planets.",
+      "across": 74,
+      "shape": "3:4",
+      "crop": {
+        "x": 0.42,
+        "y": 0.6,
+        "zoom": 3
+      },
+      "black": 0.12,
+      "white": 0.55,
+      "stretch": true
+    },
+    "locomotives": {
+      "source": "locomotive.jpg",
+      "alt": "A row of early steam locomotives, tall chimneys and big spoked wheels, drawn side on.",
+      "across": 192,
+      "shape": "22:5",
+      "black": 0.3,
+      "white": 0.75,
+      "stretch": true,
+      "cutout": 0.05,
+      "repeat": {
+        "count": 4,
+        "gap": 0.04,
+        "part": {
+          "x": 0.08,
+          "y": 0.2,
+          "width": 0.58,
+          "height": 0.72
+        }
+      }
+    },
+    "presses": {
+      "source": "printing-press.jpg",
+      "alt": "A row of old iron printing presses, each with an eagle perched on top.",
+      "across": 192,
+      "shape": "22:5",
+      "black": 0.26,
+      "white": 0.56,
+      "stretch": true,
+      "repeat": {
+        "count": 7,
+        "gap": 0.06,
+        "part": {
+          "x": 0.05,
+          "y": 0,
+          "width": 0.9,
+          "height": 0.72
+        }
+      }
+    },
+    "hammers": {
+      "source": "steam-hammer.jpg",
+      "alt": "A row of steam hammers: big arched iron machines that beat red-hot metal into shape.",
       "across": 120,
       "shape": "5:2",
-      "crop": {
-        "x": 0.5,
-        "y": 0.5,
-        "zoom": 0.8
-      },
       "black": 0.3,
-      "white": 0.7,
-      "sharpen": 1,
-      "cutout": 0.03
+      "white": 0.66,
+      "stretch": true,
+      "cutout": 0.04,
+      "repeat": {
+        "count": 4,
+        "gap": 0.05,
+        "part": {
+          "x": 0.12,
+          "y": 0.04,
+          "width": 0.56,
+          "height": 0.85
+        }
+      }
     },
-    "telephone": {
-      "source": "telephone.jpg",
-      "alt": "An old black rotary telephone with its handset off the hook, the cord looping all the way across.",
+    "hammerrow": {
+      "source": "steam-hammer.jpg",
+      "alt": "A long row of steam hammers, the big arched iron machines of the age of steam.",
       "across": 288,
       "shape": "5:1",
-      "crop": {
-        "x": 0.5,
-        "y": 0.5,
-        "zoom": 0.42
-      },
       "black": 0.3,
-      "white": 0.7,
-      "sharpen": 1,
-      "cutout": 0.03
+      "white": 0.66,
+      "stretch": true,
+      "cutout": 0.04,
+      "repeat": {
+        "count": 8,
+        "gap": 0.05,
+        "part": {
+          "x": 0.12,
+          "y": 0.04,
+          "width": 0.56,
+          "height": 0.85
+        }
+      }
     }
   }
 }

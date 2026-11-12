@@ -1,12 +1,12 @@
 ---
 title: Credits
-picture: telephone
+picture: hammerrow
 layout: layouts/page.njk
 description: The people and services that helped make this site.
 ---
 {#-
   The Credits page: four numbered cards. Their words are in _data/pages.json ("credits"); the
-  photographers come from _data/image-credits.json (as "photoCredits": see eleventy.config.js).
+  pictures come from _data/image-credits.json (as "pictureCredits": see eleventy.config.js).
   Each card is marked data-part="card": during a page change they arrive one after another.
 -#}
 <div class="page-grid" data-part="cards">
@@ -20,14 +20,14 @@ description: The people and services that helped make this site.
   </section>
 
   <section class="panel page-grid__main" data-part="card">
-    <h2 class="panel__title">{{ pages.credits.photos.title }}</h2>
+    <h2 class="panel__title">{{ pages.credits.pictures.title }}</h2>
     <div class="panel__text">
-      {%- for paragraph in pages.credits.photos.paragraphs %}
+      {%- for paragraph in pages.credits.pictures.paragraphs %}
       <p>{{ paragraph | safe }}</p>
       {%- endfor %}
       <ul class="panel__list">
-        {%- for person in photoCredits %}
-        <li><a href="{{ person.profile }}">{{ person.name }}</a>, for {{ person.subjects | join(" and ") }}</li>
+        {%- for picture in pictureCredits %}
+        <li>{{ picture.subject | capitalize }}: <a href="{{ picture.url }}">{{ picture.title }}</a> ({{ picture.year }}), by {{ picture.artist }}. {{ picture.collection }}, {{ picture.licence }}.</li>
         {%- endfor %}
       </ul>
     </div>

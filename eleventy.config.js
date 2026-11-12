@@ -9,7 +9,7 @@ import { bundleAssets, bundleIntro } from './scripts/lib/bundle.mjs';
 import { missingFacts, projectLink } from './scripts/lib/projects.mjs';
 import { publishFile } from './scripts/lib/downloads.mjs';
 import { publishKey } from './scripts/lib/pgp.mjs';
-import { photographersToThank } from './scripts/lib/credits.mjs';
+import { picturesToThank } from './scripts/lib/credits.mjs';
 import { mailto } from './scripts/lib/mailto.mjs';
 import { answerApi } from './server/api.js';
 
@@ -44,13 +44,11 @@ export default function (eleventyConfig) {
   // the address it is being viewed at, to count visitors on the live site only (layouts/base.njk).
   eleventyConfig.addGlobalData('liveHost', new URL(site.url).hostname);
 
-  // The photographers to thank on the Credits page, from _data/image-credits.json
+  // The pictures to thank on the Credits page, from _data/image-credits.json
   // (scripts/lib/credits.mjs). That file's name has a hyphen in it, which templates cannot spell,
   // so the list is handed to them under this name.
-  eleventyConfig.addGlobalData('photoCredits', () =>
-    photographersToThank(
-      JSON.parse(fs.readFileSync('src/_data/image-credits.json', 'utf8')).photos,
-    ),
+  eleventyConfig.addGlobalData('pictureCredits', () =>
+    picturesToThank(JSON.parse(fs.readFileSync('src/_data/image-credits.json', 'utf8')).pictures),
   );
 
   // The headline font has no apostrophe. This swaps each apostrophe for an empty marker,

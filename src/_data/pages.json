@@ -27,16 +27,18 @@
   },
 
   "credits": {
-    "note": "The Credits page. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes. The photographers themselves come from image-credits.json.",
+    "note": "The Credits page. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes. The pictures themselves come from image-credits.json.",
     "design": {
       "title": "Design",
       "paragraphs": [
         "Design based on <a href=\"https://henry.codes\">henry.codes</a> by Henry Desroches. The code and words here are my own."
       ]
     },
-    "photos": {
-      "title": "Photographs",
-      "paragraphs": ["A huge thanks to these great folks for their breathtaking photos:"]
+    "pictures": {
+      "title": "Pictures",
+      "paragraphs": [
+        "A huge thanks to these great folks for their breathtaking pictures, and to the museums that share them freely:"
+      ]
     },
     "weather": {
       "title": "Weather",

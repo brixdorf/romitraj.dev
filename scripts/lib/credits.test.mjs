@@ -1,39 +1,65 @@
-// Tests for the list of photographers the Credits page thanks (scripts/lib/credits.mjs).
+// Tests for the list of pictures the Credits page thanks (scripts/lib/credits.mjs).
 import { describe, expect, it } from 'vite-plus/test';
-import { photographersToThank } from './credits.mjs';
+import { picturesToThank } from './credits.mjs';
 
-const unsplash = (name, subject) => ({
-  photographer: name,
-  profile: `https://unsplash.com/@${name.toLowerCase()}`,
+const work = (subject, extra = {}) => ({
   subject,
-  url: `https://unsplash.com/photos/${subject}`,
+  title: `A print of ${subject}`,
+  artist: 'An Engraver',
+  year: '1768',
+  collection: 'A Museum',
+  licence: 'CC0',
+  url: `https://example.org/${subject.replaceAll(' ', '-')}`,
+  ...extra,
 });
 
-describe('photographersToThank', () => {
-  it('lists each photographer once, with everything they photographed', () => {
+describe('picturesToThank', () => {
+  it('lists every picture with its artist, title, year, collection and licence, in order', () => {
     expect(
-      photographersToThank({
-        'a.jpg': unsplash('Ann', 'the lamp'),
-        'b.jpg': unsplash('Ben', 'the clock'),
-        'c.jpg': unsplash('Ann', 'the globe'),
+      picturesToThank({
+        'a.jpg': work('the orrery'),
+        'b.jpg': work('the press', { licence: 'Public domain', year: 'about 1820' }),
       }),
     ).toEqual([
-      { name: 'Ann', profile: 'https://unsplash.com/@ann', subjects: ['the lamp', 'the globe'] },
-      { name: 'Ben', profile: 'https://unsplash.com/@ben', subjects: ['the clock'] },
+      {
+        subject: 'the orrery',
+        title: 'A print of the orrery',
+        artist: 'An Engraver',
+        year: '1768',
+        collection: 'A Museum',
+        licence: 'CC0',
+        url: 'https://example.org/the-orrery',
+      },
+      {
+        subject: 'the press',
+        title: 'A print of the press',
+        artist: 'An Engraver',
+        year: 'about 1820',
+        collection: 'A Museum',
+        licence: 'Public domain',
+        url: 'https://example.org/the-press',
+      },
     ]);
   });
 
-  it('stops the build when a photo lacks a fact', () => {
-    expect(() =>
-      photographersToThank({ 'a.jpg': { ...unsplash('Ann', 'the lamp'), url: '' } }),
-    ).toThrow('a.jpg needs "url"');
+  it('stops the build when a picture lacks a fact', () => {
+    for (const fact of ['subject', 'title', 'artist', 'year', 'collection', 'licence', 'url'])
+      expect(() => picturesToThank({ 'a.jpg': work('the orrery', { [fact]: '' }) })).toThrow(
+        `a.jpg needs "${fact}"`,
+      );
   });
 
-  it('stops the build when a profile is not an Unsplash profile', () => {
+  it('stops the build for a licence that does not allow free use', () => {
     expect(() =>
-      photographersToThank({
-        'a.jpg': { ...unsplash('Ann', 'the lamp'), profile: 'https://example.org/ann' },
-      }),
-    ).toThrow('https://unsplash.com/@name');
+      picturesToThank({ 'a.jpg': work('the orrery', { licence: 'All rights reserved' }) }),
+    ).toThrow('a.jpg');
+    for (const licence of ['Public domain', 'CC0', 'Unsplash License'])
+      expect(() => picturesToThank({ 'a.jpg': work('the orrery', { licence }) })).not.toThrow();
+  });
+
+  it('stops the build for an address that is not a web page', () => {
+    expect(() => picturesToThank({ 'a.jpg': work('the orrery', { url: 'orrery.jpg' }) })).toThrow(
+      'a.jpg',
+    );
   });
 });

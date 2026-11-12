@@ -1,47 +1,59 @@
 {
-  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. The photos from Unsplash are free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the hourglass'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. A photo marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry.",
-  "photos": {
-    "sewing-machine.jpg": {
-      "photographer": "Annie Spratt",
-      "profile": "https://unsplash.com/@anniespratt",
-      "subject": "the sewing machine",
-      "url": "https://unsplash.com/photos/black-and-yellow-metal-sewing-machine-hzdgFPz1V24"
+  "note": "Where each picture in src/assets/img/source/ came from, and what the Credits page says about it. They are old prints, free to use: in the public domain, or shared by their museum under CC0 (no rights kept). 'subject' is how the Credits page names the picture ('the orrery'), 'title', 'artist' and 'year' describe the work, 'collection' is who keeps the original and shares the scan, 'licence' is Public domain, CC0 or Unsplash License, and 'url' is the picture's own page. The build stops if a picture is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry.",
+  "pictures": {
+    "orrery.jpg": {
+      "subject": "the orrery",
+      "title": "A Philosopher Giving a Lecture on the Orrery",
+      "artist": "William Pether, after Joseph Wright of Derby",
+      "year": "1768",
+      "collection": "National Gallery of Art, Washington",
+      "licence": "CC0",
+      "url": "https://commons.wikimedia.org/wiki/File:William_Pether_after_Joseph_Wright,_A_Philosopher_Giving_a_Lecture_on_the_Orrery,_1768,_NGA_119599.jpg"
     },
-    "typewriter.jpg": {
-      "photographer": "Bonnie Hawkins",
-      "profile": "https://unsplash.com/@dios4me",
-      "subject": "the typewriter",
-      "url": "https://unsplash.com/photos/a-black-and-white-photo-of-an-old-fashioned-typewriter-sufuSMO41Jg"
+    "alchemist.jpg": {
+      "subject": "the alchemist",
+      "title": "The Alchymist, in Search of the Philosopher’s Stone, Discovers Phosphorus",
+      "artist": "William Pether, after Joseph Wright of Derby",
+      "year": "1775",
+      "collection": "Cleveland Museum of Art",
+      "licence": "CC0",
+      "url": "https://clevelandart.org/art/1995.2"
     },
-    "hourglass.jpg": {
-      "photographer": "Callum Mullin",
-      "profile": "https://unsplash.com/@cmbgraphicdesign",
-      "subject": "the hourglass",
-      "url": "https://unsplash.com/photos/an-antique-hourglass-with-sand-flowing-ozuQ8EY2CRA"
+    "diogenes.jpg": {
+      "subject": "Diogenes",
+      "title": "Diogenes, Holding a Lantern",
+      "artist": "Pierre-François Basan, after Jusepe de Ribera",
+      "year": "1750 to 1769",
+      "collection": "The Metropolitan Museum of Art",
+      "licence": "CC0",
+      "url": "https://commons.wikimedia.org/wiki/File:Diogenes,_bust-length,_and_turned_to_the_right,_holding_a_lantern_MET_DP836615.jpg"
     },
-    "lantern.jpg": {
-      "photographer": "Belov Sergey",
-      "profile": "https://unsplash.com/@belov7043",
-      "subject": "the lantern",
-      "url": "https://unsplash.com/photos/silhouette-of-an-old-lantern-against-a-pale-sky-sOvV69iL6SA"
+    "locomotive.jpg": {
+      "subject": "the locomotives",
+      "title": "A Locomotive Engine Similar to the Planet",
+      "artist": "William Miller, after J. Kindar",
+      "year": "1832",
+      "collection": "Wikimedia Commons",
+      "licence": "Public domain",
+      "url": "https://commons.wikimedia.org/wiki/File:Planet_locomotive_engraving_by_William_Miller_after_J_Kindar.jpg"
     },
-    "binoculars.jpg": {
-      "photographer": "Glen Carrie",
-      "profile": "https://unsplash.com/@glencarrie",
-      "subject": "the binoculars",
-      "url": "https://unsplash.com/photos/black-binoculars-on-white-surface-bMIUBn07iM0"
+    "printing-press.jpg": {
+      "subject": "the printing presses",
+      "title": "The Columbian Press",
+      "artist": "an unknown engraver, for Charles Timperley’s printers’ manual",
+      "year": "1842",
+      "collection": "Wikimedia Commons",
+      "licence": "Public domain",
+      "url": "https://commons.wikimedia.org/wiki/File:George_E_Clymer%27s_printing_press_advertisment.jpg"
     },
-    "telephone.jpg": {
-      "photographer": "Quino Al",
-      "profile": "https://unsplash.com/@quinoal",
-      "subject": "the telephone",
-      "url": "https://unsplash.com/photos/photo-of-black-rotary-phone-against-white-background-xhGMQ_nYWqU"
-    },
-    "radio.jpg": {
-      "photographer": "Ian Talmacs",
-      "profile": "https://unsplash.com/@iantalmacs",
-      "subject": "the radio",
-      "url": "https://unsplash.com/photos/vintage-radio-on-a-white-background-mZSx0BmjOMg"
+    "steam-hammer.jpg": {
+      "subject": "the steam hammers",
+      "title": "Nasmyth’s Patent Steam Hammer",
+      "artist": "an unknown engraver, for Charles Tomlinson’s Cyclopaedia of Useful Arts",
+      "year": "1854",
+      "collection": "Library of Congress",
+      "licence": "Public domain",
+      "url": "https://commons.wikimedia.org/wiki/File:Nasmyth%27s_patent_steam_hammer,_copied_by_permission_of_the_inventor_from_the_machine_in_the_great_exhibition_LCCN2006691796.jpg"
     }
   }
 }

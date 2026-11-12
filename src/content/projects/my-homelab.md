@@ -7,7 +7,7 @@ tags:
   - Networking
 year: 2026 to now
 order: 4
-image: radio
+image: hammers
 ---
 
 One cloud server that runs most of what I put on the internet, this website included.

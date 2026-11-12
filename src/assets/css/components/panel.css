@@ -49,7 +49,7 @@
   color: var(--color-muted-on-paper);
 }
 
-/* A list inside a card's text (the photographers on the Credits page). Its dots are drawn here,
+/* A list inside a card’s text (the pictures on the Credits page). Its dots are drawn here,
    the same in every browser: the browser's own bullet is kept, so that screen readers still
    announce a list, but made invisible and set in the text font, because Safari draws bullets as
    a letter and the serif font has no bullet letter. */
