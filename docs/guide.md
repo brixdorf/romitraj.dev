@@ -81,6 +81,7 @@ src/
                 animations.js (tickers and movement tied to scroll), widgets.js (local time, year,
                 weather, the track, the blog's posts), posts.js (brings the blog's posts on
                 the home page and the About page up to date),
+                copy.js (the copy button beside the gpg command on the About page),
                 intro.js (the headline's entrance when the home page opens; built into a small
                 script of its own), shapes.js (shapes shared by the animations),
                 transitions.js (page changes without a reload), scroll-memory.js (remembers
@@ -308,7 +309,8 @@ Its three framed pictures are named in `src/content/about.njk` (`portrait`, `jel
 - **The toolbox** is a table of two columns, area and skills, matching the skills on the resume. Add a row as `["Area", "Skills"]`. A table of three columns works too: the third is shown as a grey aside.
 - **The quote** (Epictetus) sits right under "About the human", in large serif letters (`--type-saying` in `tokens.css`). Its two halves, `plain` and `italic`, are two lines, the second slanted. It is in the large serif, so no straight apostrophe and no slash. It echoes the "Who" card, which says you keep learning about the things you think you already know.
   - **It has an entrance:** when the page is opened, its two lines slide up into place one after the other, solid, through a window at their top edge, as the page's name does when it arrives (`entrance: saying` at the top of `about.njk`; see "The headline's entrance"). Arriving from another page, the same happens while the name is still sliding in (`pageIn` in `page-changes.js`, `pageChange.pageIn.saying` in `motion.js`). The page's name itself does not move on opening. No entrance for visitors who asked for less motion.
-- **The Contact card shows the OpenPGP key**: its fingerprint, key ID, algorithms ("Ed25519 (signing) and Curve25519 (encryption)") and expiry date, a "Download key" button, and the command that fetches it from the domain, in a framed box where one click selects all of it. The facts are read from the key file itself during the build, so they cannot drift from the key; only their labels are in `about.json` (`contact.key`). See "The OpenPGP key".
+- **The Contact card shows the OpenPGP key**: its fingerprint, key ID, algorithms ("Ed25519 (signing) and Curve25519 (encryption)") and expiry date, a "Download key" button, and the command that fetches it from the domain, in a framed box where one click selects all of it, with a small "Copy" button beside it.
+  - **The copy button** (`src/assets/js/copy.js`) copies the command and shows "Copied" for 1.5 seconds (`copied` in `motion.js`), filled with ink like a button under the pointer. It is a real button, so the Tab key reaches it and Enter or Space presses it; screen readers hear "Copy the command", then "Copied". It needs scripts, so it is hidden without them, and the box can still be selected by hand. Its words are `copy`, `copied` and `copyLabel` in `about.json` (`contact.key`). The facts are read from the key file itself during the build, so they cannot drift from the key; only their labels are in `about.json` (`contact.key`). See "The OpenPGP key".
 
 ### Adding or changing a project
 

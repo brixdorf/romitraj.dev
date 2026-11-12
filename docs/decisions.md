@@ -2,6 +2,15 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, last: a copy button, and a shorter description
+
+- **The Projects page's search description** is Romit's: "The projects Romit Raj Sahu has built." The rest of the hidden text stays as rewritten earlier the same day.
+- **A copy button beside the gpg command** on the About page (`src/assets/js/copy.js`, tested): one press copies "gpg --locate-external-keys hi@romitraj.dev" with the browser's clipboard, or the older way (selecting a hidden copy) if the clipboard refuses. It then shows "Copied" for 1.5 seconds, filled with ink in the `.button` style (`.button--small`, as tall as the box beside it).
+  - **Keyboard and screen readers:** it is a real `<button>`, so Tab reaches it and Enter or Space presses it, with the focus ring every link has. Screen readers hear its label, "Copy the command", and "Copied" from a status line beside it.
+  - **Without scripts** it is hidden by the styles (it shows only on a page marked `js`), and the command can still be selected by hand. Nothing in the page is changed when it starts: one listener on the whole document handles every copy button, so pages that arrive by a page change work too, and the copy of the page that Taxi keeps stays as built.
+  - **On a narrow card** the command wraps inside its box, so the button stays beside it.
+  - Checked in Chromium: mouse and keyboard copy the exact command, the state returns after 1.5 seconds, it works after a page change, and it is hidden without scripts. The full check at the end of Part 3 covers the other browsers.
+
 ## 2026-11-12, later: Romit's fixes to Part 2
 
 Eleven fixes Romit asked for after looking at Part 2. Some of them reverse choices in the entry below.
