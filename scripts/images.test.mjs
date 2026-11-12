@@ -1,7 +1,8 @@
 // Tests for the picture pipeline (scripts/images.mjs): speck removal (the "despeckle" setting),
-// which pictures need a photographer on record, and which blocks are backdrop behind a subject.
+// which pictures need a photographer on record, which blocks are backdrop behind a subject, and
+// which part of a photo is its plain backdrop, to be cut away (the "cutout" setting).
 import { describe, expect, it } from 'vite-plus/test';
-import { backdropOf, needsCredit, removeSpecks } from './images.mjs';
+import { backdropOf, needsCredit, plainBackdrop, removeSpecks } from './images.mjs';
 
 // A small picture from rows of text: "#" is ink, "." is paper.
 const picture = (rows) => ({
@@ -103,6 +104,53 @@ describe('backdropOf', () => {
     const clear = ['ooooo', 'o...o', 'o...o', 'o...o', 'ooooo'];
     expect([...backdropOf(cells(light, '.'), 5, 5, cells(clear, 'o'))]).toEqual([
       ...cells(clear, 'o'),
+    ]);
+  });
+});
+
+describe('plainBackdrop', () => {
+  // Greys from rows of digits: 0 is black, 9 is white.
+  const greys = (rows) => ({
+    width: rows[0].length,
+    height: rows.length,
+    values: Uint8Array.from(rows.join('').split(''), (digit) => Math.round((digit / 9) * 255)),
+  });
+  const marks = (found, width) =>
+    Array.from({ length: found.length / width }, (_, y) =>
+      Array.from(found.slice(y * width, (y + 1) * width), (cell) => (cell ? 'b' : '.')).join(''),
+    );
+
+  it('finds an even backdrop around a dark subject, and not the subject', () => {
+    const { values, width, height } = greys(['8888888', '8811188', '8810188', '8811188', '8888888']);
+    expect(marks(plainBackdrop(values, width, height, 0.05), width)).toEqual([
+      'bbbbbbb',
+      'bb...bb',
+      'bb...bb',
+      'bb...bb',
+      'bbbbbbb',
+    ]);
+  });
+
+  it('follows a backdrop that darkens slowly from one side to the other', () => {
+    const { values, width, height } = greys(['9876543', '9816543', '9876543']);
+    expect(marks(plainBackdrop(values, width, height, 0.12), width)).toEqual([
+      'bbbbbbb',
+      'bb.bbbb',
+      'bbbbbbb',
+    ]);
+  });
+
+  it('leaves a light spot inside the subject alone: it cannot be reached from the edge', () => {
+    const { values, width, height } = greys(['88888', '81118', '81818', '81118', '88888']);
+    expect(marks(plainBackdrop(values, width, height, 0.05), width)[2]).toBe('b...b');
+  });
+
+  it('stops at a sharp edge even when the subject is light', () => {
+    const { values, width, height } = greys(['3333', '3993', '3333']);
+    expect(marks(plainBackdrop(values, width, height, 0.1), width)).toEqual([
+      'bbbb',
+      'b..b',
+      'bbbb',
     ]);
   });
 });

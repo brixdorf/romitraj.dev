@@ -112,6 +112,52 @@ export function backdropOf(light, width, height, clear = null) {
   return clear ? Uint8Array.from(clear) : findBackdrop(light, width, height);
 }
 
+// Which part of a photo is its plain backdrop: the pixels reached from the picture's edge by
+// steps between neighbours whose greys differ by less than "step" (0 to 1). An even or slowly
+// changing backdrop is followed all the way to the subject, and stops at the subject's edge, where
+// the grey jumps. A light spot inside the subject cannot be reached from the edge, so it stays.
+// Used by the "cutout" setting, so a photo of an object on a plain ground becomes the object alone
+// on paper, the way the reference cuts out its subjects. Gives 1 for backdrop, 0 for the rest.
+export function plainBackdrop(greys, width, height, step) {
+  const limit = step * 255;
+  const found = new Uint8Array(width * height);
+  const queue = [];
+  const seed = (index) => {
+    if (found[index]) return;
+    found[index] = 1;
+    queue.push(index);
+  };
+  for (let x = 0; x < width; x++) {
+    seed(x);
+    seed((height - 1) * width + x);
+  }
+  for (let y = 0; y < height; y++) {
+    seed(y * width);
+    seed(y * width + width - 1);
+  }
+  while (queue.length) {
+    const index = queue.pop();
+    const x = index % width;
+    const y = (index - x) / width;
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+      const next = ny * width + nx;
+      if (!found[next] && Math.abs(greys[next] - greys[index]) < limit) {
+        found[next] = 1;
+        queue.push(next);
+      }
+    }
+  }
+  return found;
+}
+
 // Removes lone specks of ink: a block with no ink in the eight blocks around it and almost none
 // (at most one other) in the seven by seven blocks around it. That is a stray dot on paper, such as
 // the trace of the faint outline a cut-out photo leaves around its subject. The even dots of a
@@ -213,6 +259,25 @@ async function convertOne(name, settings, colours) {
       )
     : null;
 
+  // A photo of an object on a plain ground ("cutout": how far apart two neighbouring greys of the
+  // ground may be) loses its ground: it becomes paper. Found on a slightly softened copy, so the
+  // grain of the photo does not stop the search.
+  const cutAway = settings.cutout
+    ? plainBackdrop(
+        await opened()
+          .flatten({ background: '#ffffff' })
+          .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+          .resize(across, down, { fit: 'fill', kernel: 'lanczos3' })
+          .greyscale()
+          .blur(0.8)
+          .raw()
+          .toBuffer(),
+        across,
+        down,
+        settings.cutout,
+      )
+    : null;
+
   // Stretch the greys, then dither.
   let dark = new Uint8Array(across * down);
   const light = new Uint8Array(across * down);
@@ -221,8 +286,8 @@ async function convertOne(name, settings, colours) {
       const index = y * across + x;
       let value = Math.min(1, Math.max(0, (greys[index] / 255 - black) / (white - black)));
       if (gamma !== 1) value **= gamma;
-      dark[index] = value <= thresholdAt(pattern, x, y) ? 1 : 0;
-      light[index] = value > 0.5 ? 1 : 0;
+      dark[index] = value <= thresholdAt(pattern, x, y) && !cutAway?.[index] ? 1 : 0;
+      light[index] = value > 0.5 || cutAway?.[index] ? 1 : 0;
     }
   }
 
