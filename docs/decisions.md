@@ -2,6 +2,73 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, pictures that fit together, and a compass you can spin
+
+Two requests from Romit: pictures that fit together the way henry.codes's do, found anywhere on the internet, each credited and described; and a hero compass that ignores the mouse, turns on its own like Resend's cube, spins freely when dragged, and has nothing behind it.
+
+### Sources checked
+
+| What                 | Source, read on 2026-11-12                                                                                                                                                            | Used for                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| henry.codes          | Its pictures, looked at only, in our own screenshots in the private `reference/`                                                                                                      | How its pictures fit together (below)                                       |
+| resend.com           | Its 3D cube, watched in Chromium in the toolbox: frames while idle and after a drag                                                                                                   | How the compass moves: a slow tumble on its own, a drag spins it, it coasts |
+| Each print's licence | Its file page on Wikimedia Commons ("CC0" from the National Gallery of Art, the Met and the Cleveland Museum of Art; "Public domain" for the others); the Cleveland Museum's own page | The pictures below                                                          |
+| Playwright's clock   | `page.clock` in Playwright 1.65.0 (already installed): stops and moves on the page's timers, frames and `performance.now()`                                                           | The compass test                                                            |
+
+No package was added or updated. The Art Institute of Chicago's collection search sits behind a bot check, which was not worked around; Wikimedia Commons, the Met's and the Cleveland Museum's open data answered.
+
+### How the reference's pictures fit together
+
+They are all one family, old engravings in heavy black ink, and used in three ways: one big figure behind the about text, single subjects in the small frames, and one motif (a thorn branch) repeated as a band in every wide strip. The previous photos here were a mix of unrelated 20th-century objects (a sewing machine, a typewriter, a telephone, a radio), in modern photographs.
+
+### The new set: old prints of science and machines
+
+| Picture (`images.json`) | Print                                                                                 | Artist                                                     | Year         | Collection, licence                | Where                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------ | ---------------------------------- | ------------------------------------------------------------------------------------ |
+| `orrery`, `lamplight`   | A Philosopher Giving a Lecture on the Orrery (mezzotint)                              | William Pether, after Joseph Wright of Derby               | 1768         | National Gallery of Art, CC0       | Home page's about section (an oval); About page's small frame (the children's faces) |
+| `alchemist`             | The Alchymist, in Search of the Philosopher’s Stone, Discovers Phosphorus (mezzotint) | William Pether, after Joseph Wright of Derby               | 1775         | Cleveland Museum of Art, CC0       | Beside Aletheia                                                                      |
+| `diogenes`              | Diogenes, holding a lantern                                                           | Pierre-François Basan, after Jusepe de Ribera              | 1750 to 1769 | The Met, CC0                       | The page for a missing address                                                       |
+| `locomotives`           | A locomotive engine similar to the Planet                                             | William Miller, after J. Kindar                            | 1832         | Wikimedia Commons, public domain   | Beside "Projects", repeated                                                          |
+| `presses`               | The Columbian Press                                                                   | unknown, in Charles Timperley's printers' manual           | 1842         | Wikimedia Commons, public domain   | Beside "Resume", repeated                                                            |
+| `hammers`, `hammerrow`  | Nasmyth's patent steam hammer                                                         | unknown, in Charles Tomlinson's Cyclopaedia of Useful Arts | 1854         | Library of Congress, public domain | Beside My Homelab; beside "Credits"                                                  |
+
+- **Why these:** the same structure as the reference with this site's own family, 18th and 19th-century prints of science and machines. The big pieces and small frames are tonal prints (mezzotints and a stipple engraving): deep black with lamp-lit highlights, which is what survives two tones. Most are after Joseph Wright of Derby, who painted science by candlelight. The wide strips are bands of one machine repeated.
+- **Tried and dropped** (each through the site's own conversion, about fifty in all): the Flammarion woodcut, Dürer's armillary sphere, Ramelli's book wheel, Babbage's Difference Engine and Herschel's telescope (fine line engravings: noise at these block sizes); the Met's astrolabes, clocks and celestial globes (brass on grey shrinks to nothing in a strip); the air pump, the iron forge and the blacksmith's shop as small frames (whole scenes turn to mush); a Stephenson locomotive (too light).
+- **The theme** stays "the age of exploration meeting old machines", now as prints of the period rather than modern photos. Nothing of the sea.
+- **Files:** the 1280-pixel copies Commons serves, kept as they came (never edited). The old photos and their Unsplash credits are gone.
+
+### Three new picture settings (`scripts/images.mjs`, tested)
+
+- **`stretch`** existed; **`fade`** fades a picture into the paper in an oval, like a vignette in an old book (`fadeKeeps`): its middle and size can be set, so the orrery behind the home page's about text stays clear of the text on tablets and phones (measured: the text reaches 9% into the picture at 768px and over its top 7% at 390px).
+- **`repeat`** sets copies of a picture (or a `part` of it) side by side, as a band (`repeatLayout`, `partRegion`).
+
+### The Credits page
+
+The card is "Pictures" now, listing for each print what it shows, its title (linked to its page), year, artist, collection and licence (`scripts/lib/credits.mjs`, tested: the build stops on a missing fact, an address that is not a web page, or any licence other than public domain, CC0 or the Unsplash License). Romit's sentence changed by the fewest words: "A huge thanks to these great folks for their breathtaking pictures, and to the museums that share them freely:" (listed in `REWRITE.md` for him to approve).
+
+### The hero compass
+
+- **No reaction to the mouse.** The pointer and scroll listeners are gone.
+- **Turns on its own,** like Resend's cube: still for 1.2 seconds after it appears (so it first matches the still picture), then eases in over 1.5 seconds to 30 degrees a second about an axis close to upright that wanders, so it tumbles and shows its face, edge and back.
+- **Drag to spin, all the way round.** Its whole pose is now a rotation (nine numbers) rather than three angles with limits: a drag turns it about the axis across the drag, 0.6 degrees per pixel, with no limit. Let go and it keeps the speed of the last tenth of a second (at most 900 degrees a second), easing back to its own pace over about a second.
+- **Touch:** a round handle over the compass (`.hero__grip`, `touch-action: none`) takes the finger, so dragging there turns the compass and a finger elsewhere in the frame still scrolls the page. The mouse shows a hand (the standard `grab` cursor).
+- **The needle** points up the window, pulled hardest when the dial faces the viewer, and is dragged a little by the case spinning on its face; it wobbles as the compass tumbles.
+- **Room to turn:** it turns about the middle of case, crown and bow together, and the view now reaches 1.4 case radii across, so it never leaves the frame. It sits about a fifth smaller in the frame than before.
+- **The back** of the case has a raised boss and two turned grooves, and catches a broad light from behind the viewer so they show.
+- **Nothing behind it:** the painted texture behind the hero picture (`scripts/lib/paint.mjs`, the `texture` ground) is removed everywhere, the share image included. The brief's "faint paint texture" rule is withdrawn by this request.
+- **One clock:** frames and pointer events both read `performance.now()`, so a drag's speed is measured on the same clock as the frames.
+- **The check** (`scripts/lib/compass.mjs`) changed with the behaviour: it now stops the page's clock with Playwright's clock and moves it on by hand, and tests that the first drawing is the still picture, that only paper surrounds the compass, that the mouse moving over it changes nothing, that it turns on its own and keeps turning, that a drag turns it and it coasts after, and that a finger on it turns it (`touch-action: none`). The old tests of following the pointer and coming to rest went with the behaviour they tested. The headline's entrance runs on the browser's own animation clock, which Playwright's clock does not stop, so the test waits for it to end before comparing (in Firefox its letters were still passing over the top of the frame).
+
+### Checks
+
+The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass. On the way, the full check found three things, each fixed:
+
+- **A missing letter:** the serif fonts have no "ç", so the Credits page fetched the fallback font for "Pierre-François Basan". He is written "P.-F. Basan", a usual short form.
+- **The letters test** compares two photographs of each sliding heading, and the compass, now always turning beside the headline, differed between them. That test already hid the tickers for the same reason; it now hides the compass's canvas too (its place stays, so nothing moves). The picture test leaves out the compass's drag handle with its canvas, for the same reason it left out the canvas; the compass test checks the frame does not move when they arrive.
+- **The compass test** asked Playwright to stop the clock 20ms ahead, which under the load of three browsers was already past; it now tries again from the new time.
+
+`pnpm run speed`: Largest Contentful Paint on a slow phone 1092ms (1144ms before), on a laptop 104ms; the headline's entrance costs 0ms on the phone and 64ms on the laptop.
+
 ## 2026-11-12, Part 3 again: better photos, a finer compass, two About cards
 
 Romit found the Part 3 photos and the 3D compass poor and asked for both again, plus his own caption back on the missing page and two new cards on the About page.
