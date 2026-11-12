@@ -2,6 +2,7 @@
 import { startAnimations } from './animations.js';
 import { startWidgets, showWidgets } from './widgets.js';
 import { startPageChanges } from './transitions.js';
+import { startCopyButtons } from './copy.js';
 
 // Marks the page as script-enabled, so styles can tell when scripts are running.
 document.documentElement.classList.add('js');
@@ -22,6 +23,9 @@ startPageChanges({
     stopAnimations = startAnimations(content);
   },
 });
+
+// The copy buttons listen on the whole page, so they need starting only once.
+startCopyButtons();
 
 // Widgets first, so the ticker measures its content with the time already in it.
 startWidgets();

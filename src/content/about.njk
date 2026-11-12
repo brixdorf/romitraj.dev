@@ -119,7 +119,13 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
       {#- The same key, fetched by GnuPG from the Web Key Directory (scripts/lib/pgp.mjs). One click
           selects the whole command, ready to copy. #}
       <p class="key__fetch">{{ about.contact.key.fetch | fill }}</p>
-      <code class="command">{{ about.contact.key.command | fill }}</code>
+      {#- The copy button beside it appears only when scripts run (copy.js); without them the
+          command is still there to select by hand. #}
+      <div class="command-row">
+        <code class="command">{{ about.contact.key.command | fill }}</code>
+        <button type="button" class="button button--small copy-button" data-copy="{{ about.contact.key.command | fill }}" data-copied="{{ about.contact.key.copied }}" aria-label="{{ about.contact.key.copyLabel }}"><span data-copy-words>{{ about.contact.key.copy }}</span></button>
+        <span class="visually-hidden" role="status" data-copy-status></span>
+      </div>
     </div>
     <a class="link panel__action" href="mailto:{{ site.email }}">{{ about.contact.link }}{{ arrow("mailto:") }}</a>
   </section>

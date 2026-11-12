@@ -1,6 +1,8 @@
-/* A button-shaped link (the OpenPGP key's download): a small bold label in a 2px ink frame with
-   the site's 12px corners. Under the pointer it fills with ink, in the same 0.2s as other hovers. */
+/* A button-shaped link or button (the OpenPGP key's download, the copy button): a small bold
+   label in a 2px ink frame with the site's 12px corners. Under the pointer it fills with ink, in
+   the same 0.2s as other hovers. */
 .button {
+  font-family: var(--font-text);
   display: inline-flex;
   align-items: center;
   padding: 10px 16px;
@@ -18,9 +20,41 @@
     color var(--duration-base) var(--ease-in-out-cubic);
 }
 
-.button:hover {
+.button:hover,
+.button.is-copied {
   background: var(--color-ink);
   color: var(--color-paper);
+}
+
+/* A smaller one, as tall as the command box beside it. */
+.button--small {
+  justify-content: center;
+  padding: 6px 12px;
+}
+
+/* The copy button needs scripts, so it shows only when they run. */
+.copy-button {
+  display: none;
+}
+
+.js .copy-button {
+  display: inline-flex;
+}
+
+/* A command with its copy button beside it. On a narrow card the command wraps inside its box,
+   so the button stays beside it. */
+.command-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.command-row .command {
+  min-inline-size: 0;
+}
+
+.command-row .button {
+  flex-shrink: 0;
 }
 
 /* A command to copy: one line in a light frame. One click selects all of it. */

@@ -19,6 +19,9 @@ export const duration = {
   scrollCatchUp: 2,
 };
 
+// A copy button shows "Copied" for this long after it is pressed (copy.js).
+export const copied = { time: 1.5 };
+
 export const ease = {
   // Things that arrive as you scroll start quickly and settle gently.
   scrollIn: 'power1.out',

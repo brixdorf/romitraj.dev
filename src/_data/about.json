@@ -36,7 +36,7 @@
     ],
     "link": "Say hi",
     "key": {
-      "note": "The OpenPGP key under the Contact card. Its facts (fingerprint, key ID, algorithms, expiry) are read from the key itself, src/assets/files/romitraj-pgp-public.asc; these are only the words around them. 'uses' names what each part of the key is for; 'and' joins the algorithms. In 'fetch' and 'command', {email} is the address from site.json.",
+      "note": "The OpenPGP key under the Contact card. Its facts (fingerprint, key ID, algorithms, expiry) are read from the key itself, src/assets/files/romitraj-pgp-public.asc; these are only the words around them. 'uses' names what each part of the key is for; 'and' joins the algorithms. In 'fetch' and 'command', {email} is the address from site.json. 'copy' and 'copied' are the copy button's words before and after a press; 'copyLabel' is what screen readers hear for it.",
       "label": "OpenPGP",
       "fingerprint": "Fingerprint",
       "keyId": "Key ID",
@@ -51,7 +51,10 @@
       "expires": "Expires",
       "download": "Download key",
       "fetch": "You can also fetch it straight from my domain:",
-      "command": "gpg --locate-external-keys {email}"
+      "command": "gpg --locate-external-keys {email}",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyLabel": "Copy the command"
     }
   },
 
