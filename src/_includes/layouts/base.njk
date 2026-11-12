@@ -13,7 +13,7 @@
   browser's light or dark look.
 -#}
 <!doctype html>
-<html lang="{{ site.language }}">
+<html lang="{{ site.language }}"{% if entrance and entrance != true %} data-entrance="{{ entrance }}"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -100,7 +100,7 @@
   {%- endif %}
   {%- if pageKind == "home" or entrance %}
   <script>
-    /* The headline slides in when the page opens (the home page, and any page that says "entrance: true" at the top of its file). Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while pnpm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */
+    /* The headline slides in when the page opens (the home page, and any page that says "entrance: true" at the top of its file; a page that names its pieces instead, such as "entrance: saying" on the About page, gets an entrance for those pieces only, listed in data-entrance above). Marking the page here, before anything is drawn, lets the styles hide the headline until its letters are ready to move. Not for visitors who asked for less motion, not while pnpm run check is photographing (it sets steadyMotion), and never for longer than three seconds. */
     if (!window.steadyMotion && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("intro");
       setTimeout(function () { document.documentElement.classList.remove("intro"); }, 3000);

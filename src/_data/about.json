@@ -56,7 +56,7 @@
   },
 
   "quote": {
-    "note": "The large quote that closes the page, set in the large serif: no straight apostrophe, no slash. 'plain' and 'italic' are its two halves, as in the top banner.",
+    "note": "The large quote at the top of the page, right under its name, set in the large serif: no straight apostrophe, no slash. 'plain' and 'italic' are its two halves, each on a line of its own, the second in italics.",
     "plain": "It is impossible for a man to learn",
     "italic": "what he thinks he already knows.",
     "author": "Epictetus, c. 108 AD"

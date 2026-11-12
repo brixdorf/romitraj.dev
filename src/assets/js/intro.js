@@ -3,6 +3,9 @@
 // The page for a missing address ("Lost in oblivion") has the same entrance for its giant name: that
 // page is reached by a typed or outside address, never by a page change, so this is the only
 // time its letters can slide in. A page asks for it with "entrance: true" at the top of its file.
+// A page can also name the pieces that should enter, such as "entrance: saying" on the About page:
+// then only those move (here the quote under its name, one half after the other), listed in
+// data-entrance.
 //
 // This file is not part of the main script. The build turns it into a very small script of its
 // own and writes it straight into those pages (see eleventy.config.js and layouts/base.njk), so
@@ -32,6 +35,9 @@ import { intro as rule } from './motion.js';
 import { shape } from './shapes.js';
 
 const page = document.documentElement;
+// The pieces that enter: those the page names, or else every kind below.
+const named = page.dataset.entrance ? page.dataset.entrance.split(' ') : null;
+const enters = (part) => !named || named.includes(part);
 const firstInputs = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
 // The lines that are in letters, with their running animations, and the animations of pieces that are not cut.
 let lines = [];
@@ -81,6 +87,7 @@ function settle() {
 function enter() {
   const content = document.querySelector('[data-taxi-view]');
   for (const [part, startingPlace] of Object.entries(startingPlaces)) {
+    if (!enters(part)) continue;
     for (const element of content.querySelectorAll(`[data-part="${part}"]`)) {
       const split = splitLetters(element);
       const from = startingPlace(parseFloat(getComputedStyle(element).fontSize));
@@ -99,8 +106,30 @@ function enter() {
       lines.push({ animations, restore: split.restore });
     }
   }
+  // The About page's quote: its two lines (each half of it) slide up from behind their own top
+  // edge, solid, one after the other, as the page's name does when it arrives.
+  if (enters('saying')) {
+    const animations = [...content.querySelectorAll('[data-part="saying"] .saying__line')].map(
+      (line, order) =>
+        line.animate(
+          [
+            { transform: 'translateY(100%)', clipPath: shape.topEdge },
+            { transform: 'translateY(0)', clipPath: shape.all },
+          ],
+          {
+            duration: rule.saying.time * 1000,
+            delay: order * rule.saying.apart * 1000,
+            easing: rule.ease,
+            fill: 'backwards',
+          },
+        ),
+    );
+    lines.push({ animations, restore() {} });
+  }
   // The outlined italic words are not cut: they slide in from the left as one piece.
-  for (const element of content.querySelectorAll('[data-part="flourish"]')) {
+  for (const element of enters('flourish')
+    ? content.querySelectorAll('[data-part="flourish"]')
+    : []) {
     others.push(
       element.animate(
         [

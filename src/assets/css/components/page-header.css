@@ -36,8 +36,9 @@
 }
 
 /* On a page whose name slides in when it opens (the page for a missing address), the name waits
-   out of sight while the page is marked "intro". See assets/js/intro.js. */
-.intro .page-header__title {
+   out of sight while the page is marked "intro". See assets/js/intro.js. A page whose entrance is
+   for other pieces only (data-entrance, such as the About page's quote) keeps its name in sight. */
+.intro:not([data-entrance]) .page-header__title {
   visibility: hidden;
 }
 

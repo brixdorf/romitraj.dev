@@ -1,5 +1,5 @@
 /* The About page: where each card and picture frame sits in the page grid at each window width,
-   plus the portrait's caption, the short piece about the latest blog post and the closing quote. */
+   plus the quote under the page's name, the portrait's caption and the short piece about the latest blog post. */
 .about-page__portrait {
   margin: 0 0 32px;
 }
@@ -124,10 +124,13 @@
   margin: 24px 0 8px;
 }
 
-/* The closing quote: large serif letters, half plain and half italic like the top banner, with
-   the author's name in small grey capitals under it. */
+/* The quote right under the page's name: two lines of large serif letters, the second in
+   italics, with the author's name in small grey capitals under them. While the page is marked
+   "intro" (for a moment after it opens), the lines wait out of sight for their entrance; see
+   assets/js/intro.js. */
 .saying {
-  margin: 48px 0 0;
+  margin: 0 0 64px;
+  padding-inline: var(--gutter);
 }
 
 .saying__text {
@@ -137,9 +140,21 @@
 .saying__text p {
   margin: 0;
   font-family: var(--font-serif-display);
-  font-size: var(--type-list-title);
+  font-size: var(--type-saying);
   line-height: 1;
+}
+
+.saying__line {
+  display: block;
   text-wrap: balance;
+}
+
+.saying__line--italic {
+  font-style: italic;
+}
+
+.intro .saying__line {
+  visibility: hidden;
 }
 
 .saying__author {
@@ -206,11 +221,6 @@
     grid-column: 1 / -1;
     grid-row: 6;
   }
-
-  .about-page__saying {
-    grid-column: 1 / -1;
-    grid-row: 7;
-  }
 }
 
 /* Twelve columns: the tall portrait on the left edge, everything else to its right. */
@@ -273,10 +283,5 @@
   .about-page__toolbox {
     grid-column: 3 / span 10;
     grid-row: 5;
-  }
-
-  .about-page__saying {
-    grid-column: 3 / span 10;
-    grid-row: 6;
   }
 }

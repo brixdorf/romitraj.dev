@@ -280,7 +280,7 @@ export function pageOutToProject(page) {
       rule.frame.at,
     );
     timeline.to(
-      parts(page, 'card'),
+      [...parts(page, 'saying'), ...parts(page, 'card')],
       {
         x: rule.cards.x,
         opacity: 0,
@@ -301,7 +301,7 @@ export function pageOut(page) {
     for (const title of parts(page, 'title'))
       lettersOut(tools, title, 'justAbove', rules.letters.slow);
     timeline.to(
-      parts(page, 'cards'),
+      [...parts(page, 'saying'), ...parts(page, 'cards')],
       { opacity: 0, duration: rule.cards.time, ease: rule.cards.ease },
       rule.cards.at,
     );
@@ -313,7 +313,8 @@ export function pageOut(page) {
   });
 }
 
-// Arriving: the page name's letters rise into place, then the picture frame, then the cards one by one.
+// Arriving: the page name's letters rise into place, then the picture frame, then the cards one by
+// one. The About page's quote rises, one half after the other, while its name is still arriving.
 export function pageIn(page) {
   const rule = rules.pageIn;
   return play(
@@ -321,6 +322,21 @@ export function pageIn(page) {
       const { timeline, touch } = tools;
       for (const title of parts(page, 'title'))
         lettersIn(tools, title, 'justBelow', rules.letters.slow);
+      // The About page's quote: its two lines, one after the other.
+      timeline.fromTo(
+        touch(
+          parts(page, 'saying').flatMap((saying) => [...saying.querySelectorAll('.saying__line')]),
+        ),
+        { y: 0, yPercent: 100, clipPath: shape.topEdge },
+        {
+          yPercent: 0,
+          clipPath: shape.all,
+          duration: rule.saying.time,
+          ease: rule.saying.ease,
+          stagger: rule.saying.apart,
+        },
+        rule.saying.at,
+      );
       timeline.fromTo(
         touch(parts(page, 'header-frame')),
         { opacity: 0 },

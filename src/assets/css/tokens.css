@@ -48,6 +48,7 @@
   --type-panel-title: 48px;
   --type-panel-number: 24px;
   --type-list-title: 48px;
+  --type-saying: 40px;
   --type-reading: 16px;
   --type-letter: 20px;
   --type-lead: 16px;
@@ -104,6 +105,8 @@
     --type-lead: 24px;
     --type-nav: 20px;
     --type-label: 16px;
+    /* The quote at the top of the About page grows with the window up to 1600px wide. */
+    --type-saying: clamp(56px, 6.5vw, 104px);
   }
 }
 

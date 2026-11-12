@@ -33,6 +33,9 @@ const letterGap = 0.02;
 const flourishAt = 0.46;
 const flourishTime = 0.4;
 const flourishFrom = -16;
+// The lines of the About page's quote slide up into place one after another, each as slowly as a
+// giant letter, this far apart.
+const sayingGap = 0.12;
 
 // The headline's entrance when the home page is first opened or reloaded (intro.js). It waits for
 // these fonts, but no longer than "patience" seconds, then the letters slide in one after another.
@@ -43,6 +46,8 @@ export const intro = {
   apart: letterGap,
   // The same curve as "power2.inOut" in the page changes, written the way CSS writes it.
   ease: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+  // The lines of the About page's quote.
+  saying: { time: letterTime, apart: sayingGap },
   // The outlined italic words, as when arriving from another page. The curve is "power1.out".
   flourish: {
     at: flourishAt,
@@ -123,6 +128,8 @@ export const pageChange = {
 
   // Arriving at a page with a giant name.
   pageIn: {
+    // The About page's quote: its lines rise into place while the page's name is still arriving.
+    saying: { at: 0.3, time: letterTime, ease: 'power2.inOut', apart: sayingGap },
     frame: { at: 0.67, time: 0.3, ease: 'power1.out' },
     cards: { at: 0.98, time: 0.5, ease: 'power1.out', apart: 0.1, x: -10 },
   },

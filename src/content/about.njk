@@ -6,6 +6,7 @@ frame: square
 picture: compass
 frameTone: ink
 ruled: true
+entrance: saying
 layout: layouts/page.njk
 description: Who Romit Raj Sahu is, what he is experimenting with, and how to reach him.
 ---
@@ -26,6 +27,17 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
     <a class="teaser__link" href="{{ post.url }}" data-post-link>{{ about.latest.link }}{{ arrow(post.url) }}</a>
   </article>
 {%- endmacro -%}
+{#- Epictetus, in large serif letters right under the page's name. It echoes the "Who" card:
+    learning more about the things you think you already know. Its two halves are two lines; each
+    line slides up into place when the page opens or arrives ("entrance: saying" above;
+    assets/js/intro.js and page-changes.js). #}
+<figure class="saying" data-part="saying">
+  <blockquote class="saying__text">
+    <p><span class="saying__line">{{ about.quote.plain }}</span> <span class="saying__line saying__line--italic">{{ about.quote.italic }}</span></p>
+  </blockquote>
+  <figcaption class="saying__author">{{ about.quote.author }}</figcaption>
+</figure>
+
 <div class="page-grid about-page" data-part="cards">
   <section class="panel about-page__who" data-part="card">
     <h2 class="panel__title">{{ about.who.title }}</h2>
@@ -134,12 +146,4 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
       </tbody>
     </table>
   </section>
-
-  {#- A closing thought in large serif letters. It echoes the "Who" card: learning more about the things you think you already know. #}
-  <figure class="saying about-page__saying" data-part="card">
-    <blockquote class="saying__text">
-      <p>{{ about.quote.plain }} <i>{{ about.quote.italic }}</i></p>
-    </blockquote>
-    <figcaption class="saying__author">{{ about.quote.author }}</figcaption>
-  </figure>
 </div>
