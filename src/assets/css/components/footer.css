@@ -197,8 +197,12 @@
 }
 
 /* The serif has no copyright sign, so that one character uses the text font. */
+/* The copyright sign is in the text font, inside a line of serif. It takes no height of its own
+   in the line, so every browser makes the line the same height (Firefox made it half a pixel
+   taller, which moved the compass under it on phones). */
 .footer__symbol {
   font-family: var(--font-text);
+  line-height: 0;
 }
 
 .footer__heart .icon {
