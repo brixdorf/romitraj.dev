@@ -1,6 +1,6 @@
 // Tests for reading the OpenPGP key (scripts/lib/pgp.mjs) and publishing it with the files that
 // let "gpg --locate-external-keys" find it (the Web Key Directory), and for publishing a file
-// with a fingerprint in its address (scripts/lib/downloads.mjs).
+// under its plain name (scripts/lib/downloads.mjs).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -37,7 +37,10 @@ describe('keyFacts', () => {
     expect(keyFacts(dearmor(armored))).toEqual({
       fingerprint: '010F 1F08 E31C AFDB 78E1 AEEC CF7E F21B CBB8 D0BB',
       keyId: 'CF7EF21BCBB8D0BB',
-      algorithm: 'Ed25519',
+      algorithms: [
+        { name: 'Ed25519', use: 'signing' },
+        { name: 'Curve25519', use: 'encryption' },
+      ],
       created: '2026-09-29',
       expires: '2029-09-28',
       userIds: ['Romit Raj Sahu <hi@romitraj.dev>'],
@@ -61,7 +64,7 @@ describe('publishing', () => {
 
   it('writes the armored key for download, the binary key and an empty policy for WKD', () => {
     const key = publishKey({ source: keyFile, email: 'hi@romitraj.dev', outDir: out });
-    expect(key.url).toMatch(/^\/romitraj-pgp-public\.asc\?v=[0-9a-f]{8}$/);
+    expect(key.url).toBe('/romitraj-pgp-public.asc');
     expect(key.facts.keyId).toBe('CF7EF21BCBB8D0BB');
     expect(fs.readFileSync(path.join(out, 'romitraj-pgp-public.asc'), 'utf8')).toBe(armored);
     const binary = fs.readFileSync(
@@ -77,12 +80,10 @@ describe('publishing', () => {
     ).toThrow(/someone@romitraj\.dev/);
   });
 
-  it('copies a file to its published place with a fingerprint in its address', () => {
+  it('copies a file to its published place under its plain name, with no version in it', () => {
     const source = path.join(out, 'source.pdf');
     fs.writeFileSync(source, 'a resume');
-    expect(publishFile(source, out, 'resume.pdf')).toBe(
-      `/resume.pdf?v=${sha256('a resume').slice(0, 8)}`,
-    );
+    expect(publishFile(source, out, 'resume.pdf')).toBe('/resume.pdf');
     expect(fs.readFileSync(path.join(out, 'resume.pdf'), 'utf8')).toBe('a resume');
   });
 });
