@@ -69,7 +69,7 @@ Photos of old machines and instruments, shot on plain white or grey grounds, mos
 
 ### Checks
 
-The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass: every picture says what `images.json` has for it, nothing moves as they arrive, each sits in the same place in all three browsers, and all 45 picture files together weigh 679 KB (the heaviest is the portrait at 960 pixels). The same held after the four swaps below.
+The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass: every picture says what `images.json` has for it, nothing moves as they arrive, each sits in the same place in all three browsers, and all 45 picture files together weigh 679 KB (the heaviest is the portrait at 960 pixels). The same held after the four swaps in the entry above.
 
 ## 2026-11-12, pictures that fit together, and a compass you can spin
 
