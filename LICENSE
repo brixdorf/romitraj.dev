@@ -29,7 +29,8 @@ The MIT license applies to the code in this repository only.
 - Content. The site's text, bio, project write-ups and anything else written
   by Romit Raj Sahu is all rights reserved and is not covered by the MIT
   license.
-- Photos. The photos come from Unsplash and stay under the Unsplash License.
-  Credits are listed in src/_data/image-credits.json.
+- Pictures. The old prints the pictures are made from are in the public domain
+  or shared by their museums under CC0. Credits are listed in
+  src/_data/image-credits.json.
 - Fallback fonts. The fallback fonts stay under the SIL Open Font License.
   Their license files are kept next to them in src/assets/fonts/.

@@ -26,7 +26,7 @@ The headline says _"What we know is a drop, what we don't know is an ocean."_ Th
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/weather-dark.svg"><img src="docs/readme/weather-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Live weather and music.** A thin moving strip on the home page shows the weather in Bangalore, my local time, and the song I'm playing on Spotify right now. If one of those services is having a bad day, that bit just hides. No error messages, no drama.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Old machines and explorer's gear: a sewing machine, a typewriter, a lantern, binoculars, an old telephone. The photos are turned into two colours, ink and paper, each time the site is built. The compass on the home page is 3D, polished case, glass and all. Move your mouse or scroll and it turns, swings a little past and settles, and its needle wobbles back to north. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Old prints of science and machines, from museums that share them freely: a philosopher showing off a model of the planets by lamplight, an alchemist, Diogenes with his lantern, and rows of steam locomotives, printing presses and steam hammers. They are turned into two colours, ink and paper, each time the site is built. The compass on the home page is 3D, polished case, glass and all. It slowly tumbles on its own; grab it and spin it any way you like, and its needle wobbles back to north. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
 
 And it looks the same in Chrome, Edge, Firefox and Safari, on a laptop or a phone. One command opens every page in three browsers and complains loudly if anything is off.
 
@@ -59,9 +59,9 @@ Everything else, from changing a sentence to putting it on a server, is in the [
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/heart-dark.svg"><img src="docs/readme/heart-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Credits
 
 - The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code and words here are my own.
-- The photographs are from [Unsplash](https://unsplash.com), and each photographer is named on the site's [Credits page](https://romitraj.dev/credits/).
+- The pictures are made from old prints that museums share freely (the National Gallery of Art, the Met, the Cleveland Museum of Art, the Library of Congress), and each one is named on the site's [Credits page](https://romitraj.dev/credits/).
 - Weather data by [Open-Meteo.com](https://open-meteo.com). Icons by [Phosphor Icons](https://phosphoricons.com).
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/scales-dark.svg"><img src="docs/readme/scales-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> License
 
-The code is [MIT](LICENSE) licensed, so take what is useful. The site's content (the words, my bio, the project write-ups) is all rights reserved, the photos stay under the Unsplash License, and the fallback fonts under the SIL Open Font License.
+The code is [MIT](LICENSE) licensed, so take what is useful. The site's content (the words, my bio, the project write-ups) is all rights reserved, the old prints stay in the public domain, and the fallback fonts under the SIL Open Font License.
