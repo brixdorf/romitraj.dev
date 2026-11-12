@@ -2,7 +2,8 @@
 // (assets/js/intro.js on opening the page, assets/js/page-changes.js on arriving from another page).
 // It confirms that
 //   - the quote is hidden until its lines are ready, never shown in place first (no flash);
-//   - its lines then slide in, and end exactly where a still page has them;
+//   - its two lines (the plain half, then the italic half) then slide in, and end exactly where a
+//     still page has them;
 //   - the page's name does not move or hide when the page opens: only the quote has an entrance;
 //   - arriving from the home page, the lines slide in too and end in place;
 //   - visitors who asked for less motion get no entrance, and without scripts the quote is there.
@@ -23,7 +24,10 @@ const watchFromTheStart = () => {
     const name = document.querySelector('[data-part="title"]');
     if (line) {
       const visible = getComputedStyle(line).visibility === 'visible';
-      const inLines = Boolean(document.querySelector('.saying .split-line'));
+      // Moving: an animation of its own (the entrance) or a position set by the page change.
+      const inLines = [...document.querySelectorAll('.saying__line')].some(
+        (each) => each.getAnimations().length > 0 || each.style.transform !== '',
+      );
       if (!visible) window.sayingLog.hiddenAtFirst = true;
       if (inLines) window.sayingLog.linesSeen = true;
       if (visible && !inLines && !window.sayingLog.linesSeen) window.sayingLog.shownTooEarly = true;
@@ -71,7 +75,7 @@ export async function sayingEntrance(browser, address) {
   const log = await page.evaluate(() => window.sayingLog);
   if (!log.hiddenAtFirst) problems.push('the quote was not hidden while it waited for its lines');
   if (log.shownTooEarly) problems.push('the quote flashed in place before its lines slid in');
-  if (!log.linesSeen) problems.push('the quote did not slide in: no lines were made');
+  if (!log.linesSeen) problems.push('the quote did not slide in: its lines never moved');
   if (log.nameMoved)
     problems.push('the page’s name was hidden or cut into letters when the page opened');
   if (await page.evaluate(() => document.documentElement.classList.contains('intro')))
@@ -84,11 +88,7 @@ export async function sayingEntrance(browser, address) {
   await page.mouse.click(700, 860);
   await page.waitForTimeout(200);
   off = furthest(await letterPlaces(page, quote), still);
-  if (
-    off > 0.6 ||
-    (await page.evaluate(() => document.querySelectorAll('.saying .split-line').length))
-  )
-    problems.push('the plain quote was not put back in place after the first click');
+  if (off > 0.6) problems.push('the quote was not in place after the first click');
   await context.close();
 
   // Arriving from the home page.
@@ -99,7 +99,12 @@ export async function sayingEntrance(browser, address) {
   await page.mouse.click(5, 5);
   await page.locator('.hero__nav a[href="/about/"]').click();
   const seen = await page
-    .waitForFunction(() => document.querySelector('.saying .split-line'), null, { timeout: 4000 })
+    .waitForFunction(
+      () =>
+        [...document.querySelectorAll('.saying__line')].some((each) => each.style.transform !== ''),
+      null,
+      { timeout: 4000, polling: 'raf' },
+    )
     .then(
       () => true,
       () => false,
