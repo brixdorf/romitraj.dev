@@ -97,22 +97,34 @@ function signedSubpackets(body) {
   return found;
 }
 
-const ed25519Oid = '2b06010401da470f01';
+// The curves by their OID (the number that names them inside the key).
+const curves = { '2b06010401da470f01': 'Ed25519', '2b060104019755010501': 'Curve25519' };
 function algorithmName(key) {
   const algorithm = key[5];
   if (algorithm === 27) return 'Ed25519';
   if (algorithm === 28) return 'Ed448';
-  if (algorithm === 22 && key.subarray(7, 7 + key[6]).toString('hex') === ed25519Oid)
-    return 'Ed25519';
+  if (algorithm === 25) return 'Curve25519';
+  if (algorithm === 26) return 'X448';
+  if ([18, 19, 22].includes(algorithm))
+    return curves[key.subarray(7, 7 + key[6]).toString('hex')] || `curve algorithm ${algorithm}`;
   if ([1, 2, 3].includes(algorithm)) return `RSA ${key.readUInt16BE(6)}`;
   return `algorithm ${algorithm}`;
 }
 
+// What a key is for, from the key flags its signature gives it (RFC 9580, section 5.2.3.29).
+function useOf(flags) {
+  if (flags & 0x0c) return 'encryption';
+  if (flags & 0x02) return 'signing';
+  if (flags & 0x20) return 'authentication';
+  return 'certification';
+}
+
 const day = (seconds) => new Date(seconds * 1000).toISOString().slice(0, 10);
 
-// The facts about the primary key, as gpg prints them: its fingerprint in groups of four, its long
-// key ID, its kind, the days it was made and stops being valid (by its newest self-signature on a
-// user ID), and its user IDs.
+// The facts about the key, as gpg prints them: the primary key's fingerprint in groups of four and
+// its long key ID; the algorithm of the primary key and of each subkey with what it is for
+// ("Ed25519" for signing, "Curve25519" for encryption); the days the key was made and stops being
+// valid (by its newest self-signature on a user ID); and its user IDs.
 export function keyFacts(bytes) {
   const all = packets(bytes);
   const primary = all[0];
@@ -127,26 +139,29 @@ export function keyFacts(bytes) {
 
   const userIds = [];
   let newest = null;
+  // The primary key, then each subkey, with the flags its own signature gives it.
+  const keys = [{ body: primary.body, flags: 0 }];
   for (const packet of all.slice(1)) {
-    if (packet.tag === 14) break; // a subkey: what follows belongs to it
+    if (packet.tag === 14) keys.push({ body: packet.body, flags: 0 });
     if (packet.tag === 13) userIds.push(packet.body.toString('utf8'));
-    // A version 4 certification of a user ID (signature types 0x10 to 0x13).
-    if (
-      packet.tag === 2 &&
-      packet.body[0] === 4 &&
-      packet.body[1] >= 0x10 &&
-      packet.body[1] <= 0x13
-    ) {
-      const subpackets = signedSubpackets(packet.body);
+    if (packet.tag !== 2 || packet.body[0] !== 4) continue;
+    const type = packet.body[1];
+    const subpackets = signedSubpackets(packet.body);
+    const flags = subpackets[27]?.[0] ?? 0;
+    // A certification of a user ID (signature types 0x10 to 0x13), on the primary key.
+    if (keys.length === 1 && type >= 0x10 && type <= 0x13) {
       const made = subpackets[2]?.readUInt32BE(0) ?? 0;
       if (!newest || made >= newest.made) newest = { made, lasts: subpackets[9]?.readUInt32BE(0) };
+      keys[0].flags ||= flags;
     }
+    // A subkey's binding signature (type 0x18).
+    if (keys.length > 1 && type === 0x18) keys.at(-1).flags = flags;
   }
 
   return {
     fingerprint: fingerprint.match(/.{4}/g).join(' '),
     keyId: fingerprint.slice(-16),
-    algorithm: algorithmName(primary.body),
+    algorithms: keys.map((key) => ({ name: algorithmName(key.body), use: useOf(key.flags) })),
     created: day(created),
     expires: newest?.lasts ? day(created + newest.lasts) : null,
     userIds,
