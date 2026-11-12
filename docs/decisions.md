@@ -76,11 +76,13 @@ The anchor icon is now Phosphor's gear (2.1.1, fill, ink and paper files). The p
 
 ### The full check
 
-Run twice at the end of Part 3, in Chromium, Firefox and WebKit at once. It also confirms the Vite+ bundling in Firefox and WebKit: no script error or layout fault in either.
+Run five times at the end of Part 3, in Chromium, Firefox and WebKit at once. It also confirms the Vite+ bundling in Firefox and WebKit: no script error or layout fault in either.
 
 - **First run, four problems, all fixed:** (1) the Credits page drew "Олександр К" in a fallback font (Louize has no Cyrillic): the name is now written "Oleksandr K"; (2) the About page's in-sight post test assumed a 1000px window shows the piece, untrue since the quote moved to the top in Part 2: the window is now 1600px and the test checks the piece really is in sight; (3) the picture test counted the compass's canvas as a piece that appeared when the pictures loaded: it is left out there (its own test checks that it moves nothing); (4) at 768px the about section was a pixel taller in Chromium than Firefox, because the serif asides in the bio grew the line differently: they now take no line height (`line-height: 0`), and both measure the same.
 - **Second run, one problem:** on phones the footer's compass sat 1.1px lower in Firefox, because the © sign (text font, in a serif line) grew the line half a pixel there. Same fix; both now measure the same (721.53 against 721.60). Everything else passed in all three browsers, including the new compass test.
-- **Not yet done:** a third full run after that last fix (the usage limit was reached). Run `pnpm run check` once more before pushing.
+- **Third and fourth runs: WebKit only, now and then.** The home page's blog list was "still not shown after the visitor scrolled back up", and cutting the home page's headings into letters "moved 4 other pieces". Both passed alone in WebKit, four times out of four. **The cause is real, and Safari's:** WebKit moves an animated element (the tickers) even between two measurements in the same instant of a script; Chromium and Firefox hold it still until the next frame (measured: 4.1px in 100ms in WebKit, 0 in the others). So on Safari, `posts.js` could take the moving ticker for something the newer posts had pushed, undo the change and wait for another scroll. **Fix:** what moves inside a ticker is left out of that measurement (the ticker's own box is still measured), and out of the letters test's, as the other tests already did.
+- **Fifth run: passed** in all three browsers, including the new compass test. It also confirms the Vite+ bundling in Firefox and WebKit.
+- **Speed** (`pnpm run speed`): Largest Contentful Paint on a slow phone 1168ms, against about 1250ms with the whale; on a laptop 104ms. The headline's entrance costs 0ms on the phone and 8ms on the laptop.
 
 ## 2026-11-12, last: a copy button, and a shorter description
 
