@@ -1,9 +1,18 @@
 // Tests for the picture pipeline (scripts/images.mjs): speck removal (the "despeckle" setting),
-// which pictures need a photographer on record, which blocks are backdrop behind a subject, and
-// which part of a photo is its plain backdrop, to be cut away (the "cutout" setting), and how
-// much room goes around a photo shown smaller than its frame (a "zoom" below 1).
+// which pictures need their source on record, which part of a photo is its plain backdrop, to be
+// cut away (the "cutout" setting), how much room goes around a photo shown smaller than its frame
+// (a "zoom" below 1), how a picture fades into the paper ("fade") and where the copies of a
+// repeated picture go ("repeat").
 import { describe, expect, it } from 'vite-plus/test';
-import { needsCredit, paddingFor, plainBackdrop, removeSpecks } from './images.mjs';
+import {
+  fadeKeeps,
+  needsCredit,
+  paddingFor,
+  plainBackdrop,
+  partRegion,
+  removeSpecks,
+  repeatLayout,
+} from './images.mjs';
 
 // A small picture from rows of text: "#" is ink, "." is paper.
 const picture = (rows) => ({
@@ -74,7 +83,7 @@ describe('removeSpecks', () => {
 });
 
 describe('needsCredit', () => {
-  it('asks for a photographer on record for every photo', () => {
+  it('asks for its source on record for every photo or print', () => {
     expect(needsCredit({ source: 'clock.jpg' })).toBe(true);
     expect(needsCredit({ source: 'clock.jpg', kind: 'photo' })).toBe(true);
   });
@@ -185,5 +194,78 @@ describe('paddingFor', () => {
 
   it('splits an odd amount of room with the extra pixel on the right and at the bottom', () => {
     expect(paddingFor(101, 51, 0.5)).toEqual({ left: 50, right: 51, top: 25, bottom: 26 });
+  });
+});
+
+describe('fadeKeeps', () => {
+  it('keeps the middle whole and nothing at the very edge', () => {
+    expect(fadeKeeps(50, 40, 100, 80, 0.4)).toBe(1);
+    expect(fadeKeeps(0, 40, 100, 80, 0.4)).toBe(0);
+    expect(fadeKeeps(50, 0, 100, 80, 0.4)).toBe(0);
+    expect(fadeKeeps(99.5, 79.5, 100, 80, 0.4)).toBe(0);
+  });
+
+  it('fades smoothly toward the edge, over the share of the way given', () => {
+    const along = [50, 40, 32, 26, 20, 14, 8, 2].map((x) => fadeKeeps(x, 40, 100, 80, 0.6));
+    for (let index = 1; index < along.length; index++)
+      expect(along[index]).toBeLessThanOrEqual(along[index - 1]);
+    expect(along[3]).toBeGreaterThan(0);
+    expect(along[3]).toBeLessThan(1);
+    // A narrower fade keeps more of the same place.
+    expect(fadeKeeps(26, 40, 100, 80, 0.3)).toBeGreaterThan(fadeKeeps(26, 40, 100, 80, 0.6));
+  });
+
+  it('can fade from a corner: kept whole there, gone along the far edges', () => {
+    const corner = { x: 1, y: 1 };
+    expect(fadeKeeps(99.5, 79.5, 100, 80, 0.5, corner)).toBe(1);
+    expect(fadeKeeps(0, 40, 100, 80, 0.5, corner)).toBe(0);
+    expect(fadeKeeps(80, 0, 100, 80, 0.5, corner)).toBe(0);
+    expect(fadeKeeps(60, 50, 100, 80, 0.5, corner)).toBeGreaterThan(0);
+  });
+
+  it('can be a smaller oval, leaving paper between it and the edges', () => {
+    expect(fadeKeeps(10, 40, 100, 80, 0.1, { x: 0.5, y: 0.5 }, 0.7)).toBe(0);
+    expect(fadeKeeps(50, 5, 100, 80, 0.1, { x: 0.5, y: 0.5 }, 0.7)).toBe(0);
+    expect(fadeKeeps(50, 40, 100, 80, 0.1, { x: 0.5, y: 0.5 }, 0.7)).toBe(1);
+    expect(fadeKeeps(25, 40, 100, 80, 0.1, { x: 0.5, y: 0.5 }, 0.7)).toBeGreaterThan(0);
+  });
+
+  it('keeps everything without a fade', () => {
+    expect(fadeKeeps(0, 0, 100, 80, 0)).toBe(1);
+  });
+});
+
+describe('repeatLayout', () => {
+  it('sets copies side by side with a gap between them and half a gap at each end', () => {
+    expect(repeatLayout(100, 60, 3, 0.2)).toEqual({
+      width: 360,
+      height: 60,
+      lefts: [10, 130, 250],
+    });
+  });
+
+  it('is the picture itself for one copy and no gap', () => {
+    expect(repeatLayout(100, 60, 1, 0)).toEqual({ width: 100, height: 60, lefts: [0] });
+  });
+});
+
+describe('partRegion', () => {
+  it('turns a part given in shares of the picture into whole pixels', () => {
+    expect(partRegion(1000, 500, { x: 0.1, y: 0.2, width: 0.5, height: 0.4 })).toEqual({
+      left: 100,
+      top: 100,
+      width: 500,
+      height: 200,
+    });
+  });
+
+  it('is the whole picture without a part, and never reaches past its edges', () => {
+    expect(partRegion(300, 200)).toEqual({ left: 0, top: 0, width: 300, height: 200 });
+    expect(partRegion(300, 200, { x: 0.8, y: 0, width: 0.5, height: 1 })).toEqual({
+      left: 240,
+      top: 0,
+      width: 60,
+      height: 200,
+    });
   });
 });

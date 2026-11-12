@@ -163,6 +163,46 @@ export function paddingFor(width, height, zoom) {
   return { left, right: across - left, top, bottom: down - top };
 }
 
+// How much of a picture is kept at a block (1 all of it, 0 none: paper), for a picture that fades
+// into the paper toward its edges like a vignette in an old book ("fade": the share of the way
+// from the middle to the edge over which it fades). The fade follows an oval the shape of the
+// picture, so the corners go first. "from" moves the oval's middle (x and y from 0 to 1): from a
+// corner, the picture is whole there and fades out along the two far edges only. "size" below 1
+// makes the oval smaller than that, with paper all round it.
+export function fadeKeeps(x, y, width, height, fade, from = { x: 0.5, y: 0.5 }, size = 1) {
+  if (!fade) return 1;
+  const reach = (share) => Math.max(share, 1 - share) * size;
+  const across = Math.abs(x / width - from.x) / reach(from.x);
+  const down = Math.abs(y / height - from.y) / reach(from.y);
+  const share = Math.min(1, Math.max(0, (1 - Math.hypot(across, down)) / fade));
+  return share * share * (3 - 2 * share);
+}
+
+// The part of a picture to repeat ("part": x, y, width and height as shares of the picture), in
+// whole pixels and within the picture. Without a part, the whole picture.
+export function partRegion(width, height, part = {}) {
+  const { x = 0, y = 0, width: across = 1, height: down = 1 } = part;
+  const left = Math.round(Math.min(1, Math.max(0, x)) * width);
+  const top = Math.round(Math.min(1, Math.max(0, y)) * height);
+  return {
+    left,
+    top,
+    width: Math.min(width - left, Math.round(across * width)),
+    height: Math.min(height - top, Math.round(down * height)),
+  };
+}
+
+// Where copies of a picture go when it is repeated side by side ("repeat": how many, and the gap
+// between them as a share of one copy's width), with half a gap at each end so the row can
+// continue past the frame: the width and height of the row, and each copy's left edge.
+export function repeatLayout(width, height, count, gap) {
+  const space = Math.round(width * gap);
+  const lefts = Array.from({ length: count }, (_, index) =>
+    Math.round(space / 2 + index * (width + space)),
+  );
+  return { width: count * (width + space), height, lefts };
+}
+
 // The usual grey (0 to 1) along the edge of a whole photo, measured on a small copy.
 async function usualEdgeGrey(image) {
   const size = 64;
@@ -183,7 +223,7 @@ async function usualEdgeGrey(image) {
   return edge.sort((a, b) => a - b)[Math.floor(edge.length / 2)] / 255;
 }
 
-// Whether a picture needs its photographer on record in image-credits.json: every photo does,
+// Whether a picture needs its source on record in image-credits.json: every photo or print does,
 // unless it is marked "credit": false. The site's own drawings (SVG files) never do.
 export function needsCredit(settings) {
   return !settings.source.endsWith('.svg') && settings.credit !== false;
@@ -234,6 +274,28 @@ async function convertOne(name, settings, colours) {
   let opened = () => sharp(file, isDrawing ? { density: 300 } : {}).rotate();
   let meta = await opened().metadata();
   let crop = settings.crop;
+  // A picture repeated side by side, in the grey of its own ground (which a cutout then removes),
+  // for a band that fills a wide frame, as one motif repeated.
+  if (settings.repeat) {
+    const { count = 3, gap = 0, part } = settings.repeat;
+    const grey = Math.round((await usualEdgeGrey(opened())) * 255);
+    const piece = partRegion(meta.width, meta.height, part);
+    const one = await opened().flatten({ background: '#ffffff' }).extract(piece).png().toBuffer();
+    const row = repeatLayout(piece.width, piece.height, count, gap);
+    const repeated = await sharp({
+      create: {
+        width: row.width,
+        height: row.height,
+        channels: 3,
+        background: { r: grey, g: grey, b: grey },
+      },
+    })
+      .composite(row.lefts.map((left) => ({ input: one, left, top: 0 })))
+      .png()
+      .toBuffer();
+    opened = () => sharp(repeated);
+    meta = await opened().metadata();
+  }
   // A zoom below 1 shows the whole photo smaller, with room around it in the grey of the photo's
   // own ground (so it blends in and turns to paper with it), for a subject that would otherwise be
   // cut by a wide frame.
@@ -283,6 +345,16 @@ async function convertOne(name, settings, colours) {
       )
     : null;
 
+  // A picture that fades into the paper toward its edges: "fade" is a number (the share of the way
+  // over which it fades, from the middle), or { amount, x, y, size } to fade from another point,
+  // or within a smaller oval.
+  const fade = typeof settings.fade === 'object' ? settings.fade.amount : settings.fade;
+  const fadeSize = typeof settings.fade === 'object' ? (settings.fade.size ?? 1) : 1;
+  const fadeFrom =
+    typeof settings.fade === 'object'
+      ? { x: settings.fade.x ?? 0.5, y: settings.fade.y ?? 0.5 }
+      : { x: 0.5, y: 0.5 };
+
   // Stretch the greys, then dither.
   let dark = new Uint8Array(across * down);
   for (let y = 0; y < down; y++) {
@@ -290,6 +362,9 @@ async function convertOne(name, settings, colours) {
       const index = y * across + x;
       let value = Math.min(1, Math.max(0, (greys[index] / 255 - black) / (white - black)));
       if (gamma !== 1) value **= gamma;
+      if (fade)
+        value =
+          1 - (1 - value) * fadeKeeps(x + 0.5, y + 0.5, across, down, fade, fadeFrom, fadeSize);
       dark[index] = value <= thresholdAt(pattern, x, y) && !cutAway?.[index] ? 1 : 0;
     }
   }
@@ -339,8 +414,8 @@ export async function convertImages(outDir) {
       throw new Error(
         `images.json: "${name}" needs exactly one of these: "alt" (a short description for screen readers) or "decorative": true (for a picture that is only decoration).`,
       );
-    // Every photo must have its photographer on record, unless it is marked "credit": false.
-    if (needsCredit(settings) && !credits.photos?.[settings.source])
+    // Every photo or print must have its source on record, unless it is marked "credit": false.
+    if (needsCredit(settings) && !credits.pictures?.[settings.source])
       throw new Error(
         `image-credits.json has no entry for ${settings.source} (used by "${name}").`,
       );
