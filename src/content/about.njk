@@ -94,12 +94,20 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
       <dl class="key__facts">
         <div><dt>{{ about.contact.key.fingerprint }}</dt><dd class="key__fingerprint">{{ key.fingerprint }}</dd></div>
         <div><dt>{{ about.contact.key.keyId }}</dt><dd>{{ key.keyId }}</dd></div>
-        <div><dt>{{ about.contact.key.algorithm }}</dt><dd>{{ key.algorithm }}</dd></div>
+        <div><dt>{{ about.contact.key.algorithms }}</dt><dd>
+          {%- for part in key.algorithms -%}
+          {{ " " + about.contact.key.and + " " if loop.last and not loop.first else (", " if not loop.first) }}{{ part.name }} ({{ about.contact.key.uses[part.use] }})
+          {%- endfor -%}
+        </dd></div>
         {%- if key.expires %}
         <div><dt>{{ about.contact.key.expires }}</dt><dd><time datetime="{{ key.expires }}">{{ key.expires }}</time></dd></div>
         {%- endif %}
       </dl>
-      <a class="link key__download" href="{{ downloads.key.url }}" download data-taxi-ignore>{{ about.contact.key.download }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+      <a class="button key__download" href="{{ downloads.key.url }}" download data-taxi-ignore>{{ about.contact.key.download }}</a>
+      {#- The same key, fetched by GnuPG from the Web Key Directory (scripts/lib/pgp.mjs). One click
+          selects the whole command, ready to copy. #}
+      <p class="key__fetch">{{ about.contact.key.fetch | fill }}</p>
+      <code class="command">{{ about.contact.key.command | fill }}</code>
     </div>
     <a class="link panel__action" href="mailto:{{ site.email }}">{{ about.contact.link }}{{ arrow("mailto:") }}</a>
   </section>

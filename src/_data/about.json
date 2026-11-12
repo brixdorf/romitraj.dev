@@ -36,13 +36,22 @@
     ],
     "link": "Say hi",
     "key": {
-      "note": "The OpenPGP key under the Contact card. Its facts (fingerprint, key ID, kind, expiry) are read from the key itself, src/assets/files/romitraj-pgp-public.asc; these are only the labels.",
+      "note": "The OpenPGP key under the Contact card. Its facts (fingerprint, key ID, algorithms, expiry) are read from the key itself, src/assets/files/romitraj-pgp-public.asc; these are only the words around them. 'uses' names what each part of the key is for; 'and' joins the algorithms. In 'fetch' and 'command', {email} is the address from site.json.",
       "label": "OpenPGP",
       "fingerprint": "Fingerprint",
       "keyId": "Key ID",
-      "algorithm": "Type",
+      "algorithms": "Algorithms",
+      "uses": {
+        "signing": "signing",
+        "encryption": "encryption",
+        "authentication": "authentication",
+        "certification": "certification"
+      },
+      "and": "and",
       "expires": "Expires",
-      "download": "Download the key"
+      "download": "Download key",
+      "fetch": "You can also fetch it straight from my domain:",
+      "command": "gpg --locate-external-keys {email}"
     }
   },
 

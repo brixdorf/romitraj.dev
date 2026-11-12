@@ -82,7 +82,8 @@
 }
 
 /* The OpenPGP key under the Contact card's text: a small grey label, then its facts in two
-   columns (name, value) in the text font, and a link to download it. */
+   columns (name, value) in the text font, a button to download it, and the command that fetches
+   it from the domain. */
 .key {
   margin-block: 8px 16px;
   font-size: var(--type-small);
@@ -119,11 +120,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.key__download {
-  font-size: var(--type-micro);
-  font-weight: 700;
-  line-height: 1.5;
-  text-transform: uppercase;
+.key__fetch {
+  margin: 24px 0 8px;
 }
 
 /* The closing quote: large serif letters, half plain and half italic like the top banner, with
