@@ -23,7 +23,7 @@
 
   {%- include "partials/ticker.njk" %}
 
-  <nav class="hero__nav" aria-label="Main">
+  <nav class="hero__nav" aria-label="{{ home.navLabel }}">
     {%- for group in navigation %}
     <p class="nav-list__label" id="nav-{{ group.label | slugify }}" data-part="nav-piece">{{ group.label }}</p>
     <ul class="nav-list" aria-labelledby="nav-{{ group.label | slugify }}">

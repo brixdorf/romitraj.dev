@@ -1,6 +1,7 @@
 {
   "lead": "The personal site and portfolio of Romit&nbsp;Raj&nbsp;Sahu, a guy striving to leave his mark on computer science.",
   "scrollNote": "(Scroll for more.)",
+  "navLabel": "Main",
 
   "ticker": {
     "note": "The small words of the status ticker. The labels are read out by screen readers and are not shown. In 'weather', {temperature} and {condition} are filled in by the page; the words for the sky are in weather.json.",
@@ -57,6 +58,8 @@
   },
 
   "footer": {
+    "navLabel": "Site map",
+    "heartLabel": "love",
     "homeLabel": "Home",
     "elsewhereLabel": "Elsewhere",
     "contactLabel": "Contact",
