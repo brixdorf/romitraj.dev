@@ -35,10 +35,8 @@
       ]
     },
     "pictures": {
-      "title": "Pictures",
-      "paragraphs": [
-        "A huge thanks to these great folks for their breathtaking pictures, and to the museums that share them freely:"
-      ]
+      "title": "Photographs",
+      "paragraphs": ["A huge thanks to these great folks for their breathtaking photos:"]
     },
     "weather": {
       "title": "Weather",
