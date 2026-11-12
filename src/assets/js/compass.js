@@ -92,7 +92,10 @@ void main() {
   if (dot(n, v) < 0.0) n = -n;
   if (knurl != 0.0) {
     float angle = knurl < 0.0 ? atan(local.x, local.z + 0.06) : atan(local.y, local.x);
-    n = normalize(n + normalize(around) * 0.55 * sin(angle * abs(knurl)));
+    // The angle is folded into one groove's turn first: graphics cards work out the sine of a
+    // large number with different precision, and browsers would draw the grooves differently.
+    float groove = fract(angle / 6.2831853 * abs(knurl));
+    n = normalize(n + normalize(around) * 0.55 * sin(groove * 6.2831853));
   }
   vec3 r = reflect(-v, n);
   float facingEye = clamp(dot(n, v), 0.0, 1.0);
@@ -136,8 +139,14 @@ void main() {
   gl_Position = vec4(corner, 0.0, 1.0);
 }`;
 
+// High precision where there is any: at medium precision some browsers (Firefox here) work out
+// the sample places too coarsely, miss the fine picture's pixels and shift every edge.
 const blockFragment = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 uniform sampler2D scene;
 uniform vec2 size;
 uniform vec3 ink;
@@ -385,6 +394,9 @@ export function compassPainter(canvas, { keep = false } = {}) {
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       gl.disableVertexAttribArray(corner);
+      // Let go of the fine picture, so the next frame can draw into it again (some browsers
+      // refuse to draw into a picture that is still held for reading).
+      gl.bindTexture(gl.TEXTURE_2D, null);
     },
     forget() {
       gl.getExtension('WEBGL_lose_context')?.loseContext();
