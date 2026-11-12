@@ -2,6 +2,86 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, Part 3: a new theme, new pictures, a 3D compass
+
+Part 3 of the overhaul. The sea theme is gone. The new one, Romit's, is **the age of exploration meeting old machines**: compasses, armillary spheres, star charts, telescopes, hourglasses, gears and punched cards.
+
+### Versions and sources checked
+
+| What                | Version                   | Source, read on 2026-11-12                                                                                        | Used for                                       |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Phosphor Icons      | 2.1.1 (newest)            | `@phosphor-icons/core` package.json on unpkg.com                                                                  | The README's gear icon, in place of the anchor |
+| WebGL 1             | in every target           | Checked in the three test browsers here (Chromium 158 with SwiftShader, Firefox 159, WebKit 27.2): all draw WebGL | The hero's compass                             |
+| sharp, @jsquash/jxl | 0.35.5, 1.3.0 (unchanged) | `pnpm view`                                                                                                       | Lossless AVIF and JPEG XL                      |
+
+No package was added. The compass is drawn with plain WebGL, a few hundred lines of the site's own code, rather than a 3D library (three.js alone would be several times the size of the whole main script).
+
+### The photos
+
+Chosen from Unsplash for one clear subject on a plain ground, which is what survives the two-tone treatment. Each page was read on 2026-11-12 and says "Free to use under the Unsplash License" (the Smithsonian's says "Dual License: Public Domain & Unsplash License"; it was tried and dropped, see below). Unsplash's search now sits behind a bot check, which was not worked around: photos were found through its pages as a web reader sees them, and the files fetched from its image server.
+
+| Picture (`images.json`) | Photo                                                                                                                                      | Photographer                | Where                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `armillary`, `heavens`  | [Celestial spheres and armillary sphere diagrams](https://unsplash.com/photos/celestial-spheres-and-armillary-sphere-diagrams-7LzE9wWU-pI) | The New York Public Library | Behind the home page's about section (the armillary sphere); beside "Credits" (the heavens above it) |
+| `gears`                 | [Cogs and gears](https://unsplash.com/photos/cogs-and-gears-GmvH5v9l3K4)                                                                   | Tim Mossholder              | Beside "Projects"                                                                                    |
+| `punchcards`            | [Rows of vintage punched cards with data](https://unsplash.com/photos/rows-of-vintage-punched-cards-with-data-OOeeu8t-Xl4)                 | Bernd Dittrich              | Beside "Resume"                                                                                      |
+| `hourglass`             | [Clear hour glass with brown frame](https://unsplash.com/photos/clear-hour-glass-with-brown-frame-KYxXMTpTzek)                             | Quilia                      | The About page's small frame                                                                         |
+| `telescope`             | [Black telescope](https://unsplash.com/photos/black-telescope-gCeH4z9m7bg)                                                                 | Uriel Soberanes             | The page for a missing address                                                                       |
+| `globe`                 | [A black globe sitting on top of a white table](https://unsplash.com/photos/a-black-globe-sitting-on-top-of-a-white-table-RDjZh9dqlP4)     | charlesdeluvio              | Beside Aletheia on the Projects page                                                                 |
+| `movement`              | [A close up view of a watch movement](https://unsplash.com/photos/a-close-up-view-of-a-watch-movement-HmIwomthlWw)                         | Олександр К                 | Beside My Homelab on the Projects page                                                               |
+
+Tried and dropped: a clear hourglass on white (the glass vanished), a 1795 star map (its fine lines turned to noise at 192 blocks), and the Smithsonian's surveyor's compass in its case (a muddle of greys). The whale's tail, the server rack, the padlock and the harbour cranes are gone, with their credits.
+
+### The band above the footer: a night sky
+
+`night-sky.svg`, this site's own drawing, in place of the sea swells: paper at the top darkening to ink, stars coming out as it darkens (a few four-pointed), a thin crescent moon, and the arcs and hour lines of a star chart, dark on the light part and light on the dark part. Stippled (`pattern: grain`) as before. It also fills the About page's wide frame. The CSS is `night-sky.css` (was `shore.css`).
+
+### The hero: a 3D compass
+
+Romit's request: an animated 3D compass in the pixel style, reacting to the pointer or the scroll, with a still pixel picture where it cannot run.
+
+- **Drawn with WebGL into a canvas exactly as many pixels as the hero's picture has blocks** (152 by 190), enlarged with `image-rendering: pixelated`. The shader lights each surface and turns the result into ink or paper with the same two by two pattern the build uses for photos, counted from the top left, so it is the same kind of picture as the others.
+- **The model** (`compass-model.js`, tested): a brass case turned from a profile (a rounded back, a rolled edge, a lip), its ring on a stem, a light face with a thin ring, 36 marks (longer at the four quarters), a rose of eight points each split dark and light, a pivot, and a needle with a raised ridge, its dark half north. Each surface carries a tone from ink to paper.
+- **The movement** (`compass-motion.js`, tested; numbers in `motion.js`, `compass`): it leans toward the pointer (up to 16° and 22°), the case turns on its face as the hero scrolls away (up to 140°, plus a little with the pointer), and it follows with a time constant of 0.18s, whatever the screen's refresh rate. The needle has a spring toward north, damping and a pivot that drags it along when the case turns, so it swings past north and settles in a few wobbles. A finger is not a pointer: on touch screens the scroll turns it.
+- **It draws only while something moves**, and not while the hero is out of sight or the tab hidden. Leaving the home page stops it and removes its canvas (and frees the WebGL context); coming back starts it again.
+- **The still picture first, and wherever it cannot run.** `pnpm run share` now first draws the compass at rest with the same code, in Chromium, and saves `src/assets/img/source/hero-compass.png` (see-through around the compass). The build turns it into the hero's picture like any source; the painted texture shows exactly where it is see-through (new: a source with see-through parts gives its own outline, `backdropOf` in `images.mjs`, tested). Converted, it is the same block for block. Every visitor gets the still first; the canvas is laid over it after load, when the browser is idle, and takes its place once its first drawing is ready. Without scripts, without WebGL, under reduced motion (also when switched on during a visit) or if the context is lost, the still stays.
+- **Accessibility:** the still `<img>` keeps its place in the page at opacity 0, so screen readers read its description; the canvas is `aria-hidden`.
+- **Loading speed:** the still is the page's largest piece, as the whale was; the compass's code is in the main script and starts after load.
+
+### Formats: lossless JPEG XL, AVIF and PNG for every pixel picture
+
+`scripts/lib/formats.mjs` (tested) saves each pixel picture losslessly in all three, decodes each file again and keeps only those that give back exactly the same pixels, and the page offers the ones smaller than the PNG, smallest first, in a `<picture>`, with the PNG last for everyone else. The `<picture>` takes no part in the layout (`display: contents`), so nothing moves.
+
+Sizes in bytes (PNG, JPEG XL, AVIF): hero 1,584, 934, 3,295; armillary 4,709, 3,323, 7,615; night sky 8,453, 8,894, 16,138; heavens 959, 991, 1,971; the rest are a few hundred bytes each, JPEG XL about a third under the PNG. Offered: JPEG XL then PNG, except the night sky and the heavens (PNG alone).
+
+- **AVIF never wins**: for two-tone pixel art it is two to three times the PNG. Effort 9 (the slowest) made it 10 to 15% smaller but still twice the PNG, and added about 10 seconds to every build, so the AVIF files are made at effort 4, only to be compared. JPEG XL is made at effort 9 (lossless JPEG XL is quick at that size).
+- **The texture behind the hero stays a lossy WebP**: it is a smooth surface, and lossless it would weigh hundreds of kilobytes. The portrait stays as in Part 2.
+- Chromium 158 takes the JPEG XL; Firefox the PNG.
+
+### The share image and the preview tags
+
+The share image now shows the hero's compass at rest on its painted texture (3 pixels a block), beside the headline. Every page also carries `og:locale` (`en_IN`, `locale` in `site.json`) and `twitter:site` (the X name, as `twitter:creator`); the check expects both (`scripts/lib/head.mjs`). Its description says "an old pocket compass".
+
+### The page for a missing address
+
+A telescope on a tripod, "pointed at nothing in particular", with the caption "I pointed the telescope everywhere. Still nothing." (a draft for Romit). The test of that page waited for the words "Lost at sea" after a link to a missing page; since the rename it waited ten seconds in vain each time before going on. It now waits for the page's own name, and its made-up addresses are no longer sea jokes.
+
+### Sea words
+
+Gone from the code, the styles and the guide: the paint texture's "swells" are "bumps", the band is the night sky, the missing page's picture class is `lost__picture`. The headline's own words ("a drop", "an ocean") are Romit's and stay. Older entries in this log keep their words: they record what was true then.
+
+### The README
+
+The anchor icon is now Phosphor's gear (2.1.1, fill, ink and paper files). The pictures paragraph describes the new pictures and the 3D compass, the tools list names WebGL and jSquash, and the screenshot was retaken.
+
+### The full check
+
+Run twice at the end of Part 3, in Chromium, Firefox and WebKit at once. It also confirms the Vite+ bundling in Firefox and WebKit: no script error or layout fault in either.
+
+- **First run, four problems, all fixed:** (1) the Credits page drew "Олександр К" in a fallback font (Louize has no Cyrillic): the name is now written "Oleksandr K"; (2) the About page's in-sight post test assumed a 1000px window shows the piece, untrue since the quote moved to the top in Part 2: the window is now 1600px and the test checks the piece really is in sight; (3) the picture test counted the compass's canvas as a piece that appeared when the pictures loaded: it is left out there (its own test checks that it moves nothing); (4) at 768px the about section was a pixel taller in Chromium than Firefox, because the serif asides in the bio grew the line differently: they now take no line height (`line-height: 0`), and both measure the same.
+- **Second run, one problem:** on phones the footer's compass sat 1.1px lower in Firefox, because the © sign (text font, in a serif line) grew the line half a pixel there. Same fix; both now measure the same (721.53 against 721.60). Everything else passed in all three browsers, including the new compass test.
+- **Not yet done:** a third full run after that last fix (the usage limit was reached). Run `pnpm run check` once more before pushing.
+
 ## 2026-11-12, last: a copy button, and a shorter description
 
 - **The Projects page's search description** is Romit's: "The projects Romit Raj Sahu has built." The rest of the hidden text stays as rewritten earlier the same day.
