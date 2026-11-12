@@ -15,6 +15,11 @@ import { root } from './site.mjs';
 // The heaviest a single picture file may be. The two-tone pictures are far below this; it is
 // here to catch a setting that makes one balloon.
 const heaviestAllowed = 24 * 1024;
+// A photo (JPEG XL, AVIF or JPEG, from scripts/lib/photo.mjs) is shades of grey, not two tones,
+// and comes in several widths of which a browser fetches one: each file has a limit of its own.
+const heaviestPhotoAllowed = 160 * 1024;
+const isPhoto = (name) => /\.(jxl|avif|jpg)$/.test(name);
+const limitFor = (name) => (isPhoto(name) ? heaviestPhotoAllowed : heaviestAllowed);
 
 export function pictureFiles(siteDir) {
   const dir = path.join(siteDir, 'assets', 'img');
@@ -37,10 +42,10 @@ export function pictureFiles(siteDir) {
       ? `${files.length} files, ${kb(total)} in all, the heaviest ${heaviest.name} at ${kb(heaviest.bytes)}`
       : 'none',
     problems: files
-      .filter((file) => file.bytes > heaviestAllowed)
+      .filter((file) => file.bytes > limitFor(file.name))
       .map(
         (file) =>
-          `${file.name} is ${kb(file.bytes)}: more than the ${kb(heaviestAllowed)} a picture may weigh`,
+          `${file.name} is ${kb(file.bytes)}: more than the ${kb(limitFor(file.name))} ${isPhoto(file.name) ? 'a photo' : 'a picture'} may weigh`,
       ),
   };
 }
@@ -177,7 +182,11 @@ export async function picturesHoldStill(browser, address, pagePaths) {
       // What is written into the page for each picture.
       const written = await page.evaluate(() =>
         [...document.querySelectorAll('img')].map((image) => ({
-          name: (image.getAttribute('src') || '').split('/').pop().split('?')[0],
+          // The picture's name from images.json: its mark, or else its file's name (a photo's
+          // files are named by width, such as "portrait-480.jpg").
+          name:
+            image.dataset.picture ||
+            (image.getAttribute('src') || '').split('/').pop().split('?')[0],
           sized:
             Number(image.getAttribute('width')) > 0 && Number(image.getAttribute('height')) > 0,
           alt: image.getAttribute('alt'),
