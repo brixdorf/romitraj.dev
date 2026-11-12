@@ -10,6 +10,7 @@ import { missingFacts, projectLink } from './scripts/lib/projects.mjs';
 import { publishFile } from './scripts/lib/downloads.mjs';
 import { publishKey } from './scripts/lib/pgp.mjs';
 import { photographersToThank } from './scripts/lib/credits.mjs';
+import { mailto } from './scripts/lib/mailto.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -123,6 +124,8 @@ export default function (eleventyConfig) {
 
   // How a project's link is labelled: "Code: GitHub", or "Live:" and the site's address.
   eleventyConfig.addFilter('projectLink', projectLink);
+  // An email link with its subject filled in: {{ site.email | mailto(subject) }}.
+  eleventyConfig.addFilter('mailto', mailto);
 
   // The number of letters in the longest word of a heading. The styles use it to shrink a giant
   // heading on a narrow window until its longest word fits.
