@@ -4,7 +4,7 @@
     "hero": {
       "source": "hero-compass.png",
       "alt": "An old pocket compass in chunky pixels, its needle pointing north.",
-      "across": 228,
+      "across": 152,
       "shape": "4:5",
       "black": 0.3,
       "white": 0.7,

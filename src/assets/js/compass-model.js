@@ -188,9 +188,9 @@ function torus(into, centre, big, thick, material, around = 64, tube = 20) {
 
 // The materials. Polished brass reads light, blued steel dark; the dial is paper with ink marks.
 const brass = { tone: 0.78, kind: METAL };
-const knurled = { tone: 0.72, kind: METAL, knurl: 150 };
+const knurled = { tone: 0.72, kind: METAL, knurl: 84 };
 // A negative count: grooves around the crown's own axis (up, +y) instead of the dial's (+z).
-const crownKnurl = { tone: 0.72, kind: METAL, knurl: -64 };
+const crownKnurl = { tone: 0.72, kind: METAL, knurl: -36 };
 const dial = { tone: 0.96, kind: PAINT };
 const ink = { tone: 0.05, kind: PAINT };
 const roseDark = { tone: 0.3, kind: PAINT };
@@ -251,9 +251,9 @@ export function buildCompass() {
   // thin inner ring, and a small north pointer on the track.
   annulus(body, dialZ, 0, 0.87, dial);
   const onDial = dialZ + 0.002;
-  annulus(body, onDial, 0.836, 0.846, ink);
-  annulus(body, onDial, 0.745, 0.752, ink);
-  annulus(body, onDial, 0.57, 0.576, ink);
+  annulus(body, onDial, 0.832, 0.848, ink);
+  annulus(body, onDial, 0.743, 0.755, ink);
+  annulus(body, onDial, 0.567, 0.579, ink);
   for (let degree = 0; degree < 360; degree += 5) {
     const angle = (degree * Math.PI) / 180;
     if (degree % 90 === 0) continue;
@@ -265,7 +265,7 @@ export function buildCompass() {
       angle,
       thirty ? 0.7 : ten ? 0.752 : 0.79,
       0.836,
-      thirty ? 0.022 : 0.012,
+      thirty ? 0.028 : 0.017,
       ink,
     );
   }

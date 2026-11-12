@@ -38,7 +38,7 @@ const escape = (text) =>
 const giantLine = (text) => escape(text).replace(/['’]/g, '<span class="apostrophe"></span>');
 
 // The card's own measurements, in pixels.
-const card = { width: 1200, height: 630, bar: 12, edge: 48, gap: 40, block: 2 };
+const card = { width: 1200, height: 630, bar: 12, edge: 48, gap: 40, block: 3 };
 
 // The compass's still picture comes first: the build turns it into the hero's picture.
 {
