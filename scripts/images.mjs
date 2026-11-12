@@ -19,12 +19,15 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { paintTexture } from './lib/paint.mjs';
+import { makePhoto } from './lib/photo.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceDir = path.join(root, 'src', 'assets', 'img', 'source');
 const listFile = path.join(root, 'src', '_data', 'images.json');
 const creditsFile = path.join(root, 'src', '_data', 'image-credits.json');
 const tokensFile = path.join(root, 'src', 'assets', 'css', 'tokens.css');
+// Photos already made, kept between builds: finding each format's quality takes a few seconds.
+const photoCache = path.join(root, '.cache', 'photos');
 
 // The two colours come from the styles, so the pictures always match the page.
 function colourFromTokens(name) {
@@ -123,6 +126,12 @@ export function removeSpecks(dark, width, height, reach = 3, most = 2) {
     }
   }
   return kept;
+}
+
+// Whether a picture needs its photographer on record in image-credits.json: every photo does,
+// unless it is marked "credit": false. The site's own drawings (SVG files) never do.
+export function needsCredit(settings) {
+  return !settings.source.endsWith('.svg') && settings.credit !== false;
 }
 
 // The part of the source to use: its middle, or the part around "focus", cut to the wanted shape.
@@ -254,14 +263,27 @@ export async function convertImages(outDir) {
       throw new Error(
         `images.json: "${name}" needs exactly one of these: "alt" (a short description for screen readers) or "decorative": true (for a picture that is only decoration).`,
       );
+    // Every photo must have its photographer on record, unless it is marked "credit": false.
+    if (needsCredit(settings) && !credits.photos?.[settings.source])
+      throw new Error(
+        `image-credits.json has no entry for ${settings.source} (used by "${name}").`,
+      );
+    // A photo ("kind": "photo") stays a photo: shades of grey in JPEG XL, AVIF and JPEG at a few
+    // widths (scripts/lib/photo.mjs), shown with a <picture> tag.
+    if (settings.kind === 'photo') {
+      const made = await makePhoto({
+        name,
+        file: path.join(sourceDir, settings.source),
+        settings,
+        outDir,
+        cacheDir: photoCache,
+      });
+      pictures[name] = { kind: 'photo', ...made, alt: decorative ? '' : settings.alt, decorative };
+      continue;
+    }
     if (!(settings.across > 0))
       throw new Error(
         `images.json: "${name}" needs "across": how many blocks wide the picture is.`,
-      );
-    // Every photo must have its photographer on record. Drawings are the site's own.
-    if (!settings.source.endsWith('.svg') && !credits.photos?.[settings.source])
-      throw new Error(
-        `image-credits.json has no entry for ${settings.source} (used by "${name}").`,
       );
 
     const sourceFile = path.join(sourceDir, settings.source);
@@ -282,6 +304,7 @@ export async function convertImages(outDir) {
     }
     fs.writeFileSync(path.join(outDir, `${name}.png`), made.picture.buffer);
     pictures[name] = {
+      kind: 'pixels',
       src: `/assets/img/${name}.png?v=${fingerprint(made.picture.buffer)}`,
       width: made.picture.width,
       height: made.picture.height,
@@ -308,6 +331,13 @@ export async function convertImages(outDir) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const pictures = await convertImages(path.join(root, '_site', 'assets', 'img'));
   for (const [name, picture] of Object.entries(pictures)) {
+    if (picture.kind === 'photo') {
+      for (const format of picture.formats)
+        console.log(
+          `${name}: ${format.extension} at quality ${format.quality} (score ${format.score.toFixed(4)}), ${format.files.map((file) => `${file.width}px ${file.bytes} bytes`).join(', ')}`,
+        );
+      continue;
+    }
     console.log(
       `${name}: ${picture.width} x ${picture.height} blocks, ${picture.bytes} bytes, ${Math.round(picture.share * 100)}% drawn${picture.texture ? `, texture ${picture.texture.bytes} bytes` : ''}`,
     );

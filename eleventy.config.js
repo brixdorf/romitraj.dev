@@ -204,7 +204,8 @@ export default function (eleventyConfig) {
   // keeps its place before the file arrives, and its alt text from images.json (empty for a
   // picture marked as decoration there, so that screen readers pass over it).
   // Options: "eager: true" for a picture at the top of a page (fetched at once instead of when it
-  // comes near the window), and "class" for an extra class name.
+  // comes near the window), "class" for an extra class name, and for a photo "sizes": how wide
+  // it is shown, as in an <img> tag's sizes attribute.
   let pictures = {};
   eleventyConfig.on('eleventy.before', async ({ directories }) => {
     pictures = await convertImages(path.join(directories.output, 'assets', 'img'));
@@ -213,8 +214,25 @@ export default function (eleventyConfig) {
     const picture = pictures[name];
     if (!picture) throw new Error(`There is no picture called "${name}" in src/_data/images.json.`);
     const attribute = (text) => escapeHtml(text).replace(/"/g, '&quot;');
+    const loading = options.eager ? 'fetchpriority="high"' : 'loading="lazy"';
     const tag = (file, alt, kind) =>
-      `<img class="picture picture--${kind}${options.class ? ` ${options.class}` : ''}" src="${file.src}" width="${file.width}" height="${file.height}" alt="${attribute(alt)}" ${options.eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+      `<img class="picture picture--${kind}${options.class ? ` ${options.class}` : ''}" src="${file.src}" width="${file.width}" height="${file.height}" alt="${attribute(alt)}" data-picture="${name}" ${loading} decoding="async">`;
+    // A photo: a <picture> that offers the newer formats first, smallest first, and JPEG to any
+    // browser that knows neither. "sizes" tells the browser how wide the photo is shown, so it
+    // fetches the smallest file that is still sharp on that screen.
+    if (picture.kind === 'photo') {
+      const sizes = options.sizes || '100vw';
+      return (
+        `<picture class="picture-set">` +
+        picture.sources
+          .map(
+            (source) => `<source type="${source.type}" srcset="${source.srcset}" sizes="${sizes}">`,
+          )
+          .join('') +
+        `<img class="picture picture--photo${options.class ? ` ${options.class}` : ''}" src="${picture.fallback.src}" srcset="${picture.fallback.srcset}" sizes="${sizes}" width="${picture.width}" height="${picture.height}" alt="${attribute(picture.alt)}" data-picture="${name}" ${loading} decoding="async">` +
+        `</picture>`
+      );
+    }
     // A picture with a painted backdrop is two files: the paint underneath, the pixels on top.
     return (
       (picture.texture ? tag(picture.texture, '', 'paint') : '') +

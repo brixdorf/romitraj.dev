@@ -75,9 +75,15 @@ a {
   overflow: hidden;
 }
 
-.frame > .picture {
+.frame > .picture,
+.frame > .picture-set {
   position: absolute;
   inset: 0;
+}
+
+/* A photo's <picture> wrapper: a plain box, so the photo inside fills it like any picture. */
+.picture-set {
+  display: block;
 }
 
 /* A dark frame, for a picture drawn in the paper colour. */
