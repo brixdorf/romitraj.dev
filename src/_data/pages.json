@@ -62,12 +62,12 @@
   },
 
   "resume": {
-    "note": "The Resume page's card. The PDF itself is src/assets/files/resume.pdf: replace that file to update it. Set in the serif font: use the curly apostrophe (’) and no slashes.",
-    "title": "One page",
+    "note": "The Resume page's card: no title, a few words, then a link that opens the PDF in the browser and a button that downloads it. The PDF itself is src/assets/files/resume.pdf: replace that file to update it. Set in the serif font: use the curly apostrophe (’) and no slashes.",
     "paragraphs": [
-      "My projects, my studies and the skills I work with, all on one page.",
+      "The best of all me in one page.",
       "Questions about any of it? Email me at <a href=\"mailto:{email}\">{email}</a>."
     ],
-    "link": "Open the PDF"
+    "link": "Open the PDF",
+    "download": "Download PDF"
   }
 }

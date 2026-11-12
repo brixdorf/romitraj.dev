@@ -4,15 +4,17 @@ picture: fluke
 layout: layouts/page.njk
 description: The resume of Romit Raj Sahu.
 ---
-{#- One card with a few words and the link to the resume itself (src/assets/files/resume.pdf, published at /resume.pdf). Its words are in _data/pages.json ("resume"). The link loads the PDF the ordinary way (data-taxi-ignore), not as a page change. -#}
+{#- One card, without a number or a title: a few words, a link that opens the resume in the browser (src/assets/files/resume.pdf, published at /resume.pdf) and a button that downloads it. Its words are in _data/pages.json ("resume"). Both load the PDF the ordinary way (data-taxi-ignore), not as a page change. -#}
 <div class="page-grid" data-part="cards">
   <section class="panel page-grid__main" data-part="card">
-    <h2 class="panel__title">{{ pages.resume.title }}</h2>
     <div class="panel__text">
       {%- for paragraph in pages.resume.paragraphs %}
       <p>{{ paragraph | fill | safe }}</p>
       {%- endfor %}
     </div>
-    <a class="link panel__action" href="{{ downloads.resume }}" data-taxi-ignore>{{ pages.resume.link }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+    <p class="panel__actions">
+      <a class="link panel__action" href="{{ downloads.resume }}" data-taxi-ignore>{{ pages.resume.link }}<span class="link__arrow" aria-hidden="true">&nearr;</span></a>
+      <a class="button" href="{{ downloads.resume }}" download data-taxi-ignore>{{ pages.resume.download }}</a>
+    </p>
   </section>
 </div>

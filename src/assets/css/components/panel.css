@@ -99,6 +99,19 @@
   text-decoration: underline;
 }
 
+/* Two ways to finish a card side by side: a small bold link and a button (the Resume page). */
+.panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin: 16px 0 0;
+}
+
+.panel__actions .panel__action {
+  margin-block: 0;
+}
+
 /* The one small bold link that ends a card. */
 .panel__action {
   justify-self: start;
