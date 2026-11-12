@@ -190,6 +190,17 @@ export function removeSpecks(dark, width, height, reach = 3, most = 2) {
   return kept;
 }
 
+// How much room to add around a photo shown at a zoom below 1: enough on each side that the photo
+// takes up "zoom" of the result's width and height. None at a zoom of 1 or more.
+export function paddingFor(width, height, zoom) {
+  if (!(zoom < 1)) return null;
+  const across = Math.round(width / zoom) - width;
+  const down = Math.round(height / zoom) - height;
+  const left = Math.floor(across / 2);
+  const top = Math.floor(down / 2);
+  return { left, right: across - left, top, bottom: down - top };
+}
+
 // Whether a picture needs its photographer on record in image-credits.json: every photo does,
 // unless it is marked "credit": false. The site's own drawings (SVG files) never do.
 export function needsCredit(settings) {
@@ -238,14 +249,28 @@ async function convertOne(name, settings, colours) {
 
   // Drawings (SVG) are drawn large first, so that shrinking them averages their edges.
   const isDrawing = settings.source.endsWith('.svg');
-  const opened = () => sharp(file, isDrawing ? { density: 300 } : {}).rotate();
-  const meta = await opened().metadata();
+  let opened = () => sharp(file, isDrawing ? { density: 300 } : {}).rotate();
+  let meta = await opened().metadata();
+  let crop = settings.crop;
+  // A zoom below 1 shows the whole photo smaller, with plain white room around it (which becomes
+  // paper), for a subject that would otherwise be cut by a wide frame.
+  const padding = paddingFor(meta.width, meta.height, crop?.zoom);
+  if (padding) {
+    const padded = await opened()
+      .flatten({ background: '#ffffff' })
+      .extend({ ...padding, background: '#ffffff' })
+      .png()
+      .toBuffer();
+    opened = () => sharp(padded);
+    meta = await opened().metadata();
+    crop = { ...crop, zoom: 1 };
+  }
   const shape = settings.shape ? shapeOf(settings.shape) : meta.width / meta.height;
   const across = settings.across;
   const down = Math.round(across / shape);
   let image = opened()
     .flatten({ background: '#ffffff' })
-    .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+    .extract(regionToUse(meta.width, meta.height, shape, crop))
     .resize(across, down, { fit: 'fill', kernel: 'lanczos3' })
     .greyscale();
   if (settings.stretch) image = image.normalise({ lower: 1, upper: 99 });
@@ -255,7 +280,7 @@ async function convertOne(name, settings, colours) {
   const clear = meta.hasAlpha
     ? Uint8Array.from(
         await opened()
-          .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+          .extract(regionToUse(meta.width, meta.height, shape, crop))
           .resize(across, down, { fit: 'fill', kernel: 'nearest' })
           .ensureAlpha()
           .extractChannel(3)
@@ -272,7 +297,7 @@ async function convertOne(name, settings, colours) {
     ? plainBackdrop(
         await opened()
           .flatten({ background: '#ffffff' })
-          .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+          .extract(regionToUse(meta.width, meta.height, shape, crop))
           .resize(across, down, { fit: 'fill', kernel: 'lanczos3' })
           .greyscale()
           .blur(0.8)

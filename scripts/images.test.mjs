@@ -1,8 +1,9 @@
 // Tests for the picture pipeline (scripts/images.mjs): speck removal (the "despeckle" setting),
 // which pictures need a photographer on record, which blocks are backdrop behind a subject, and
-// which part of a photo is its plain backdrop, to be cut away (the "cutout" setting).
+// which part of a photo is its plain backdrop, to be cut away (the "cutout" setting), and how
+// much room goes around a photo shown smaller than its frame (a "zoom" below 1).
 import { describe, expect, it } from 'vite-plus/test';
-import { backdropOf, needsCredit, plainBackdrop, removeSpecks } from './images.mjs';
+import { backdropOf, needsCredit, paddingFor, plainBackdrop, removeSpecks } from './images.mjs';
 
 // A small picture from rows of text: "#" is ink, "." is paper.
 const picture = (rows) => ({
@@ -175,5 +176,21 @@ describe('plainBackdrop', () => {
       'b..b',
       'bbbb',
     ]);
+  });
+});
+
+describe('paddingFor', () => {
+  it('adds nothing at a zoom of 1 or more', () => {
+    expect(paddingFor(1600, 1000, 1)).toBeNull();
+    expect(paddingFor(1600, 1000, 1.4)).toBeNull();
+    expect(paddingFor(1600, 1000)).toBeNull();
+  });
+
+  it('adds room on every side, so a zoom of one half shows the photo at half its size', () => {
+    expect(paddingFor(1600, 1000, 0.5)).toEqual({ left: 800, right: 800, top: 500, bottom: 500 });
+  });
+
+  it('splits an odd amount of room with the extra pixel on the right and at the bottom', () => {
+    expect(paddingFor(101, 51, 0.5)).toEqual({ left: 50, right: 51, top: 25, bottom: 26 });
   });
 });
