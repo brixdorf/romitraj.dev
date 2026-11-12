@@ -274,13 +274,15 @@ async function convertOne(name, settings, colours) {
   let opened = () => sharp(file, isDrawing ? { density: 300 } : {}).rotate();
   let meta = await opened().metadata();
   let crop = settings.crop;
-  // A zoom below 1 shows the whole photo smaller, with plain white room around it (which becomes
-  // paper), for a subject that would otherwise be cut by a wide frame.
+  // A zoom below 1 shows the whole photo smaller, with room around it in the grey of the photo's
+  // own ground (so it blends in and turns to paper with it), for a subject that would otherwise be
+  // cut by a wide frame.
   const padding = paddingFor(meta.width, meta.height, crop?.zoom);
   if (padding) {
+    const grey = Math.round((await usualEdgeGrey(opened())) * 255);
     const padded = await opened()
       .flatten({ background: '#ffffff' })
-      .extend({ ...padding, background: '#ffffff' })
+      .extend({ ...padding, background: { r: grey, g: grey, b: grey } })
       .png()
       .toBuffer();
     opened = () => sharp(padded);
