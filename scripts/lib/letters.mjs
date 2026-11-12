@@ -49,10 +49,12 @@ export async function lettersStayWhole(page, pagePath) {
   // ticker is not enough: it builds itself again, and starts moving again, a moment after the
   // window changes size, and whenever the page asks for the weather or the track again. When
   // that fell between the two photographs, its movement under "OCEAN." was counted as ink cut
-  // from the letters (seen once, in one browser, at the widest window).
+  // from the letters (seen once, in one browser, at the widest window). The hero's 3D compass is
+  // taken out the same way: since 2026-11-12 it turns on its own all the time, beside the
+  // headline's letters (its canvas keeps its place, so nothing moves).
   await page.addStyleTag({
     content:
-      '*, *::before, *::after { animation-play-state: paused !important; transition: none !important; } [data-ticker] { visibility: hidden !important; }',
+      '*, *::before, *::after { animation-play-state: paused !important; transition: none !important; } [data-ticker], .hero__compass { visibility: hidden !important; }',
   });
   const problems = [];
   for (const width of windowWidths) {

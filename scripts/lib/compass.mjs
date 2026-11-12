@@ -99,6 +99,20 @@ function plainAround({ data, width, height }) {
   return true;
 }
 
+// Stops the page's clock a moment from now. The page's time runs on while the order travels, and
+// on a busy computer "a moment from now" can already be past, which Playwright refuses: then it
+// tries again from the new time.
+async function stopClock(page) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 50 * attempt);
+      return;
+    } catch (error) {
+      if (attempt >= 5 || !/past/.test(error.message)) throw error;
+    }
+  }
+}
+
 // Waits for the compass to take over, up to a few seconds. Returns whether it did.
 const goesLive = (page, timeout = 5000) =>
   page
@@ -198,7 +212,7 @@ export async function compassInBrowser(browser, address) {
     // picture with the same hard edges, but may round a block's edge to a different screen pixel.
     // The page's clock is stopped first: the compass holds still for a moment after it takes over
     // (compass.idle.delay in motion.js), and then turns.
-    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 20);
+    await stopClock(page);
     // The headline's entrance runs on the browser's own animation clock, which Playwright's
     // clock does not stop, and its letters pass over the top of the frame: it is left to end.
     await page

@@ -53,14 +53,15 @@ export function pictureFiles(siteDir) {
 }
 
 // Where everything on the page is. Tickers are left out: they move all the time by design. So is
-// the hero's 3D compass, a canvas laid over its still picture once the page has loaded: its own
-// test (lib/compass.mjs) confirms that it sits exactly over the picture and moves nothing.
+// the hero's 3D compass, a canvas laid over its still picture once the page has loaded, with the
+// round handle it is dragged by: its own test (lib/compass.mjs) confirms that it sits exactly
+// over the picture and moves nothing.
 const places = () =>
   [...document.querySelectorAll('body *')]
     .filter(
       (element) =>
         !element.closest('[data-ticker]') &&
-        !element.matches('img.picture, canvas.hero__compass') &&
+        !element.matches('img.picture, canvas.hero__compass, .hero__grip') &&
         element.getClientRects().length,
     )
     .map((element) => {
