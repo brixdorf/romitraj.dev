@@ -7,7 +7,7 @@
 
   position: relative;
   /* No padding on top. On phones and tablets the home page's first line starts at the footer's
-     very top, under the sea band; "You are here" brings its own room on the other pages. */
+     very top, under the night sky band; "You are here" brings its own room on the other pages. */
   padding: 0 var(--gutter) 0;
   background: var(--color-ink);
   color: var(--color-paper);

@@ -1,29 +1,53 @@
 {
-  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. The photos from Unsplash are free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the whale’s tail'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. A photo marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry.",
+  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. The photos from Unsplash are free to use under the Unsplash License (https://unsplash.com/license), which allows changed versions and asks for no credit; they are credited anyway. 'url' is the photo's own page, 'profile' the photographer's page on Unsplash (the Credits page links their name to it), and 'subject' is how the Credits page names the photo ('the hourglass'). The build stops if a photo is used without an entry here, or if an entry lacks one of these. A photo marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry.",
   "photos": {
+    "armillary.jpg": {
+      "photographer": "The New York Public Library",
+      "profile": "https://unsplash.com/@nypl",
+      "subject": "the engraving of the armillary sphere and the heavens",
+      "url": "https://unsplash.com/photos/celestial-spheres-and-armillary-sphere-diagrams-7LzE9wWU-pI"
+    },
+    "gears.jpg": {
+      "photographer": "Tim Mossholder",
+      "profile": "https://unsplash.com/@timmossholder",
+      "subject": "the gears",
+      "url": "https://unsplash.com/photos/cogs-and-gears-GmvH5v9l3K4"
+    },
+    "punch-cards.jpg": {
+      "photographer": "Bernd Dittrich",
+      "profile": "https://unsplash.com/@hdbernd",
+      "subject": "the punched cards",
+      "url": "https://unsplash.com/photos/rows-of-vintage-punched-cards-with-data-OOeeu8t-Xl4"
+    },
+    "hourglass.jpg": {
+      "photographer": "Quilia",
+      "profile": "https://unsplash.com/@heyquilia",
+      "subject": "the hourglass",
+      "url": "https://unsplash.com/photos/clear-hour-glass-with-brown-frame-KYxXMTpTzek"
+    },
+    "telescope.jpg": {
+      "photographer": "Uriel Soberanes",
+      "profile": "https://unsplash.com/@soberanes",
+      "subject": "the surveyor’s telescope",
+      "url": "https://unsplash.com/photos/black-telescope-gCeH4z9m7bg"
+    },
+    "watch-movement.jpg": {
+      "photographer": "Олександр К",
+      "profile": "https://unsplash.com/@gidlark",
+      "subject": "the watch movement",
+      "url": "https://unsplash.com/photos/a-close-up-view-of-a-watch-movement-HmIwomthlWw"
+    },
     "whale-tail.jpg": {
       "photographer": "Zac Bowling",
       "profile": "https://unsplash.com/@zbowling",
       "subject": "the whale’s tail",
       "url": "https://unsplash.com/photos/a-whale-tail-flups-out-of-the-water-1QF3rWzi7CM"
     },
-    "server-rack.jpg": {
-      "photographer": "Domaintechnik",
-      "profile": "https://unsplash.com/@fslfsl",
-      "subject": "the server rack",
-      "url": "https://unsplash.com/photos/server-rack-with-blinking-green-lights-VHmBX7FnXw0"
-    },
-    "padlock.jpg": {
-      "photographer": "Hush Naidoo Jade Photography",
-      "profile": "https://unsplash.com/@hush52",
-      "subject": "the padlock",
-      "url": "https://unsplash.com/photos/brass-padlock-with-key-on-white-background-gxAUvs7fjvc"
-    },
-    "harbour-cranes.jpg": {
-      "photographer": "Werner Hilversum",
-      "profile": "https://unsplash.com/@werner80",
-      "subject": "the harbour cranes",
-      "url": "https://unsplash.com/photos/a-group-of-cranes-sitting-on-top-of-a-body-of-water-vFLJEhS_y5w"
+    "globe.jpg": {
+      "photographer": "charlesdeluvio",
+      "profile": "https://unsplash.com/@charlesdeluvio",
+      "subject": "the globe",
+      "url": "https://unsplash.com/photos/a-black-globe-sitting-on-top-of-a-white-table-RDjZh9dqlP4"
     }
   }
 }

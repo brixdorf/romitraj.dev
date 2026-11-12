@@ -1,5 +1,5 @@
 /* The page for an address that leads nowhere ("Lost in oblivion"): one card with a few words and the
-   ways back, and a framed close-up of the diver beside it. Everything else on the page is the
+   ways back, and a framed telescope beside it. Everything else on the page is the
    same header, card and frame every inner page uses. */
 
 /* Where the card's number would say 01, this one says what kind of page it is. */
@@ -16,7 +16,7 @@
   margin-block-end: 0;
 }
 
-.lost__searcher {
+.lost__picture {
   margin: 0;
 }
 
@@ -35,24 +35,24 @@
   color: var(--color-muted-on-paper);
 }
 
-/* Tablet: the card on the left, the diver on the right. */
+/* Tablet: the card on the left, the telescope on the right. */
 @media (width >= 600px) {
   .lost__card {
     grid-column: 1;
   }
 
-  .lost__searcher {
+  .lost__picture {
     grid-column: 2;
   }
 }
 
-/* Laptop: the card where every single card sits, the diver in the three columns after it. */
+/* Laptop: the card where every single card sits, the telescope in the three columns after it. */
 @media (width >= 1000px) {
   .lost__card {
     grid-column: 3 / span 6;
   }
 
-  .lost__searcher {
+  .lost__picture {
     grid-column: 9 / span 3;
   }
 }

@@ -1,8 +1,9 @@
-/* The band of sea at the end of the home page: stippled swells that sink into the footer's dark.
+/* The band of night sky at the end of the home page: a stippled sky that darkens into the footer's ink,
+   with the stars coming out and the arcs of a star chart across it.
    Its height is fixed, so nothing moves when the picture arrives. Up to 1920px wide the picture
    keeps its natural size (three pixels to a block) and the sides are simply cut off; on wider
    windows it grows with the window. */
-.shore {
+.night-sky {
   position: relative;
   block-size: max(480px, 25vw);
   overflow: hidden;
@@ -14,7 +15,7 @@
   );
 }
 
-.shore .picture {
+.night-sky .picture {
   position: absolute;
   inset-block-end: 0;
   inset-inline-start: 50%;
