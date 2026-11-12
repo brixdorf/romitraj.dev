@@ -5,18 +5,45 @@ import { buildCompass } from './compass-model.js';
 const parts = buildCompass();
 
 describe('buildCompass', () => {
-  it('gives the case and the needle as separate lists of triangles, so the needle can turn alone', () => {
-    for (const part of [parts.body, parts.needle]) {
+  const all = () => [parts.body, parts.needle, parts.glass];
+
+  it('gives the case, the needle and the glass as separate lists of triangles, so the needle can turn alone', () => {
+    for (const part of all()) {
       expect(part.count).toBeGreaterThan(0);
       expect(part.count % 3).toBe(0);
       expect(part.positions).toHaveLength(part.count * 3);
       expect(part.normals).toHaveLength(part.count * 3);
       expect(part.tones).toHaveLength(part.count);
+      expect(part.kinds).toHaveLength(part.count);
+      expect(part.grooves).toHaveLength(part.count);
     }
   });
 
+  it('says what every corner is made of: painted (0) or polished metal (1)', () => {
+    for (const part of all())
+      expect(part.kinds.every((kind) => kind === 0 || kind === 1)).toBe(true);
+    expect(parts.body.kinds.some((kind) => kind === 0)).toBe(true);
+    expect(parts.body.kinds.some((kind) => kind === 1)).toBe(true);
+  });
+
+  it('knurls the bezel and the crown: some metal carries fine grooves around it', () => {
+    const grooved = [...parts.body.grooves].filter((count) => count > 0);
+    expect(grooved.length).toBeGreaterThan(0);
+    expect(Math.min(...grooved)).toBeGreaterThanOrEqual(60);
+  });
+
+  it('covers the face with a glass a little above everything on it, needle included', () => {
+    let lowest = Infinity;
+    for (let index = 0; index < parts.glass.count; index++)
+      lowest = Math.min(lowest, parts.glass.positions[index * 3 + 2]);
+    let highest = -Infinity;
+    for (let index = 0; index < parts.needle.count; index++)
+      highest = Math.max(highest, parts.needle.positions[index * 3 + 2]);
+    expect(lowest).toBeGreaterThan(highest);
+  });
+
   it('has a normal of length one at every corner', () => {
-    for (const part of [parts.body, parts.needle]) {
+    for (const part of all()) {
       for (let index = 0; index < part.count; index++) {
         const [x, y, z] = part.normals.slice(index * 3, index * 3 + 3);
         expect(Math.hypot(x, y, z)).toBeCloseTo(1, 4);
@@ -25,8 +52,7 @@ describe('buildCompass', () => {
   });
 
   it('keeps every tone between ink (0) and paper (1)', () => {
-    for (const part of [parts.body, parts.needle])
-      expect(part.tones.every((tone) => tone >= 0 && tone <= 1)).toBe(true);
+    for (const part of all()) expect(part.tones.every((tone) => tone >= 0 && tone <= 1)).toBe(true);
   });
 
   it('is a case of radius one, its ring on top, its face toward the viewer', () => {
