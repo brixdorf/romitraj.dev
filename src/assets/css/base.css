@@ -76,7 +76,8 @@ a {
 }
 
 .frame > .picture,
-.frame > .picture-set {
+.frame > .picture-set,
+.frame > .picture-set--pixels > .picture {
   position: absolute;
   inset: 0;
 }
@@ -84,6 +85,12 @@ a {
 /* A photo's <picture> wrapper: a plain box, so the photo inside fills it like any picture. */
 .picture-set {
   display: block;
+}
+
+/* A pixel picture's <picture> wrapper, which only offers the newer formats: it takes no part in
+   the layout, so the picture inside is placed exactly as if it stood alone. */
+.picture-set--pixels {
+  display: contents;
 }
 
 /* A dark frame, for a picture drawn in the paper colour. */

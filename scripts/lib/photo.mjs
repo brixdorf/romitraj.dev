@@ -89,7 +89,7 @@ export async function lowestQuality(score, target) {
 
 // The JPEG XL encoder and decoder are WebAssembly files inside their package, loaded once.
 let jxlReady;
-function loadJxl() {
+export function loadJxl() {
   jxlReady ||= (async () => {
     const codec = path.join(
       path.dirname(fileURLToPath(import.meta.resolve('@jsquash/jxl/encode.js'))),

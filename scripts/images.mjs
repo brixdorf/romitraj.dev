@@ -12,7 +12,9 @@
 //    becomes solid ink, everything lighter than "white" solid paper.
 // 3. What lies between is "dithered": each pixel is compared with a small repeating pattern of
 //    thresholds, so a mid grey comes out as a checkerboard of ink and paper.
-// 4. It is saved as a PNG with a palette of two or three colours, which keeps it tiny and lossless.
+// 4. It is saved, losslessly, as a PNG with a palette of two or three colours, as JPEG XL and as
+//    AVIF (scripts/lib/formats.mjs). The page offers the newer formats that came out smaller than
+//    the PNG, smallest first, and the PNG to every other browser.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -20,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { paintTexture } from './lib/paint.mjs';
 import { makePhoto } from './lib/photo.mjs';
+import { losslessFormats, offerOrder } from './lib/formats.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceDir = path.join(root, 'src', 'assets', 'img', 'source');
@@ -222,10 +225,8 @@ async function convertOne(name, settings, colours) {
       if (colour === (tones === 'paper' ? colours.paper : colours.ink)) used++;
     }
   }
-  const png = await sharp(pixels, { raw: { width: across, height: down, channels: 4 } })
-    .png({ palette: true, colours: 4, compressionLevel: 9, effort: 10, dither: 0 })
-    .toBuffer();
-  return { buffer: png, width: across, height: down, share: used / dark.length };
+  const files = await losslessFormats(pixels, across, down);
+  return { files, width: across, height: down, share: used / dark.length };
 }
 
 // The texture behind a picture whose ground is "texture": painted, then saved as a small WebP.
@@ -302,16 +303,31 @@ export async function convertImages(outDir) {
       made = { key, picture, texture };
       remembered.set(name, made);
     }
-    fs.writeFileSync(path.join(outDir, `${name}.png`), made.picture.buffer);
+    // Every format is written, so each can be compared; the page names only the ones it offers.
+    const address = (file) => {
+      fs.writeFileSync(path.join(outDir, `${name}.${file.extension}`), file.buffer);
+      return `/assets/img/${name}.${file.extension}?v=${fingerprint(file.buffer)}`;
+    };
+    const { sources, fallback } = offerOrder(made.picture.files);
+    for (const file of made.picture.files.filter(
+      (file) => file !== fallback && !sources.includes(file),
+    ))
+      address(file);
     pictures[name] = {
       kind: 'pixels',
-      src: `/assets/img/${name}.png?v=${fingerprint(made.picture.buffer)}`,
+      src: address(fallback),
+      sources: sources.map((file) => ({ type: file.type, src: address(file), bytes: file.bytes })),
+      formats: made.picture.files.map(({ extension, bytes, exact }) => ({
+        extension,
+        bytes,
+        exact,
+      })),
       width: made.picture.width,
       height: made.picture.height,
       // Decoration gets an empty description, which tells screen readers to pass over it.
       alt: decorative ? '' : settings.alt,
       decorative,
-      bytes: made.picture.buffer.length,
+      bytes: fallback.bytes,
       share: made.picture.share,
     };
     if (made.texture) {
@@ -339,7 +355,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       continue;
     }
     console.log(
-      `${name}: ${picture.width} x ${picture.height} blocks, ${picture.bytes} bytes, ${Math.round(picture.share * 100)}% drawn${picture.texture ? `, texture ${picture.texture.bytes} bytes` : ''}`,
+      `${name}: ${picture.width} x ${picture.height} blocks, ${Math.round(picture.share * 100)}% drawn, ${picture.formats.map((format) => `${format.extension} ${format.bytes}${format.exact ? '' : ' (not exact)'}`).join(', ')}; offered: ${[...picture.sources.map((source) => source.type.split('/')[1]), 'png'].join(', ')}${picture.texture ? `; texture ${picture.texture.bytes} bytes` : ''}`,
     );
   }
 }

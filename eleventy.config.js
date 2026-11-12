@@ -215,8 +215,8 @@ export default function (eleventyConfig) {
     if (!picture) throw new Error(`There is no picture called "${name}" in src/_data/images.json.`);
     const attribute = (text) => escapeHtml(text).replace(/"/g, '&quot;');
     const loading = options.eager ? 'fetchpriority="high"' : 'loading="lazy"';
-    const tag = (file, alt, kind) =>
-      `<img class="picture picture--${kind}${options.class ? ` ${options.class}` : ''}" src="${file.src}" width="${file.width}" height="${file.height}" alt="${attribute(alt)}" data-picture="${name}" ${loading} decoding="async">`;
+    const tag = (file, alt, kind, mark = name) =>
+      `<img class="picture picture--${kind}${options.class ? ` ${options.class}` : ''}" src="${file.src}" width="${file.width}" height="${file.height}" alt="${attribute(alt)}" data-picture="${mark}" ${loading} decoding="async">`;
     // A photo: a <picture> that offers the newer formats first, smallest first, and JPEG to any
     // browser that knows neither. "sizes" tells the browser how wide the photo is shown, so it
     // fetches the smallest file that is still sharp on that screen.
@@ -233,11 +233,19 @@ export default function (eleventyConfig) {
         `</picture>`
       );
     }
+    // A pixel picture: the PNG, with the newer lossless formats that came out smaller offered
+    // first (smallest first) in a <picture>, which the styles leave out of the layout
+    // (.picture-set--pixels), so the picture sits exactly where a lone <img> would.
+    const pixels = picture.sources.length
+      ? `<picture class="picture-set picture-set--pixels">` +
+        picture.sources
+          .map((source) => `<source type="${source.type}" srcset="${source.src}">`)
+          .join('') +
+        tag(picture, picture.alt, 'pixels') +
+        `</picture>`
+      : tag(picture, picture.alt, 'pixels');
     // A picture with a painted backdrop is two files: the paint underneath, the pixels on top.
-    return (
-      (picture.texture ? tag(picture.texture, '', 'paint') : '') +
-      tag(picture, picture.alt, 'pixels')
-    );
+    return (picture.texture ? tag(picture.texture, '', 'paint', `${name}-texture`) : '') + pixels;
   });
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');
