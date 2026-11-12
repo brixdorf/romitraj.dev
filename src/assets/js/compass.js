@@ -1,7 +1,7 @@
 // The hero's 3D compass. On a page with WebGL, scripts and no wish for less motion, a small canvas
 // takes the place of the still pixel picture in the hero's frame, drawn at the same size in
 // blocks (one canvas pixel is one block, enlarged without smoothing) and in the same two tones,
-// dithered the same way. It leans toward the pointer, its case turns as the page scrolls, and its
+// dithered with the pixel pictures' four by four pattern. It leans toward the pointer, its case turns as the page scrolls, and its
 // needle swings back to north. At rest it is the still picture (which `pnpm run share` makes from
 // this same code). Anywhere it cannot run, the still picture simply stays.
 import { buildCompass } from './compass-model.js';
@@ -11,45 +11,162 @@ import { compass as settings } from './motion.js';
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 // ---- Drawing ----
+//
+// Two passes. The first draws the compass three times finer than the frame's blocks into a
+// texture, as smooth shades of grey: polished metal reflects a soft studio (a large soft light
+// above on the left, a narrow one on the right, a dim room), painted parts take the light
+// softly, the bezel and crown are knurled, the needle casts a soft shadow on the dial, and the
+// glass adds only its reflections. The second pass averages each block's nine samples and turns
+// the result into ink or paper with the pixel pictures' four by four pattern ("fine" in
+// scripts/images.mjs), counted from the top left block. Where less than half a block is covered,
+// it stays clear, so the painted backdrop shows around the compass.
 
-const vertexShader = `
+const fine = 3;
+
+const sceneVertex = `
 attribute vec3 position;
 attribute vec3 normal;
 attribute float tone;
+attribute float kind;
+attribute float grooves;
 uniform mat4 turn;
 uniform mat4 view;
-varying vec3 seen;
+varying vec3 place;
+varying vec3 facing;
+varying vec3 local;
+varying vec3 around;
 varying float shade;
+varying float metal;
+varying float knurl;
 void main() {
-  seen = (turn * vec4(normal, 0.0)).xyz;
+  vec4 world = turn * vec4(position, 1.0);
+  place = world.xyz;
+  facing = (turn * vec4(normal, 0.0)).xyz;
+  local = position;
+  // The direction around the knurled part's axis, for its grooves.
+  vec3 tangent = grooves < 0.0 ? vec3(position.z + 0.06, 0.0, -position.x) : vec3(-position.y, position.x, 0.0);
+  around = (turn * vec4(tangent, 0.0)).xyz;
   shade = tone;
-  gl_Position = view * turn * vec4(position, 1.0);
+  metal = kind;
+  knurl = grooves;
+  gl_Position = view * world;
 }`;
 
-// Light from the upper left, in front. The tone is lit, then made ink or paper with the same two
-// by two pattern of thresholds as the pixel pictures (scripts/images.mjs, "checker"), counted
-// from the top left block.
-const fragmentShader = `
+const sceneFragment = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
-varying vec3 seen;
+#endif
+varying vec3 place;
+varying vec3 facing;
+varying vec3 local;
+varying vec3 around;
 varying float shade;
+varying float metal;
+varying float knurl;
+uniform vec3 eye;
+uniform vec2 needle;
+uniform float glass;
+
+const vec3 key = vec3(-0.5, 0.72, 0.48);
+const vec3 strip = vec3(0.86, 0.05, 0.5);
+
+// The room the metal reflects: a large soft light above on the left, a narrow one on the right,
+// a dim ceiling and a darker floor.
+float room(vec3 d) {
+  float soft = smoothstep(0.5, 0.93, dot(d, normalize(key)));
+  float narrow = smoothstep(0.9, 0.98, dot(d, normalize(strip)));
+  float ceiling = 0.2 + 0.35 * clamp(d.y * 0.6 + 0.4, 0.0, 1.0);
+  return ceiling + 1.1 * soft + 0.9 * narrow;
+}
+float highlights(vec3 d) {
+  float soft = smoothstep(0.7, 0.95, dot(d, normalize(key)));
+  float narrow = smoothstep(0.9, 0.98, dot(d, normalize(strip)));
+  return 1.2 * soft + 0.8 * narrow;
+}
+
+void main() {
+  vec3 n = normalize(facing);
+  vec3 v = normalize(eye - place);
+  if (dot(n, v) < 0.0) n = -n;
+  if (knurl != 0.0) {
+    float angle = knurl < 0.0 ? atan(local.x, local.z + 0.06) : atan(local.y, local.x);
+    n = normalize(n + normalize(around) * 0.55 * sin(angle * abs(knurl)));
+  }
+  vec3 r = reflect(-v, n);
+  float facingEye = clamp(dot(n, v), 0.0, 1.0);
+  float fresnel = pow(1.0 - facingEye, 5.0);
+
+  // The glass: it adds what it reflects of the lights, and toward its rim, where it reflects
+  // more of the dim room, it dulls what is under it a little.
+  if (glass > 0.5) {
+    float sheen = (0.1 + 0.9 * fresnel) * highlights(r);
+    gl_FragColor = vec4(sheen * 0.85, 0.0, 0.0, 1.0 - 0.45 * fresnel);
+    return;
+  }
+
+  float value;
+  if (metal > 0.5) {
+    float diffuse = max(dot(n, normalize(key)), 0.0);
+    value = shade * (0.82 * room(r) + 0.12 * diffuse) + 0.25 * fresnel * room(r);
+  } else {
+    float diffuse = max(dot(n, normalize(key)) * 0.6 + 0.4, 0.0);
+    float gloss = pow(max(dot(n, normalize(normalize(key) + v)), 0.0), 60.0);
+    value = shade * (0.18 + 0.86 * diffuse) + 0.18 * gloss;
+    // On the dial: the shadow under the bezel's rim, and the needle's soft shadow, cast a
+    // little down and to the right of it.
+    if (local.z < 0.07) {
+      float reach = length(local.xy);
+      value *= mix(1.0, 0.7, smoothstep(0.8, 0.87, reach));
+      vec2 p = local.xy - vec2(0.035, -0.045);
+      float along = dot(p, needle);
+      float across = abs(dot(p, vec2(needle.y, -needle.x)));
+      float width = along > 0.0 ? 0.085 * (1.0 - along / 0.74) : 0.075 * (1.0 + along / 0.56);
+      float shadow = (along > -0.56 && along < 0.74) ? smoothstep(width + 0.03, width - 0.01, across) : 0.0;
+      value *= 1.0 - 0.42 * shadow;
+    }
+  }
+  gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
+}`;
+
+const blockVertex = `
+attribute vec2 corner;
+void main() {
+  gl_Position = vec4(corner, 0.0, 1.0);
+}`;
+
+const blockFragment = `
+precision mediump float;
+uniform sampler2D scene;
+uniform vec2 size;
 uniform vec3 ink;
 uniform vec3 paper;
 uniform float black;
 uniform float white;
 uniform float rows;
+float two(vec2 at) {
+  return at.x < 0.5 ? (at.y < 0.5 ? 0.0 : 3.0) : (at.y < 0.5 ? 2.0 : 1.0);
+}
 void main() {
-  vec3 n = normalize(seen);
-  if (n.z < 0.0) n = -n;
-  vec3 light = normalize(vec3(-0.55, 0.7, 0.75));
-  float diffuse = max(dot(n, light), 0.0);
-  float glint = pow(max(dot(n, normalize(light + vec3(0.0, 0.0, 1.0))), 0.0), 18.0);
-  float value = shade * (0.38 + 0.72 * diffuse) + glint * (0.25 + 0.5 * shade);
-  float stretched = clamp((value - black) / (white - black), 0.0, 1.0);
-  vec2 at = mod(vec2(floor(gl_FragCoord.x), rows - 1.0 - floor(gl_FragCoord.y)), 2.0);
-  float step = at.x < 0.5 ? (at.y < 0.5 ? 0.0 : 3.0) : (at.y < 0.5 ? 2.0 : 1.0);
-  float threshold = (step + 0.5) / 4.0;
-  gl_FragColor = vec4(stretched <= threshold ? ink : paper, 1.0);
+  vec2 block = floor(gl_FragCoord.xy);
+  float lit = 0.0;
+  float covered = 0.0;
+  for (int i = 0; i < ${fine}; i++) {
+    for (int j = 0; j < ${fine}; j++) {
+      vec4 texel = texture2D(scene, (block * ${fine}.0 + vec2(float(i), float(j)) + 0.5) / size);
+      lit += texel.r * texel.a;
+      covered += texel.a;
+    }
+  }
+  if (covered < ${fine * fine}.0 * 0.5) {
+    gl_FragColor = vec4(0.0);
+    return;
+  }
+  float stretched = clamp((lit / covered - black) / (white - black), 0.0, 1.0);
+  vec2 at = vec2(block.x, rows - 1.0 - block.y);
+  float step = 4.0 * two(mod(at, 2.0)) + two(mod(floor(at / 2.0), 2.0));
+  gl_FragColor = vec4(stretched <= (step + 0.5) / 16.0 ? ink : paper, 1.0);
 }`;
 
 // 4 by 4 matrices, column by column, as WebGL takes them.
@@ -73,11 +190,12 @@ const turnZ = (angle) => {
   return new Float32Array([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 };
 
-// The camera: a narrow lens a little way off, looking at the compass from the front, so it keeps
-// a touch of depth. The compass is drawn a little low, to leave room for its ring.
+// The camera: a narrow lens some way off, looking at the compass from the front, so it keeps a
+// touch of depth. It looks a little above the case's middle, to leave room for the crown and bow.
+const lift = 0.22;
+const distance = 9;
 function camera(aspect) {
-  const distance = 8;
-  const half = 1.34 / distance;
+  const half = 1.42 / distance;
   const [near, far] = [distance - 3, distance + 3];
   const f = 1 / half;
   const lens = new Float32Array([
@@ -98,7 +216,7 @@ function camera(aspect) {
     (2 * far * near) / (near - far),
     0,
   ]);
-  const place = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -0.2, -distance, 1]);
+  const place = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -lift, -distance, 1]);
   return multiply(lens, place);
 }
 
@@ -108,6 +226,25 @@ const colour = (name) => {
   return [0, 2, 4].map((at) => parseInt(hex.slice(at, at + 2), 16) / 255);
 };
 
+// Compiles and links two shaders, or gives null.
+function programOf(gl, vertexText, fragmentText) {
+  const compile = (type, text) => {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, text);
+    gl.compileShader(shader);
+    return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
+  };
+  const shaders = [
+    compile(gl.VERTEX_SHADER, vertexText),
+    compile(gl.FRAGMENT_SHADER, fragmentText),
+  ];
+  if (shaders.includes(null)) return null;
+  const program = gl.createProgram();
+  for (const shader of shaders) gl.attachShader(program, shader);
+  gl.linkProgram(program);
+  return gl.getProgramParameter(program, gl.LINK_STATUS) ? program : null;
+}
+
 // Sets up WebGL on a canvas. Returns { draw(pose, needleAngle), forget() }, or null where WebGL
 // cannot be had or fails to set up.
 export function compassPainter(canvas, { keep = false } = {}) {
@@ -116,7 +253,7 @@ export function compassPainter(canvas, { keep = false } = {}) {
     gl = canvas.getContext('webgl', {
       alpha: true,
       antialias: false,
-      depth: true,
+      depth: false,
       premultipliedAlpha: true,
       preserveDrawingBuffer: keep,
     });
@@ -125,69 +262,129 @@ export function compassPainter(canvas, { keep = false } = {}) {
   }
   if (!gl) return null;
 
-  const compile = (type, text) => {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, text);
-    gl.compileShader(shader);
-    return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
-  };
-  const program = gl.createProgram();
-  const shaders = [
-    compile(gl.VERTEX_SHADER, vertexShader),
-    compile(gl.FRAGMENT_SHADER, fragmentShader),
-  ];
-  if (shaders.includes(null)) return null;
-  for (const shader of shaders) gl.attachShader(program, shader);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
-  gl.useProgram(program);
+  const scene = programOf(gl, sceneVertex, sceneFragment);
+  const blocks = programOf(gl, blockVertex, blockFragment);
+  if (!scene || !blocks) return null;
+
+  // The fine picture the first pass draws into: a texture with a depth buffer.
+  const [wide, tall] = [canvas.width * fine, canvas.height * fine];
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, wide, tall, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  for (const [name, value] of [
+    [gl.TEXTURE_MIN_FILTER, gl.NEAREST],
+    [gl.TEXTURE_MAG_FILTER, gl.NEAREST],
+    [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE],
+    [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE],
+  ])
+    gl.texParameteri(gl.TEXTURE_2D, name, value);
+  const depth = gl.createRenderbuffer();
+  gl.bindRenderbuffer(gl.RENDERBUFFER, depth);
+  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, wide, tall);
+  const target = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth);
+  if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) return null;
 
   // Each part's corners go to the graphics card once.
   const parts = buildCompass();
+  const fields = { positions: 3, normals: 3, tones: 1, kinds: 1, grooves: 1 };
+  const names = {
+    positions: 'position',
+    normals: 'normal',
+    tones: 'tone',
+    kinds: 'kind',
+    grooves: 'grooves',
+  };
   const buffers = {};
   for (const [name, shape] of Object.entries(parts)) {
     buffers[name] = { count: shape.count };
-    for (const key of ['positions', 'normals', 'tones']) {
+    for (const key of Object.keys(fields)) {
       const buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, shape[key], gl.STATIC_DRAW);
       buffers[name][key] = buffer;
     }
   }
-  const attributes = {
-    positions: [gl.getAttribLocation(program, 'position'), 3],
-    normals: [gl.getAttribLocation(program, 'normal'), 3],
-    tones: [gl.getAttribLocation(program, 'tone'), 1],
+  const sceneUniform = (name) => gl.getUniformLocation(scene, name);
+  const locations = Object.fromEntries(
+    Object.entries(names).map(([key, name]) => [key, gl.getAttribLocation(scene, name)]),
+  );
+  gl.useProgram(scene);
+  gl.uniformMatrix4fv(sceneUniform('view'), false, camera(canvas.width / canvas.height));
+  gl.uniform3fv(sceneUniform('eye'), [0, lift, distance]);
+  const turn = sceneUniform('turn');
+  const needleUniform = sceneUniform('needle');
+  const glassUniform = sceneUniform('glass');
+
+  // The second pass: one triangle that covers the canvas.
+  const cover = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cover);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const corner = gl.getAttribLocation(blocks, 'corner');
+  gl.useProgram(blocks);
+  const blockUniform = (name) => gl.getUniformLocation(blocks, name);
+  gl.uniform1i(blockUniform('scene'), 0);
+  gl.uniform2f(blockUniform('size'), wide, tall);
+  gl.uniform3fv(blockUniform('ink'), colour('--color-ink'));
+  gl.uniform3fv(blockUniform('paper'), colour('--color-paper'));
+  gl.uniform1f(blockUniform('black'), settings.black);
+  gl.uniform1f(blockUniform('white'), settings.white);
+  gl.uniform1f(blockUniform('rows'), canvas.height);
+
+  const drawPart = (name, matrix) => {
+    gl.uniformMatrix4fv(turn, false, matrix);
+    for (const [key, size] of Object.entries(fields)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers[name][key]);
+      gl.enableVertexAttribArray(locations[key]);
+      gl.vertexAttribPointer(locations[key], size, gl.FLOAT, false, 0, 0);
+    }
+    gl.drawArrays(gl.TRIANGLES, 0, buffers[name].count);
   };
-  const uniform = (name) => gl.getUniformLocation(program, name);
-  gl.uniform3fv(uniform('ink'), colour('--color-ink'));
-  gl.uniform3fv(uniform('paper'), colour('--color-paper'));
-  gl.uniform1f(uniform('black'), settings.black);
-  gl.uniform1f(uniform('white'), settings.white);
-  gl.uniform1f(uniform('rows'), canvas.height);
-  gl.uniformMatrix4fv(uniform('view'), false, camera(canvas.width / canvas.height));
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.enable(gl.DEPTH_TEST);
-  gl.clearColor(0, 0, 0, 0);
-  const turn = uniform('turn');
 
   return {
     draw(pose, needleAngle) {
+      // The fine picture.
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+      gl.viewport(0, 0, wide, tall);
+      gl.useProgram(scene);
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true);
+      gl.disable(gl.BLEND);
+      gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       const tilted = multiply(turnX(-pose.tilt), turnY(-pose.lean));
-      const wholes = [
-        ['body', multiply(tilted, turnZ(pose.spin))],
-        ['needle', multiply(tilted, turnZ(needleAngle))],
-      ];
-      for (const [name, matrix] of wholes) {
-        gl.uniformMatrix4fv(turn, false, matrix);
-        for (const [key, [where, size]] of Object.entries(attributes)) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, buffers[name][key]);
-          gl.enableVertexAttribArray(where);
-          gl.vertexAttribPointer(where, size, gl.FLOAT, false, 0, 0);
-        }
-        gl.drawArrays(gl.TRIANGLES, 0, buffers[name].count);
-      }
+      // Where the needle points on the dial, seen from the case: its shadow follows it.
+      const onDial = needleAngle - pose.spin;
+      gl.uniform2f(needleUniform, -Math.sin(onDial), Math.cos(onDial));
+      gl.uniform1f(glassUniform, 0);
+      drawPart('body', multiply(tilted, turnZ(pose.spin)));
+      drawPart('needle', multiply(tilted, turnZ(needleAngle)));
+      // The glass last: what it reflects is added to what is under it, which it dulls a little
+      // (its alpha says how much shows through), and it hides nothing.
+      gl.uniform1f(glassUniform, 1);
+      gl.depthMask(false);
+      gl.enable(gl.BLEND);
+      gl.blendFuncSeparate(gl.ONE, gl.SRC_ALPHA, gl.ZERO, gl.ONE);
+      drawPart('glass', multiply(tilted, turnZ(pose.spin)));
+      for (const key of Object.keys(fields)) gl.disableVertexAttribArray(locations[key]);
+
+      // The blocks.
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.disable(gl.DEPTH_TEST);
+      gl.disable(gl.BLEND);
+      gl.useProgram(blocks);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.bindBuffer(gl.ARRAY_BUFFER, cover);
+      gl.enableVertexAttribArray(corner);
+      gl.vertexAttribPointer(corner, 2, gl.FLOAT, false, 0, 0);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.disableVertexAttribArray(corner);
     },
     forget() {
       gl.getExtension('WEBGL_lose_context')?.loseContext();
