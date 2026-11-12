@@ -2,6 +2,57 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, pictures again: photos of old machines, nothing alive
+
+Romit's request: start fresh, ignoring every earlier picture choice; look at how henry.codes's pictures work together; find photos on Unsplash and other sites; **no living things in any picture**; credit and describe each; and on the Credits page keep his sentence exactly, "A huge thanks to these great folks for their breathtaking photos".
+
+### Sources checked
+
+| What                 | Source, read on 2026-11-12                                                                                                                                                        | Used for                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| henry.codes          | Its home, about and case study pages, photographed in Chromium in the toolbox (looked at only)                                                                                    | How its pictures fit together |
+| Each photo's licence | Its own page on unsplash.com: "Free to use under the Unsplash License", or for the Smithsonian's "Dual License: Public Domain & Unsplash License", with the object's record there | The photos below              |
+
+No package was added or updated. Unsplash's download links and search data sit behind a bot check, which was not worked around: photos were found through its pages as a web reader sees them and fetched from its image server, as before. The Smithsonian's own search service limits unnamed callers to a few requests, so it was left after that.
+
+### How the reference's pictures fit together, looked at again
+
+Not old engravings, as the previous entry thought, but **photos of hard, man-made things**: a stone gargoyle in the hero, a suit of armour with a mace behind the about text, a ghostly draped statue and a spiked collar in small frames, a city skyline above the footer, and barbed wire or a crown of thorns repeated as a band in every wide strip. Each is cut out of its background and drawn in heavy black with bright highlights. What holds them together is one mood (menacing, gothic) and one treatment, plus a spiky motif that comes back again and again.
+
+### The new set
+
+Photos of old machines and instruments, shot on plain white or grey grounds, most of them museum photos the Smithsonian shares. Nothing alive in any of them: no people, animals or plants.
+
+| Picture (`images.json`)                      | Photo                                                   | By                                                                   | Where                                                      |
+| -------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `globe`                                      | A black globe sitting on top of a white table           | charlesdeluvio, Unsplash                                             | Behind the home page's about section, large                |
+| `theodolite`, `theodolites`, `theodoliterow` | Black telescope (a surveyor's theodolite on a tripod)   | Uriel Soberanes, Unsplash                                            | The missing page; the Projects and Credits strips, as rows |
+| `presscamera`                                | Folding camera on white surface                         | Jonathan Talbert, Unsplash                                           | Beside Aletheia                                            |
+| `telephone`                                  | Alexander Graham Bell's experimental telephone, 1876    | the Smithsonian (National Museum of American History), public domain | Beside My Homelab                                          |
+| `camera`                                     | An old fashioned camera on a white background (a Kodak) | JJ Shev, Unsplash                                                    | The About page's small frame                               |
+| `typewriter`                                 | Lucien S. Crandall's typewriter patent model, 1881      | the Smithsonian (National Museum of American History), public domain | The Resume strip, as a row                                 |
+
+- **Same three uses as the reference:** one big bold shape behind the about text (the globe, whose lit edge comes out like the orb in the reference's gargoyle), single objects in the small frames, and one instrument repeated as a band in the wide strips (a row of theodolites; on the Resume page a row of typewriters).
+- **Why each:** the globe is painted black with no countries on it, a world still to explore; a theodolite maps new land, and for the missing page it is the search party's instrument; the press camera catches things in the act, as Aletheia catches dark patterns; Bell's telephone is the first network, beside the server that runs everything; the Kodak sits beside the portrait and its "I didn’t have many photos of myself" caption; a resume is typed.
+- **Tried and dropped** (about sixty, through the site's own conversion): the Smithsonian's Linotype machine (dense close-up machinery: a texture, not a shape, behind the about text, and a blob in a small frame), the binoculars John Glenn took on Friendship 7 (their white strap is the same grey as the backdrop and vanished with it, leaving two blobs), astrolabes, armillary spheres, an astronomical clock, a celestial globe and gears (in rooms, on dark grounds or with no outline), brass instruments on dark shelves, and Lincoln's pocket watch (gold on brown).
+- **Files:** each fetched at 2000 pixels wide from Unsplash's image server and kept as it came. The old prints and their records are gone.
+
+### Settings
+
+- **`cutout`** on every photo. At the globe's large size its backdrop search crept along the smooth light on the sphere's edge and removed the sphere; a smaller number (0.012) stops it.
+- **`gamma`** (already in `scripts/images.mjs`, now in the guide): 1.4 on the globe, so its highlight is a soft glow instead of a pale hole.
+- **`repeat`** makes the rows: the theodolite's head (its top two fifths) six times beside "Projects" and nine times beside "Credits"; the typewriter six times beside "Resume", on a 6 by 1 band so that a wide strip trims paper rather than typewriters.
+- **`fade`** is no longer used (the globe stands clear of the text by itself); the setting stays.
+
+### The Credits page
+
+- The card is called **Photographs** again, and its sentence is Romit's, exactly: "A huge thanks to these great folks for their breathtaking photos:" (the colon, as in his original text, leads into the list).
+- Each line now names the photographer: "The telephone: Alexander Graham Bell’s experimental telephone, 1876, by the Smithsonian. National Museum of American History, Public domain." `image-credits.json` has `photographer` in place of `artist`, and no `year` (a date that matters goes in the title). `scripts/lib/credits.mjs` and its test changed together, the test first.
+
+### Checks
+
+The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass: every picture says what `images.json` has for it, nothing moves as they arrive, each sits in the same place in all three browsers, and all 45 picture files together weigh 679 KB (the heaviest is the portrait at 960 pixels).
+
 ## 2026-11-12, pictures that fit together, and a compass you can spin
 
 Two requests from Romit: pictures that fit together the way henry.codes's do, found anywhere on the internet, each credited and described; and a hero compass that ignores the mouse, turns on its own like Resend's cube, spins freely when dragged, and has nothing behind it.
