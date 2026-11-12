@@ -110,6 +110,13 @@
   opacity: 0;
 }
 
+/* The still picture is stretched to the frame like the canvas, not cut to fit: the frame is a
+   fraction of a pixel away from four by five, and cut to fit the picture was enlarged a touch
+   more than the canvas, so in Firefox the two drifted a pixel apart toward the right. */
+.hero__image .picture--pixels {
+  object-fit: fill;
+}
+
 .hero__image--live .hero__compass {
   opacity: 1;
 }
