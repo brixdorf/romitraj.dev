@@ -594,14 +594,27 @@ export async function latestOnTheAboutPage(browser, { sameAddress, newerAddress,
     await context.close();
   }
 
-  // 2. In sight when the answer arrives (on a laptop the piece starts near the bottom of the first
+  // 2. In sight when the answer arrives (on a tall laptop window the piece is in the first
   //    screen): left alone, nothing moves; once the window is made shorter, so that the piece is
-  //    below it, it is put in place.
+  //    below it, it is put in place. (Since the quote came to the top of the page on 2026-11-12,
+  //    the piece starts below a 1000px window, so the window here is taller, and is checked.)
   {
     const { context, page, release, errors } = await openHeld(browser, newerAddress, {
       path: about,
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1440, height: 1600 },
     });
+    const placeOfPiece = () =>
+      page.evaluate(() => {
+        const { top, bottom } = document
+          .querySelector('[data-latest-post]')
+          .getBoundingClientRect();
+        return { top, bottom, window: window.innerHeight };
+      });
+    const before = await placeOfPiece();
+    if (before.top < 0 || before.bottom > before.window)
+      problems.push(
+        `the About page's piece is not in sight in a ${before.window}px window (it runs from ${Math.round(before.top)} to ${Math.round(before.bottom)}), so the test of a piece in sight cannot run`,
+      );
     await page.evaluate(watchPlaces, [false]);
     release();
     await page.waitForResponse(/\/api\/posts/, { timeout: 8000 }).catch(() => {});
@@ -615,7 +628,10 @@ export async function latestOnTheAboutPage(browser, { sameAddress, newerAddress,
       problems.push(
         `with the About page's piece in sight, ${moved.length} pieces moved when the newer post arrived, the first being ${moved[0]}`,
       );
-    await page.setViewportSize({ width: 1440, height: 700 });
+    await page.setViewportSize({
+      width: 1440,
+      height: Math.max(300, Math.floor(before.top) - 100),
+    });
     if (!(await waitForLatest(page, fresh.title, 5000)))
       problems.push(
         "once the About page's piece was below the window, the newer post was still not shown",
