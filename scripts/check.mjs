@@ -6,7 +6,9 @@
 // back, forward and reload return to the same scroll position (lib/walk.mjs), confirms that
 // cutting headings into letters for those changes moves nothing and that no letter is cut by the
 // window it slides in (lib/letters.mjs), confirms that the headline's entrance on the home page
-// is safe (lib/entrance.mjs), and so is the entrance of the About page's quote (lib/saying.mjs), and confirms that every picture is described or marked as
+// is safe (lib/entrance.mjs), and so is the entrance of the About page's quote (lib/saying.mjs),
+// confirms that the hero's 3D compass takes the still picture's place, moves and rests, and stays
+// away where it cannot run (lib/compass.mjs), and confirms that every picture is described or marked as
 // decoration, stays small, moves nothing as it loads and looks the same in every browser
 // (lib/pictures.mjs), and confirms that the weather and now-playing widgets show the right
 // facts and hide quietly when a service is down (lib/widgets.mjs), and that the blog's posts on
@@ -34,6 +36,7 @@ import { lettersStayInPlace, lettersStayWhole, testWidths } from './lib/letters.
 import { walkThePages } from './lib/walk.mjs';
 import { headlineEntrance } from './lib/entrance.mjs';
 import { sayingEntrance } from './lib/saying.mjs';
+import { compassInBrowser } from './lib/compass.mjs';
 import { lostAnswers, lostPage } from './lib/lost.mjs';
 import { headOfEveryPage, siteIconInBrowser } from './lib/head.mjs';
 import { picturesHoldStill, picturesDiffer, pictureFiles } from './lib/pictures.mjs';
@@ -426,6 +429,12 @@ try {
       const sayingProblems = await sayingEntrance(browser, server.address);
       if (sayingProblems.length) {
         say(`\nQUOTE ENTRANCE PROBLEMS in ${engineName}:\n  ` + sayingProblems.join('\n  '));
+        process.exitCode = 1;
+      }
+      // ---- The hero's 3D compass: takes the still picture's place, moves, rests, and stays away where it cannot run ----
+      const compassProblems = await compassInBrowser(browser, server.address);
+      if (compassProblems.length) {
+        say(`\nCOMPASS PROBLEMS in ${engineName}:\n  ` + compassProblems.join('\n  '));
         process.exitCode = 1;
       }
       // ---- Widgets on the page: shown when all is well, hidden quietly when not ----
