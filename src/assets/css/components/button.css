@@ -1,0 +1,40 @@
+/* A button-shaped link (the OpenPGP key's download): a small bold label in a 2px ink frame with
+   the site's 12px corners. Under the pointer it fills with ink, in the same 0.2s as other hovers. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: var(--rule) solid var(--color-ink);
+  border-radius: var(--radius);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  text-decoration: none;
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+  transition:
+    background-color var(--duration-base) var(--ease-in-out-cubic),
+    color var(--duration-base) var(--ease-in-out-cubic);
+}
+
+.button:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* A command to copy: one line in a light frame. One click selects all of it. */
+.command {
+  display: block;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  padding: 8px 12px;
+  border: var(--rule) solid var(--color-line-on-paper-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-text);
+  font-size: var(--type-small);
+  line-height: 19px;
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
