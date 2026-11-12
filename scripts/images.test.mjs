@@ -1,6 +1,7 @@
-// Tests for the picture pipeline's speck removal (scripts/images.mjs, the "despeckle" setting).
+// Tests for the picture pipeline (scripts/images.mjs): speck removal (the "despeckle" setting)
+// and which pictures need a photographer on record.
 import { describe, expect, it } from 'vite-plus/test';
-import { removeSpecks } from './images.mjs';
+import { needsCredit, removeSpecks } from './images.mjs';
 
 // A small picture from rows of text: "#" is ink, "." is paper.
 const picture = (rows) => ({
@@ -67,5 +68,20 @@ describe('removeSpecks', () => {
     const { dark, width, height } = picture(['...', '.#.', '...']);
     removeSpecks(dark, width, height);
     expect([...dark]).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0]);
+  });
+});
+
+describe('needsCredit', () => {
+  it('asks for a photographer on record for every photo', () => {
+    expect(needsCredit({ source: 'clock.jpg' })).toBe(true);
+    expect(needsCredit({ source: 'clock.jpg', kind: 'photo' })).toBe(true);
+  });
+
+  it('asks for none for the site’s own drawings', () => {
+    expect(needsCredit({ source: 'compass.svg' })).toBe(false);
+  });
+
+  it('asks for none for a photo marked "credit": false', () => {
+    expect(needsCredit({ source: 'portrait.jpg', kind: 'photo', credit: false })).toBe(false);
   });
 });
