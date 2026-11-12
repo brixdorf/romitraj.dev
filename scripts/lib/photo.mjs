@@ -114,7 +114,7 @@ const formats = [
       const rgba = new Uint8ClampedArray(grey.length * 4);
       for (let index = 0; index < grey.length; index++)
         rgba.set([grey[index], grey[index], grey[index], 255], index * 4);
-      return Buffer.from(await encodeJxl({ data: rgba, width, height }, { quality, effort: 7 }));
+      return Buffer.from(await encodeJxl({ data: rgba, width, height }, { quality, effort: 6 }));
     },
     async decode(buffer) {
       await loadJxl();
@@ -126,7 +126,7 @@ const formats = [
     extension: 'avif',
     type: 'image/avif',
     encode: (grey, width, height, quality) =>
-      greyImage(grey, width, height).avif({ quality, effort: 6 }).toBuffer(),
+      greyImage(grey, width, height).avif({ quality, effort: 4 }).toBuffer(),
     decode: greyFrom,
   },
   {
@@ -210,9 +210,17 @@ export async function makePhoto({ name, file, settings, outDir, cacheDir }) {
   const results = [];
   const files = [];
   for (const format of formats) {
+    // Each quality is tried once; the search and the final record share the answers.
+    const tried = new Map();
     const scoreAt = async (quality) => {
-      const encoded = await format.encode(greys[probe], probeWidth, probeHeight, quality);
-      return ssim(greys[probe], await format.decode(encoded), probeWidth, probeHeight);
+      if (!tried.has(quality)) {
+        const encoded = await format.encode(greys[probe], probeWidth, probeHeight, quality);
+        tried.set(
+          quality,
+          ssim(greys[probe], await format.decode(encoded), probeWidth, probeHeight),
+        );
+      }
+      return tried.get(quality);
     };
     const quality = await lowestQuality(scoreAt, target);
     const entries = [];
