@@ -2,6 +2,24 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, four pictures swapped for ones that grab attention
+
+Romit's request: the desk globe was bland ("we need something that gathers instant attention the moment visitor puts an eye on it"), and the 1881 typewriters, the press camera and the telephone should go too. Same family and the same rule: old machines and instruments, nothing alive. Each photo's page on unsplash.com was read on 2026-11-12 for its licence. No package was added or updated.
+
+| Picture (`images.json`) | Photo                                                           | By                                                             | Where                                       |
+| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------- |
+| `engine`                | Pitcairn-Brewer Model F nine-cylinder radial engine, about 1927 | the Smithsonian (National Air and Space Museum), public domain | Behind the home page's about section, large |
+| `magnifier`             | A magnifying glass on a pink background                         | Sasun Bughdaryan, Unsplash                                     | Beside Aletheia                             |
+| `computer`              | Apple computer (a Lisa 2, modified to a Macintosh XL)           | Museums Victoria, Unsplash                                     | Beside My Homelab                           |
+| `keys`                  | Grey skeleton key (an ornate bow), repeated in a row            | Tom Joseph, Unsplash                                           | Beside "Resume"                             |
+
+- **The engine** is the eye-catcher: nine cylinders bursting out of a round hub like a star, the same kind of jolt as the reference's knight with his spiked mace. It was photographed on black; cutting the black away and setting the thresholds high (`black` 0.5, `white` 0.92) draws the metal dark with its highlights light. It is zoomed out (0.68) so the whole star sits in the top half, which is all that shows on laptops, and right of centre, clear of the text on tablets.
+- **An `invert` setting** (black for white) was written, test first, to turn the engine around; it looked like a photo negative and was removed again with its test.
+- **Why the others:** a magnifying glass for a project that inspects checkouts for tricks, lying flat in a wide frame; an early personal computer beside the server that runs everything; keys for the Resume, a fence of them in the strip like the reference's barbed wire.
+- **Tried and dropped:** two other Smithsonian radial engines (one too thin, one side on), a spacesuit (reads as a person), an astronaut's helmet, black binoculars seen from above (read as a face), a vacuum tube on a workbench, other early computers and keys.
+- **Settings:** `gamma` is unused again (the globe used it).
+- **Checks:** the build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, three browsers) pass.
+
 ## 2026-11-12, pictures again: photos of old machines, nothing alive
 
 Romit's request: start fresh, ignoring every earlier picture choice; look at how henry.codes's pictures work together; find photos on Unsplash and other sites; **no living things in any picture**; credit and describe each; and on the Credits page keep his sentence exactly, "A huge thanks to these great folks for their breathtaking photos".
@@ -51,7 +69,7 @@ Photos of old machines and instruments, shot on plain white or grey grounds, mos
 
 ### Checks
 
-The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass: every picture says what `images.json` has for it, nothing moves as they arrive, each sits in the same place in all three browsers, and all 45 picture files together weigh 679 KB (the heaviest is the portrait at 960 pixels).
+The build, `pnpm run lint`, `pnpm test` (125 tests) and the full check (`pnpm run check`, Chromium, Firefox and WebKit at once) pass: every picture says what `images.json` has for it, nothing moves as they arrive, each sits in the same place in all three browsers, and all 45 picture files together weigh 679 KB (the heaviest is the portrait at 960 pixels). The same held after the four swaps below.
 
 ## 2026-11-12, pictures that fit together, and a compass you can spin
 
