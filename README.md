@@ -12,9 +12,9 @@ My corner on the internet, where I share my thoughts and show my work.
 ![Vite+](https://img.shields.io/badge/Vite%2B-2a2722?style=flat-square&logo=vite&logoColor=fafafa)
 ![Node.js](https://img.shields.io/badge/Node.js-2a2722?style=flat-square&logo=nodedotjs&logoColor=fafafa)
 
-![The home page: the headline "What we know is a drop, what we don't know is an ocean" in very large letters, above a pixel picture of a whale's tail](docs/screenshot.png)
+![The home page: the headline "What we know is a drop, what we don't know is an ocean" in very large letters, beside a pixel picture of an old pocket compass](docs/screenshot.png)
 
-## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/anchor-dark.svg"><img src="docs/readme/anchor-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What this is
+## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/gear-dark.svg"><img src="docs/readme/gear-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> What this is
 
 This is the code behind my personal website and portfolio. It has a home page, the projects I've built, a page about me, my resume, and my OpenPGP key if you want to send me an encrypted email. The longer writing lives on [my blog](https://blog.romitraj.dev), and the newest posts show up here by themselves.
 
@@ -26,7 +26,7 @@ The headline says _"What we know is a drop, what we don't know is an ocean."_ Th
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/weather-dark.svg"><img src="docs/readme/weather-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Live weather and music.** A thin moving strip on the home page shows the weather in Bangalore, my local time, and the song I'm playing on Spotify right now. If one of those services is having a bad day, that bit just hides. No error messages, no drama.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** The drawings and photos are turned into two colours, ink and paper, each time the site is built. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Old engravings of the heavens, a telescope, gears, punched cards: the photos and drawings are turned into two colours, ink and paper, each time the site is built. The compass on the home page is 3D. Move your mouse or scroll and it turns, and its needle wobbles back to north. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
 
 And it looks the same in Chrome, Edge, Firefox and Safari, on a laptop or a phone. One command opens every page in three browsers and complains loudly if anything is off.
 
@@ -36,8 +36,9 @@ Nothing fancy, on purpose.
 
 - **[Eleventy](https://www.11ty.dev)** turns plain text files into the pages. Changing any text on the site means editing one file.
 - **[GSAP](https://gsap.com)** and **[Taxi.js](https://github.com/craftedbygc/taxi)** do the movement and the page changes.
+- A little hand-written **WebGL** draws the compass. Without it you get a still picture of the same compass.
 - **[Vite+](https://viteplus.dev)** packs the styles and scripts into two small files, keeps the code tidy and runs the tests.
-- **[sharp](https://sharp.pixelplumbing.com)** makes the pixel pictures.
+- **[sharp](https://sharp.pixelplumbing.com)** and **[jSquash](https://github.com/jamsinclair/jSquash)** make the pixel pictures and the photo, each in whichever format comes out smallest.
 - A tiny **[Node.js](https://nodejs.org)** server hands out the pages and fetches the weather and the song.
 - **[Playwright](https://playwright.dev)** is the one that opens three browsers and complains.
 
