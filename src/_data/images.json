@@ -84,20 +84,18 @@
       "sharpen": 1
     },
     "portrait": {
+      "kind": "photo",
       "source": "portrait.jpg",
+      "credit": false,
       "alt": "Romit Raj Sahu in a white T-shirt, arms crossed, looking off to one side.",
-      "across": 160,
       "shape": "11:21",
       "crop": {
         "x": 0.45,
         "y": 0.42,
         "zoom": 1.15
       },
-      "pattern": "fine",
-      "black": 0.3,
-      "white": 0.8,
-      "sharpen": 1.2,
-      "despeckle": true
+      "widths": [240, 480, 720, 960],
+      "target": 0.98
     },
     "servers": {
       "source": "server-rack.jpg",
