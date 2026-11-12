@@ -176,3 +176,22 @@ export const scroll = {
   ornamentStart: 'top bottom',
   ornamentEnd: 'bottom bottom',
 };
+
+// The hero's 3D compass (compass.js, compass-motion.js). Angles are in degrees, times in seconds.
+export const compass = {
+  // The pose at rest, the one the still picture shows: the top turned away from the viewer by
+  // "tilt", the right side by "lean".
+  rest: { tilt: 24, lean: -16 },
+  // How far it can turn from rest: toward the pointer ("tilt" up and down, "lean" and "turn"
+  // across), and "spin", how far the case turns on its face once the hero has scrolled away.
+  reach: { tilt: 16, lean: 22, turn: 12, spin: 140 },
+  // How quickly it follows: about two thirds of the way in this many seconds.
+  follow: 0.18,
+  // The needle: the spring pulling it to north, the damping that calms it, and the share of the
+  // case's turn the pivot drags it along by.
+  needle: { spring: 38, damping: 2.6, drag: 0.85 },
+  // How a tone becomes ink or paper: darker than "black" solid ink, lighter than "white" solid
+  // paper, a checkerboard between (as "black" and "white" in images.json).
+  black: 0.3,
+  white: 0.72,
+};
