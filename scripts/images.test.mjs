@@ -169,6 +169,20 @@ describe('plainBackdrop', () => {
     ]);
   });
 
+  it('starts only from the ground’s grey when it is given, even if the subject fills most edges', () => {
+    const { values, width, height } = greys(['1111111', '1188811', '1188811', '1111111']);
+    expect(marks(plainBackdrop(values, width, height, 0.05, 8 / 9), width)).toEqual([
+      '.......',
+      '.......',
+      '.......',
+      '.......',
+    ]);
+    const open = greys(['1118111', '1188811', '1111111']);
+    expect(
+      marks(plainBackdrop(open.values, open.width, open.height, 0.05, 8 / 9), open.width),
+    ).toEqual(['...b...', '..bbb..', '.......']);
+  });
+
   it('stops at a sharp edge even when the subject is light', () => {
     const { values, width, height } = greys(['3333', '3993', '3333']);
     expect(marks(plainBackdrop(values, width, height, 0.1), width)).toEqual([

@@ -116,18 +116,20 @@ export function backdropOf(light, width, height, clear = null) {
 // steps between neighbours whose greys differ by less than "step" (0 to 1). An even or slowly
 // changing backdrop is followed all the way to the subject, and stops at the subject's edge, where
 // the grey jumps. A light spot inside the subject cannot be reached from the edge, so it stays.
-// The search starts only from edge pixels close to the edge's usual grey (within four steps), so a
-// subject that runs off the edge of the picture is not taken for backdrop.
+// The search starts only from edge pixels close to the ground's grey (within four steps), so a
+// subject that runs off the edge of the picture is not taken for backdrop. The ground's grey is
+// "ground" (0 to 1) when given, or else the usual grey along the edge.
 // Used by the "cutout" setting, so a photo of an object on a plain ground becomes the object alone
 // on paper, the way the reference cuts out its subjects. Gives 1 for backdrop, 0 for the rest.
-export function plainBackdrop(greys, width, height, step) {
+export function plainBackdrop(greys, width, height, step, ground = null) {
   const limit = step * 255;
   const found = new Uint8Array(width * height);
   const queue = [];
   const edge = [];
   for (let x = 0; x < width; x++) edge.push(greys[x], greys[(height - 1) * width + x]);
   for (let y = 0; y < height; y++) edge.push(greys[y * width], greys[y * width + width - 1]);
-  const usual = edge.sort((a, b) => a - b)[Math.floor(edge.length / 2)];
+  const usual =
+    ground === null ? edge.sort((a, b) => a - b)[Math.floor(edge.length / 2)] : ground * 255;
   const seed = (index) => {
     if (found[index] || Math.abs(greys[index] - usual) >= 4 * limit) return;
     found[index] = 1;
@@ -199,6 +201,26 @@ export function paddingFor(width, height, zoom) {
   const left = Math.floor(across / 2);
   const top = Math.floor(down / 2);
   return { left, right: across - left, top, bottom: down - top };
+}
+
+// The usual grey (0 to 1) along the edge of a whole photo, measured on a small copy.
+async function usualEdgeGrey(image) {
+  const size = 64;
+  const greys = await image
+    .flatten({ background: '#ffffff' })
+    .resize(size, size, { fit: 'fill' })
+    .greyscale()
+    .raw()
+    .toBuffer();
+  const edge = [];
+  for (let at = 0; at < size; at++)
+    edge.push(
+      greys[at],
+      greys[(size - 1) * size + at],
+      greys[at * size],
+      greys[at * size + size - 1],
+    );
+  return edge.sort((a, b) => a - b)[Math.floor(edge.length / 2)] / 255;
 }
 
 // Whether a picture needs its photographer on record in image-credits.json: every photo does,
@@ -292,7 +314,9 @@ async function convertOne(name, settings, colours) {
 
   // A photo of an object on a plain ground ("cutout": how far apart two neighbouring greys of the
   // ground may be) loses its ground: it becomes paper. Found on a slightly softened copy, so the
-  // grain of the photo does not stop the search.
+  // grain of the photo does not stop the search. The ground's grey is the usual grey along the
+  // whole photo's edge, which a tight crop through the subject would not show.
+  const groundGrey = settings.cutout ? await usualEdgeGrey(opened()) : null;
   const cutAway = settings.cutout
     ? plainBackdrop(
         await opened()
@@ -306,6 +330,7 @@ async function convertOne(name, settings, colours) {
         across,
         down,
         settings.cutout,
+        groundGrey,
       )
     : null;
 
