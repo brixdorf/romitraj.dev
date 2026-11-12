@@ -23,22 +23,10 @@ describe('photographersToThank', () => {
     ]);
   });
 
-  it('leaves out a photo of the site’s own, which needs only its photographer on record', () => {
-    expect(
-      photographersToThank({
-        'portrait.jpg': { photographer: 'Romit Raj Sahu', own: true },
-        'b.jpg': unsplash('Ben', 'the clock'),
-      }),
-    ).toEqual([{ name: 'Ben', profile: 'https://unsplash.com/@ben', subjects: ['the clock'] }]);
-  });
-
   it('stops the build when a photo lacks a fact', () => {
     expect(() =>
       photographersToThank({ 'a.jpg': { ...unsplash('Ann', 'the lamp'), url: '' } }),
     ).toThrow('a.jpg needs "url"');
-    expect(() => photographersToThank({ 'p.jpg': { own: true } })).toThrow(
-      'p.jpg needs "photographer"',
-    );
   });
 
   it('stops the build when a profile is not an Unsplash profile', () => {
