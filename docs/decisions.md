@@ -2,6 +2,66 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, later: Romit's fixes to Part 2
+
+Eleven fixes Romit asked for after looking at Part 2. Some of them reverse choices in the entry below.
+
+### Versions and sources checked
+
+| What                | Version                                                   | Source, read on 2026-11-12                                                                                                                                                    | Used for                                                                                                                 |
+| ------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| @jsquash/jxl        | 1.3.0 (newest)                                            | `pnpm view @jsquash/jxl version`; its README (Node needs the WebAssembly files handed to `init`)                                                                              | Encoding and decoding JPEG XL during the build. sharp, already used, cannot write JPEG XL: its own libvips has no libjxl |
+| JPEG XL in browsers | Safari since 17; Chrome from 155; Firefox switching it on | developer.chrome.com, "Shipping JPEG XL in Chrome" (dated 2026-10-06); reports of Firefox 152 (behind a setting) and 158 (on by default), with no official Mozilla page found | Why JPEG XL is offered but never alone: AVIF and JPEG follow it                                                          |
+
+### The portrait is a photo again (fix 1)
+
+- **The pixel portrait is gone.** `src/assets/img/source/portrait.jpg` is now the original photo with its backdrop. The build turns it into shades of grey and keeps it a photo (`"kind": "photo"` in `images.json`; `scripts/lib/photo.mjs`, tested).
+- **Same quality, smallest first.** Each format is saved at the lowest setting whose result scores 0.98 on SSIM (structural similarity with the grey original; 1 is identical), searched at 480 pixels and used at every width. SSIM was implemented in the project (about 60 lines, tested) because no maintained package offers a perceptual score in Node. Results for the portrait at 480 pixels: AVIF 24.7 KB (quality 74), JPEG XL 32.2 KB (quality 88), JPEG 43.9 KB (quality 91). The page offers AVIF first, then JPEG XL, then JPEG. The order is worked out on every build, so a photo where JPEG XL comes out smaller would list it first.
+- **Sized for the frame.** Four widths (240, 480, 720, 960) and a `sizes` attribute that matches the frame (a square of at most 224px under 1000px, two of twelve columns above), so a laptop takes the 240 file, a sharper screen 480, a phone 720.
+- **Encoder settings:** JPEG XL effort 6 (as small as 7 and quicker), AVIF effort 4 (sharp's default: effort 6 took three times as long for files about 2% smaller). A first build takes about 25 seconds for the portrait; the results are kept in `.cache/photos/` and reused, so later builds take about a second. On the live server, where there is no cache, each deploy takes those 25 seconds once.
+- **Not named or credited anywhere**, as asked: it has no entry in `image-credits.json` (`"credit": false` in `images.json`), the README and the Credits page say nothing about it, and the "own photo" rule added earlier today is removed again.
+- **The full check's picture tests** now name a picture by its `data-picture` mark (a photo's files are named by width) and give photo files a limit of their own, 160 KB each, since they are real photos in shades of grey; the 24 KB limit for pixel pictures is unchanged.
+
+### The quote moved to the top, with an entrance (fix 2)
+
+- It sits right under "About the human", outside the card grid, at 40px on phones and from 56px up to 104px on laptops (`--type-saying`), as two lines: the plain half, then the italic half.
+- **The entrance:** each line slides up into place through a window at its top edge, solid, the second 0.12s after the first, each in 0.95s on the same curve as the giant letters. On opening the page it runs through `intro.js` with `entrance: saying`: the page names the pieces that enter, so the page's name stays still (a page with `entrance: true`, the missing page, still gets everything). On arriving from another page it runs in `pageIn`, starting 0.3s in, while the name is still sliding up. On leaving, the quote fades with the cards. No entrance under "reduce motion", no hiding without scripts, and the usual three-second safety.
+- **Why whole lines, not each wrapped line:** cutting the quote into its wrapped lines needed the line-cutting code in the small entrance script, which then grew to 6,210 characters, past its 5,999 limit (`bundle.test.mjs`). That limit keeps the script quick and was not loosened. With whole lines the script is 5,297 characters. On phones each half wraps over two lines and moves as one piece.
+- **Speed** (`pnpm run speed /about/`, which now compares with and without the entrance on any page): 0ms of Largest Contentful Paint on a slow phone and on a laptop. The home page: 0ms and -4ms, as before.
+- **Test:** `scripts/lib/saying.mjs`, run by the full check (no flash, ends in place, the name does not move, arrival from home, reduced motion, no scripts). Run once in Chromium here: no problems.
+
+### Plain addresses for downloads (fix 3)
+
+- `/resume.pdf` and `/romitraj-pgp-public.asc` have no `?v=` any more (`scripts/lib/downloads.mjs`).
+- **Caching stays safe another way** (`server/files.js`, tested): everything without a fingerprint, pages and downloads alike, is sent with `Cache-Control: no-cache` and an ETag, so browsers and Cloudflare check each time and get a short 304 "not modified" when they already hold the latest version. Files asked for with a fingerprint may still be kept for an hour.
+- **What keeps its fingerprint:** the stylesheet, the scripts, the fonts, the icons, the pictures and the share image. Visitors never follow those as links, and the fingerprint is what lets them be kept safely. If Romit wants plain addresses there too, the same no-cache rule would cover them, at the cost of one check per file per visit.
+
+### The key card (fix 4)
+
+- The key's algorithms are read from the key for every part, with what each is for, from the key's own flags: "Ed25519 (signing) and Curve25519 (encryption)" (`keyFacts` in `scripts/lib/pgp.mjs`, tested). The words for the uses and "and" are in `about.json`.
+- **"Download key" is a button**: a new `.button` style (`button.css`) in the site's language, a 2px ink frame with 12px corners that fills with ink on hover in 0.2s. No button existed before.
+- Under it: "You can also fetch it straight from my domain:" and `gpg --locate-external-keys hi@romitraj.dev` in a framed box (`.command`) where one click selects the whole line. It is set in Neue Montreal, not a monospace font: the site's licensed fonts have none, and a system monospace would differ between browsers.
+
+### The resume opens in the browser (fixes 5 and 6)
+
+- `/resume.pdf` is sent as `application/pdf` with `Content-Disposition: inline; filename="resume.pdf"` (`server/files.js`), so browsers show it. A separate "Download PDF" button saves it (`download` attribute).
+- The card has no number and no title: "The best of all me in one page." and the email line, then "Open the PDF" and "Download PDF".
+
+### Text (fixes 7 to 10)
+
+The missing page's caption, and three lines removed from the DevOps Labs, Aletheia and My Homelab write-ups, as Romit asked.
+
+### Hidden text (fix 11)
+
+- **Rewritten in Romit's tone:** the search descriptions of the home page, the Projects page, the Credits page and the missing page, and some words for the sky ("clear skies", "cloudy", "drizzling", "raining", "pouring", "thunderstorms"). The About and Resume descriptions are his own from earlier today and stay.
+- **Kept as they are:** the screen-reader labels ("(opens in a new tab)", "Weather in {city}:", "Site map", "Main" and the rest). They are already plain, and screen-reader users rely on the usual wording.
+- **Moved out of the templates:** "Main", "Site map" and "love" were written into the templates; they are now in `home.json` (`navLabel`, `footer.navLabel`, `footer.heartLabel`), so every piece of hidden text is in a data file or at the top of a page's file.
+- Romit has the full list, with each piece's page, file, key and text, among his notes.
+
+### Checks
+
+The build, `pnpm run lint`, `pnpm test` (68 tests), `pnpm run smoke` (10 pages at three widths in Chromium) and `pnpm run links` (no dead links) pass. The full three-browser check runs at the end of Part 3, as planned; it now includes the quote's entrance.
+
 ## 2026-11-12: Romit's own words, projects, resume, portrait and OpenPGP key
 
 Part 2 of the overhaul: every piece of draft text replaced with Romit's (`../inputs/site-text.md`), his real projects, his resume, his portrait and his OpenPGP key. No new packages and no version changes.
