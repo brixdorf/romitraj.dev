@@ -105,6 +105,13 @@ function findBackdrop(light, width, height) {
   return backdrop;
 }
 
+// Which blocks are backdrop, where the painted texture shows. A source with see-through parts (the
+// hero's compass, drawn with its own outline) says so itself: exactly its see-through blocks
+// ("clear", 1 for see-through). Otherwise, the light blocks found by findBackdrop.
+export function backdropOf(light, width, height, clear = null) {
+  return clear ? Uint8Array.from(clear) : findBackdrop(light, width, height);
+}
+
 // Removes lone specks of ink: a block with no ink in the eight blocks around it and almost none
 // (at most one other) in the seven by seven blocks around it. That is a stray dot on paper, such as
 // the trace of the faint outline a cut-out photo leaves around its subject. The even dots of a
@@ -192,6 +199,19 @@ async function convertOne(name, settings, colours) {
   if (settings.stretch) image = image.normalise({ lower: 1, upper: 99 });
   if (sharpen) image = image.sharpen({ sigma: sharpen });
   const greys = await image.raw().toBuffer();
+  // A source with see-through parts keeps them as its outline (see backdropOf).
+  const clear = meta.hasAlpha
+    ? Uint8Array.from(
+        await opened()
+          .extract(regionToUse(meta.width, meta.height, shape, settings.crop))
+          .resize(across, down, { fit: 'fill', kernel: 'nearest' })
+          .ensureAlpha()
+          .extractChannel(3)
+          .raw()
+          .toBuffer(),
+        (alpha) => (alpha < 128 ? 1 : 0),
+      )
+    : null;
 
   // Stretch the greys, then dither.
   let dark = new Uint8Array(across * down);
@@ -211,7 +231,7 @@ async function convertOne(name, settings, colours) {
 
   // Colour the pixels. "tones: ink" draws the dark parts in ink on the ground; "tones: paper"
   // draws the light parts in paper on a clear ground (for pictures that sit on the ink colour).
-  const backdrop = ground === 'texture' ? findBackdrop(light, across, down) : null;
+  const backdrop = ground === 'texture' ? backdropOf(light, across, down, clear) : null;
   const pixels = Buffer.alloc(across * down * 4);
   let used = 0;
   for (let index = 0; index < dark.length; index++) {
