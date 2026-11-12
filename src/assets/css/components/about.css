@@ -65,9 +65,13 @@
   margin: 0 0 20px;
 }
 
+/* The serif asides take no height of their own in the line: their font is taller than the text's,
+   and each browser grew the line by a different fraction of a pixel to make room, so the
+   paragraph (and the drawing behind it) came out a pixel apart between browsers. */
 .about__text i {
   font-family: var(--font-serif);
   font-style: italic;
+  line-height: 0;
   color: var(--color-muted-on-paper);
 }
 
