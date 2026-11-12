@@ -3,7 +3,7 @@
 // which part of a photo is its plain backdrop, to be cut away (the "cutout" setting), and how
 // much room goes around a photo shown smaller than its frame (a "zoom" below 1).
 import { describe, expect, it } from 'vite-plus/test';
-import { backdropOf, needsCredit, paddingFor, plainBackdrop, removeSpecks } from './images.mjs';
+import { needsCredit, paddingFor, plainBackdrop, removeSpecks } from './images.mjs';
 
 // A small picture from rows of text: "#" is ink, "." is paper.
 const picture = (rows) => ({
@@ -85,27 +85,6 @@ describe('needsCredit', () => {
 
   it('asks for none for a photo marked "credit": false', () => {
     expect(needsCredit({ source: 'portrait.jpg', kind: 'photo', credit: false })).toBe(false);
-  });
-});
-
-describe('backdropOf', () => {
-  // "#" is dark, "." light; in the see-through rows, "o" is see-through and anything else solid.
-  const cells = (rows, mark) =>
-    Uint8Array.from(rows.join('').split(''), (cell) => (cell === mark ? 1 : 0));
-
-  it('without see-through parts: the light blocks reachable from the edge, not those enclosed', () => {
-    const rows = ['.....', '.###.', '.#.#.', '.###.', '.....'];
-    expect([...backdropOf(cells(rows, '.'), 5, 5)]).toEqual([
-      1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-    ]);
-  });
-
-  it('with see-through parts (a drawing with its own outline): exactly the see-through blocks', () => {
-    const light = ['.....', '.....', '..#..', '.....', '.....'];
-    const clear = ['ooooo', 'o...o', 'o...o', 'o...o', 'ooooo'];
-    expect([...backdropOf(cells(light, '.'), 5, 5, cells(clear, 'o'))]).toEqual([
-      ...cells(clear, 'o'),
-    ]);
   });
 });
 

@@ -8,11 +8,6 @@
       "shape": "4:5",
       "black": 0.3,
       "white": 0.7,
-      "ground": "texture",
-      "texture": {
-        "seed": 7,
-        "strokes": 9
-      },
       "credit": false
     },
     "sewing": {

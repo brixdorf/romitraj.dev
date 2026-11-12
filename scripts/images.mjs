@@ -20,7 +20,6 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { paintTexture } from './lib/paint.mjs';
 import { makePhoto } from './lib/photo.mjs';
 import { losslessFormats, offerOrder } from './lib/formats.mjs';
 
@@ -71,45 +70,6 @@ function thresholdAt(pattern, x, y) {
   if (!table) throw new Error(`Unknown pattern "${pattern}". Use checker, fine or grain.`);
   const size = table.length;
   return (table[y % size][x % size] + 0.5) / (size * size);
-}
-
-// Which light pixels are backdrop: those that can be reached from the picture's edge without
-// crossing anything dark. Light spots enclosed by the subject are not backdrop.
-function findBackdrop(light, width, height) {
-  const backdrop = new Uint8Array(width * height);
-  const queue = [];
-  const visit = (x, y) => {
-    if (x < 0 || y < 0 || x >= width || y >= height) return;
-    const index = y * width + x;
-    if (backdrop[index] || !light[index]) return;
-    backdrop[index] = 1;
-    queue.push(index);
-  };
-  for (let x = 0; x < width; x++) {
-    visit(x, 0);
-    visit(x, height - 1);
-  }
-  for (let y = 0; y < height; y++) {
-    visit(0, y);
-    visit(width - 1, y);
-  }
-  while (queue.length) {
-    const index = queue.pop();
-    const x = index % width;
-    const y = (index - x) / width;
-    visit(x + 1, y);
-    visit(x - 1, y);
-    visit(x, y + 1);
-    visit(x, y - 1);
-  }
-  return backdrop;
-}
-
-// Which blocks are backdrop, where the painted texture shows. A source with see-through parts (the
-// hero's compass, drawn with its own outline) says so itself: exactly its see-through blocks
-// ("clear", 1 for see-through). Otherwise, the light blocks found by findBackdrop.
-export function backdropOf(light, width, height, clear = null) {
-  return clear ? Uint8Array.from(clear) : findBackdrop(light, width, height);
 }
 
 // Which part of a photo is its plain backdrop: the pixels reached from the picture's edge by
@@ -300,19 +260,6 @@ async function convertOne(name, settings, colours) {
   if (settings.stretch) image = image.normalise({ lower: 1, upper: 99 });
   if (sharpen) image = image.sharpen({ sigma: sharpen });
   const greys = await image.raw().toBuffer();
-  // A source with see-through parts keeps them as its outline (see backdropOf).
-  const clear = meta.hasAlpha
-    ? Uint8Array.from(
-        await opened()
-          .extract(regionToUse(meta.width, meta.height, shape, crop))
-          .resize(across, down, { fit: 'fill', kernel: 'nearest' })
-          .ensureAlpha()
-          .extractChannel(3)
-          .raw()
-          .toBuffer(),
-        (alpha) => (alpha < 128 ? 1 : 0),
-      )
-    : null;
 
   // A photo of an object on a plain ground ("cutout": how far apart two neighbouring greys of the
   // ground may be) loses its ground: it becomes paper. Found on a slightly softened copy, so the
@@ -338,14 +285,12 @@ async function convertOne(name, settings, colours) {
 
   // Stretch the greys, then dither.
   let dark = new Uint8Array(across * down);
-  const light = new Uint8Array(across * down);
   for (let y = 0; y < down; y++) {
     for (let x = 0; x < across; x++) {
       const index = y * across + x;
       let value = Math.min(1, Math.max(0, (greys[index] / 255 - black) / (white - black)));
       if (gamma !== 1) value **= gamma;
       dark[index] = value <= thresholdAt(pattern, x, y) && !cutAway?.[index] ? 1 : 0;
-      light[index] = value > 0.5 || cutAway?.[index] ? 1 : 0;
     }
   }
 
@@ -354,15 +299,13 @@ async function convertOne(name, settings, colours) {
 
   // Colour the pixels. "tones: ink" draws the dark parts in ink on the ground; "tones: paper"
   // draws the light parts in paper on a clear ground (for pictures that sit on the ink colour).
-  const backdrop = ground === 'texture' ? backdropOf(light, across, down, clear) : null;
   const pixels = Buffer.alloc(across * down * 4);
   let used = 0;
   for (let index = 0; index < dark.length; index++) {
     let colour = null;
     if (tones === 'paper') colour = dark[index] ? null : colours.paper;
     else if (dark[index]) colour = colours.ink;
-    else if (ground === 'paper' || (ground === 'texture' && !backdrop[index]))
-      colour = colours.paper;
+    else if (ground === 'paper') colour = colours.paper;
     if (colour) {
       pixels.set([...colour, 255], index * 4);
       if (colour === (tones === 'paper' ? colours.paper : colours.ink)) used++;
@@ -370,17 +313,6 @@ async function convertOne(name, settings, colours) {
   }
   const files = await losslessFormats(pixels, across, down);
   return { files, width: across, height: down, share: used / dark.length };
-}
-
-// The texture behind a picture whose ground is "texture": painted, then saved as a small WebP.
-async function makeTexture(settings, shape) {
-  const { seed = 1, width = 720, strokes, quality = 72 } = settings.texture || {};
-  const height = Math.round(width / shape);
-  const greys = paintTexture({ width, height, seed, ...(strokes ? { strokes } : {}) });
-  const buffer = await sharp(Buffer.from(greys), { raw: { width, height, channels: 1 } })
-    .webp({ quality, effort: 6, smartSubsample: true })
-    .toBuffer();
-  return { buffer, width, height };
 }
 
 const fingerprint = (buffer) =>
@@ -439,11 +371,7 @@ export async function convertImages(outDir) {
     let made = remembered.get(name);
     if (!made || made.key !== key) {
       const picture = await convertOne(name, settings, colours);
-      const texture =
-        settings.ground === 'texture'
-          ? await makeTexture(settings, picture.width / picture.height)
-          : null;
-      made = { key, picture, texture };
+      made = { key, picture };
       remembered.set(name, made);
     }
     // Every format is written, so each can be compared; the page names only the ones it offers.
@@ -473,15 +401,6 @@ export async function convertImages(outDir) {
       bytes: fallback.bytes,
       share: made.picture.share,
     };
-    if (made.texture) {
-      fs.writeFileSync(path.join(outDir, `${name}-texture.webp`), made.texture.buffer);
-      pictures[name].texture = {
-        src: `/assets/img/${name}-texture.webp?v=${fingerprint(made.texture.buffer)}`,
-        width: made.texture.width,
-        height: made.texture.height,
-        bytes: made.texture.buffer.length,
-      };
-    }
   }
   return pictures;
 }
@@ -498,7 +417,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       continue;
     }
     console.log(
-      `${name}: ${picture.width} x ${picture.height} blocks, ${Math.round(picture.share * 100)}% drawn, ${picture.formats.map((format) => `${format.extension} ${format.bytes}${format.exact ? '' : ' (not exact)'}`).join(', ')}; offered: ${[...picture.sources.map((source) => source.type.split('/')[1]), 'png'].join(', ')}${picture.texture ? `; texture ${picture.texture.bytes} bytes` : ''}`,
+      `${name}: ${picture.width} x ${picture.height} blocks, ${Math.round(picture.share * 100)}% drawn, ${picture.formats.map((format) => `${format.extension} ${format.bytes}${format.exact ? '' : ' (not exact)'}`).join(', ')}; offered: ${[...picture.sources.map((source) => source.type.split('/')[1]), 'png'].join(', ')}`,
     );
   }
 }

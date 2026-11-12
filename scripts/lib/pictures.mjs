@@ -132,10 +132,9 @@ export function picturesDiffer(found) {
 }
 
 // What each picture file should say to screen readers: its description from images.json, or
-// nothing if it is marked as decoration. A painted backdrop ("...-texture") is always decoration.
+// nothing if it is marked as decoration.
 function expectedAlt(fileName) {
   const name = fileName.replace(/\.\w+$/, '');
-  if (name.endsWith('-texture')) return '';
   const settings = JSON.parse(
     fs.readFileSync(path.join(root, 'src', '_data', 'images.json'), 'utf8'),
   ).pictures[name];

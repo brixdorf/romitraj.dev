@@ -247,8 +247,7 @@ export default function (eleventyConfig) {
         tag(picture, picture.alt, 'pixels') +
         `</picture>`
       : tag(picture, picture.alt, 'pixels');
-    // A picture with a painted backdrop is two files: the paint underneath, the pixels on top.
-    return (picture.texture ? tag(picture.texture, '', 'paint', `${name}-texture`) : '') + pixels;
+    return pixels;
   });
   eleventyConfig.addWatchTarget('./src/assets/img/source/');
   eleventyConfig.addWatchTarget('./scripts/images.mjs');

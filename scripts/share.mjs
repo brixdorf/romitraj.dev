@@ -68,9 +68,8 @@ try {
     .filter((style) => style.includes('@font-face'))
     .join('\n');
   const stylesheet = /<link rel="stylesheet" href="[^"]+">/.exec(home)[0];
-  // The hero's two layers: the painted backdrop, then the compass's pixels.
+  // The hero's compass, as pixels on paper.
   const hero = home.split('class="hero__image"')[1];
-  const paintSrc = /<img class="picture picture--paint" src="([^"]+)"/.exec(hero)[1];
   const [, pictureSrc, blocksAcross, blocksDown] =
     /<img class="picture picture--pixels" src="([^"]+)" width="(\d+)" height="(\d+)"/.exec(hero);
   const frameWidth = Number(blocksAcross) * card.block;
@@ -99,7 +98,7 @@ try {
       <p class="last"><span class="flourish">${escape(headline.flourish)}</span><span class="serif">${escape(headline.serif)}</span></p>
       <p class="foot"><span>${escape(site.name)}</span><span class="muted">${escape(new URL(site.url).hostname)}</span></p>
     </div>
-    <div class="art"><img src="${paintSrc}" alt=""><img class="pixels" src="${pictureSrc}" alt=""></div>
+    <div class="art"><img class="pixels" src="${pictureSrc}" alt=""></div>
   </body></html>`;
   const page = await browser.newPage({
     viewport: { width: card.width, height: card.height },
