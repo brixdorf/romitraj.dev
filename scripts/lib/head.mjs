@@ -112,14 +112,19 @@ export async function headOfEveryPage(siteDir, root) {
     const expectedTitle = title.endsWith(` | ${site.name}`)
       ? title.slice(0, -` | ${site.name}`.length)
       : title;
+    // The site's name on X, from its X link, for "twitter:site" and "twitter:creator".
+    const xLink = site.elsewhere.find((link) => /^https:\/\/(x|twitter)\.com\//.test(link.url));
+    const xHandle = xLink ? '@' + new URL(xLink.url).pathname.split('/')[1] : null;
     const expected = {
       'og:type': 'website',
+      'og:locale': site.locale,
       'og:site_name': site.name,
       'og:title': expectedTitle,
       'og:description': meta('description'),
       'twitter:card': 'summary_large_image',
       'twitter:title': expectedTitle,
       'twitter:description': meta('description'),
+      ...(xHandle ? { 'twitter:site': xHandle, 'twitter:creator': xHandle } : {}),
     };
     for (const [key, value] of Object.entries(expected)) {
       if (meta(key) === null) problems.push(`${pagePath} has no ${key} tag`);
