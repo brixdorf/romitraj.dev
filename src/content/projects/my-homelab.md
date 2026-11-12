@@ -10,7 +10,7 @@ order: 4
 image: crane
 ---
 
-One cloud server that runs most of what I put on the internet, this website included. There's no public link for this one: the server is the project.
+One cloud server that runs most of what I put on the internet, this website included.
 
 ## What it is
 

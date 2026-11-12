@@ -14,7 +14,7 @@ A place to practise DevOps on real machines instead of just reading about it. Yo
 
 ## What it is
 
-DevOps Labs is a free practice platform that runs on your own computer. It has hands-on labs across many DevOps topics: Linux, Docker, Kubernetes, Terraform, CI and CD, GitOps and more. I'm still adding labs.
+DevOps Labs is a free practice platform that runs on your own computer. It has hands-on labs across many DevOps topics: Linux, Docker, Kubernetes, Terraform, CI and CD, GitOps and more.
 
 Each lab gives you a task and a real Linux terminal in the browser. When you think you're done, you submit, and a checker looks at what you actually did and tells you what passed and what didn't. If you're stuck, there's a hint, an approach and the full solution.
 

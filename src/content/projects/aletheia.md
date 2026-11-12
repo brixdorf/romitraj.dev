@@ -17,7 +17,7 @@ Aletheia goes through a website's checkout or sign-up the way a real customer wo
 
 You describe a flow, like signing up for a plan on some site. Aletheia sends AI web agents through it, each in its own browser, and stops before any payment. Then it reports the dark patterns it found: drip pricing, hidden subscriptions, confirmshaming, pre-ticked consent and more.
 
-Every finding comes with its proof: the exact quote, the step where it showed up, and a screenshot. I built it together with Abhijit P.
+Every finding comes with its proof: the exact quote, the step where it showed up, and a screenshot.
 
 ## Why it exists
 
