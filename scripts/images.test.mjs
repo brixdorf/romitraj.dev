@@ -151,6 +151,23 @@ describe('plainBackdrop', () => {
     expect(marks(plainBackdrop(values, width, height, 0.05), width)[2]).toBe('b...b');
   });
 
+  it('does not start inside a subject that touches the edge of the picture', () => {
+    const { values, width, height } = greys([
+      '8888888',
+      '8881111',
+      '8881111',
+      '8888888',
+      '8888888',
+    ]);
+    expect(marks(plainBackdrop(values, width, height, 0.05), width)).toEqual([
+      'bbbbbbb',
+      'bbb....',
+      'bbb....',
+      'bbbbbbb',
+      'bbbbbbb',
+    ]);
+  });
+
   it('stops at a sharp edge even when the subject is light', () => {
     const { values, width, height } = greys(['3333', '3993', '3333']);
     expect(marks(plainBackdrop(values, width, height, 0.1), width)).toEqual([

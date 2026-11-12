@@ -116,14 +116,20 @@ export function backdropOf(light, width, height, clear = null) {
 // steps between neighbours whose greys differ by less than "step" (0 to 1). An even or slowly
 // changing backdrop is followed all the way to the subject, and stops at the subject's edge, where
 // the grey jumps. A light spot inside the subject cannot be reached from the edge, so it stays.
+// The search starts only from edge pixels close to the edge's usual grey (within four steps), so a
+// subject that runs off the edge of the picture is not taken for backdrop.
 // Used by the "cutout" setting, so a photo of an object on a plain ground becomes the object alone
 // on paper, the way the reference cuts out its subjects. Gives 1 for backdrop, 0 for the rest.
 export function plainBackdrop(greys, width, height, step) {
   const limit = step * 255;
   const found = new Uint8Array(width * height);
   const queue = [];
+  const edge = [];
+  for (let x = 0; x < width; x++) edge.push(greys[x], greys[(height - 1) * width + x]);
+  for (let y = 0; y < height; y++) edge.push(greys[y * width], greys[y * width + width - 1]);
+  const usual = edge.sort((a, b) => a - b)[Math.floor(edge.length / 2)];
   const seed = (index) => {
-    if (found[index]) return;
+    if (found[index] || Math.abs(greys[index] - usual) >= 4 * limit) return;
     found[index] = 1;
     queue.push(index);
   };
