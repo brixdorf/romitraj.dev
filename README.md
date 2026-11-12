@@ -26,7 +26,7 @@ The headline says _"What we know is a drop, what we don't know is an ocean."_ Th
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/weather-dark.svg"><img src="docs/readme/weather-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Live weather and music.** A thin moving strip on the home page shows the weather in Bangalore, my local time, and the song I'm playing on Spotify right now. If one of those services is having a bad day, that bit just hides. No error messages, no drama.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Every photo and drawing, my own portrait included, is turned into two colours, ink and paper, each time the site is built. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** The drawings and photos are turned into two colours, ink and paper, each time the site is built. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
 
 And it looks the same in Chrome, Edge, Firefox and Safari, on a laptop or a phone. One command opens every page in three browsers and complains loudly if anything is off.
 
@@ -58,7 +58,7 @@ Everything else, from changing a sentence to putting it on a server, is in the [
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/heart-dark.svg"><img src="docs/readme/heart-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Credits
 
 - The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code and words here are my own.
-- The photographs are from [Unsplash](https://unsplash.com), and each photographer is named on the site's [Credits page](https://romitraj.dev/credits/). The portrait is mine.
+- The photographs are from [Unsplash](https://unsplash.com), and each photographer is named on the site's [Credits page](https://romitraj.dev/credits/).
 - Weather data by [Open-Meteo.com](https://open-meteo.com). Icons by [Phosphor Icons](https://phosphoricons.com).
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/scales-dark.svg"><img src="docs/readme/scales-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> License
