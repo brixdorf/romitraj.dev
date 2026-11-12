@@ -1,10 +1,14 @@
-// Makes two pictures of the site that live in the repository, not in the build:
+// Makes three pictures of the site that live in the repository, not in the build:
+//   src/assets/img/source/hero-compass.png  The hero's compass at rest, drawn by the site's own
+//                              WebGL code (lib/compass-still.mjs): the still picture the hero shows
+//                              before the 3D compass starts, and wherever it cannot run.
 //   src/assets/img/share.png   The share image: the 1200 by 630 pixel card that WhatsApp, LinkedIn,
 //                              X and similar apps show when a link to the site is shared.
 //   docs/screenshot.png        The picture of the home page at the top of the README.
 // Run it with: pnpm run share
-// Run it again after changing the headline, the fonts, the colors or the diver drawing, then
-// commit the two pictures.
+// Run it again after changing the headline, the fonts, the colors or the compass (its shapes in
+// assets/js/compass-model.js, its resting pose and tones in assets/js/motion.js), then commit the
+// three pictures.
 //
 // Why this is a command and not part of the build: the card is set in the site's licensed fonts.
 // Those are on this computer (in the private folder next door) and not on the live server, which
@@ -22,6 +26,7 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import sharp from 'sharp';
 import { root, siteDir, buildSite, startServer, launchOptions } from './lib/site.mjs';
+import { makeCompassStill, stillFile } from './lib/compass-still.mjs';
 
 const read = (file) => JSON.parse(fs.readFileSync(path.join(root, 'src', '_data', file), 'utf8'));
 const site = read('site.json');
@@ -33,7 +38,18 @@ const escape = (text) =>
 const giantLine = (text) => escape(text).replace(/['’]/g, '<span class="apostrophe"></span>');
 
 // The card's own measurements, in pixels.
-const card = { width: 1200, height: 630, bar: 12, edge: 48, gap: 40, block: 4 };
+const card = { width: 1200, height: 630, bar: 12, edge: 48, gap: 40, block: 3 };
+
+// The compass's still picture comes first: the build turns it into the hero's picture.
+{
+  const browser = await chromium.launch(launchOptions('chromium'));
+  try {
+    const { width, height } = await makeCompassStill(browser);
+    console.log(`Compass still: ${path.relative(root, stillFile)}, ${width} by ${height} blocks.`);
+  } finally {
+    await browser.close();
+  }
+}
 
 await buildSite();
 if (!fs.existsSync(path.join(siteDir, 'fonts'))) {
@@ -52,10 +68,11 @@ try {
     .filter((style) => style.includes('@font-face'))
     .join('\n');
   const stylesheet = /<link rel="stylesheet" href="[^"]+">/.exec(home)[0];
-  const picture = /<img class="picture[^"]*" src="([^"]+)" width="(\d+)" height="(\d+)"/.exec(
-    fs.readFileSync(path.join(siteDir, '404.html'), 'utf8').split('lost__frame')[1],
-  );
-  const [, pictureSrc, blocksAcross, blocksDown] = picture;
+  // The hero's two layers: the painted backdrop, then the compass's pixels.
+  const hero = home.split('class="hero__image"')[1];
+  const paintSrc = /<img class="picture picture--paint" src="([^"]+)"/.exec(hero)[1];
+  const [, pictureSrc, blocksAcross, blocksDown] =
+    /<img class="picture picture--pixels" src="([^"]+)" width="(\d+)" height="(\d+)"/.exec(hero);
   const frameWidth = Number(blocksAcross) * card.block;
   const frameHeight = Number(blocksDown) * card.block;
   const textWidth = card.width - 2 * card.edge - card.gap - frameWidth - 4;
@@ -71,8 +88,9 @@ try {
     .serif { font-family: var(--font-serif-display); font-size: 118px; line-height: 0.8; text-transform: uppercase; }
     .foot { margin: auto 0 0; display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-text); font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; text-transform: uppercase; }
     .foot .muted { color: var(--color-muted-on-paper); }
-    .art { position: absolute; inset-block-start: ${card.bar + 40}px; inset-inline-end: ${card.edge}px; inline-size: ${frameWidth}px; block-size: ${frameHeight}px; border: var(--rule) solid var(--color-ink); border-radius: var(--radius); overflow: hidden; }
-    .art img { display: block; inline-size: 100%; block-size: 100%; image-rendering: pixelated; }
+    .art { position: absolute; inset-block-start: ${card.bar + Math.round((card.height - card.bar - frameHeight - 4) / 2)}px; inset-inline-end: ${card.edge}px; inline-size: ${frameWidth}px; block-size: ${frameHeight}px; border: var(--rule) solid var(--color-ink); border-radius: var(--radius); overflow: hidden; }
+    .art img { position: absolute; inset: 0; display: block; inline-size: 100%; block-size: 100%; }
+    .art .pixels { image-rendering: pixelated; }
   </style></head><body>
     <div class="bar"></div>
     <div class="words">
@@ -81,7 +99,7 @@ try {
       <p class="last"><span class="flourish">${escape(headline.flourish)}</span><span class="serif">${escape(headline.serif)}</span></p>
       <p class="foot"><span>${escape(site.name)}</span><span class="muted">${escape(new URL(site.url).hostname)}</span></p>
     </div>
-    <div class="art"><img src="${pictureSrc}" alt=""></div>
+    <div class="art"><img src="${paintSrc}" alt=""><img class="pixels" src="${pictureSrc}" alt=""></div>
   </body></html>`;
   const page = await browser.newPage({
     viewport: { width: card.width, height: card.height },

@@ -14,7 +14,8 @@ export const rest = Object.freeze({
   spin: 0,
 });
 
-// The pose for a pointer position ("x" and "y" from -1 to 1 across the window, 0 in the middle)
+// The pose for a pointer position ("x" and "y" from -1 to 1 across the window, 0 in the middle,
+// right and up positive)
 // and how far the hero has scrolled away (0 at the top, 1 once it has gone). The compass leans
 // toward the pointer and the case turns as the page scrolls.
 export function poseFor(pointer, scrolled) {

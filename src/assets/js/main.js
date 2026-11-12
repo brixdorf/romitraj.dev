@@ -3,6 +3,7 @@ import { startAnimations } from './animations.js';
 import { startWidgets, showWidgets } from './widgets.js';
 import { startPageChanges } from './transitions.js';
 import { startCopyButtons } from './copy.js';
+import { startCompass } from './compass.js';
 
 // Marks the page as script-enabled, so styles can tell when scripts are running.
 document.documentElement.classList.add('js');
@@ -10,6 +11,11 @@ document.documentElement.classList.add('js');
 // Page changes are set up first, while the page is still exactly as it was built: Taxi keeps a
 // copy of it for when the visitor comes back.
 let stopAnimations = () => {};
+// The tickers, the scroll movement and the hero's compass, started together and stopped together.
+const startMovement = (root) => {
+  const stops = [startAnimations(root), startCompass(root)];
+  return () => stops.forEach((stop) => stop());
+};
 startPageChanges({
   // The old content is about to be thrown away: stop its tickers and scroll movement.
   beforeSwap() {
@@ -20,7 +26,7 @@ startPageChanges({
   // posts may be brought up to date wherever they are.
   afterSwap(content) {
     showWidgets({ arriving: true });
-    stopAnimations = startAnimations(content);
+    stopAnimations = startMovement(content);
   },
 });
 
@@ -29,4 +35,4 @@ startCopyButtons();
 
 // Widgets first, so the ticker measures its content with the time already in it.
 startWidgets();
-stopAnimations = startAnimations();
+stopAnimations = startMovement(document);

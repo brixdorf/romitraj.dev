@@ -2,23 +2,18 @@
   "note": "Every picture on the site. 'source' is a file in src/assets/img/source/ (a photo, or an SVG drawing). Every picture needs one of two things: 'alt', a short description that screen readers read aloud, or 'decorative': true, for a picture that is only decoration and should be passed over in silence. 'across' is how many pixel blocks wide the finished picture is: fewer means chunkier. 'shape' cuts the source to a shape (width:height) and 'crop' chooses which part: x and y from 0 to 1, and zoom. Greys darker than 'black' become solid ink and lighter than 'white' solid paper (both from 0 to 1): move them closer together for harder contrast. The rest is explained in docs/guide.md under Pictures.",
   "pictures": {
     "hero": {
-      "source": "whale-tail.jpg",
-      "alt": "A whale’s tail rising out of a dark sea, drawn in chunky black pixels.",
+      "source": "hero-compass.png",
+      "alt": "An old pocket compass in chunky pixels, its needle pointing north. Move the pointer or scroll and it turns to follow.",
       "across": 152,
       "shape": "4:5",
-      "crop": {
-        "x": 0.5,
-        "y": 0.4,
-        "zoom": 1.45
-      },
-      "black": 0.38,
-      "white": 0.64,
-      "sharpen": 1,
+      "black": 0.3,
+      "white": 0.7,
       "ground": "texture",
       "texture": {
         "seed": 7,
         "strokes": 9
-      }
+      },
+      "credit": false
     },
     "armillary": {
       "source": "armillary.jpg",

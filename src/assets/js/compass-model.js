@@ -142,7 +142,7 @@ function rosePoint(into, z, angle, length, width, dark, light) {
 
 export function buildCompass() {
   const body = part();
-  const brass = 0.52;
+  const brass = 0.36;
   const faceZ = 0.06;
 
   // The case: a shallow drum with a rounded back, a rolled edge and a lip around the face.
@@ -166,6 +166,7 @@ export function buildCompass() {
   // The face, light, with a thin ring and marks around its edge.
   annulus(body, faceZ, 0, 0.885, 0.97);
   annulus(body, faceZ + 0.001, 0.655, 0.675, 0.04);
+  annulus(body, faceZ + 0.001, 0.845, 0.885, 0.12);
   for (let degree = 0; degree < 360; degree += 10) {
     const cardinal = degree % 90 === 0;
     const angle = (degree * Math.PI) / 180;
@@ -178,10 +179,10 @@ export function buildCompass() {
       body,
       faceZ + (long ? 0.004 : 0.003),
       (quarter * Math.PI) / 4,
-      long ? 0.6 : 0.36,
-      long ? 0.09 : 0.06,
-      0.6,
-      0.88,
+      long ? 0.62 : 0.38,
+      long ? 0.1 : 0.07,
+      long ? 0.42 : 0.55,
+      0.92,
     );
   }
 
@@ -218,10 +219,10 @@ export function buildCompass() {
   const needle = part();
   const z = 0.135;
   const ridge = z + 0.03;
-  const width = 0.085;
+  const width = 0.1;
   const halves = [
-    [0.62, 0.06],
-    [-0.54, 0.9],
+    [0.66, 0.04],
+    [-0.58, 0.9],
   ];
   for (const [reach, tone] of halves) {
     const tip = [0, reach, z];

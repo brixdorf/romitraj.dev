@@ -98,6 +98,26 @@
   inset: 0;
 }
 
+/* The 3D compass (assets/js/compass.js): a canvas laid exactly over the still pixel picture, one
+   canvas pixel to a block, enlarged without smoothing. It shows once its first drawing is ready;
+   the still picture then goes unseen but stays in the page, so its description is still read. */
+.hero__compass {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+
+.hero__image--live .hero__compass {
+  opacity: 1;
+}
+
+.hero__image--live .picture--pixels {
+  opacity: 0;
+}
+
 /* ---- Phone: the headline runs down the left edge, everything else stacks beside it. ---- */
 @media (width < 600px) {
   .hero {
