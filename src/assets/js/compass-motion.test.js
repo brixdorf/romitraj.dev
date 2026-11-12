@@ -25,13 +25,38 @@ describe('poseFor', () => {
 });
 
 describe('settle', () => {
+  const flat = { tilt: 0, lean: 0, spin: 0 };
+  // Runs the pose toward "target" for "seconds" in frames of a sixtieth of a second, and returns
+  // every lean it passed through.
+  const run = (target, seconds) => {
+    let pose = flat;
+    const leans = [];
+    for (let frame = 0; frame < seconds * 60; frame++) {
+      pose = settle(pose, target, 1 / 60);
+      leans.push(pose.lean);
+    }
+    return { pose, leans };
+  };
+
   it('moves part of the way toward the target each frame, more in a longer frame', () => {
-    const flat = { tilt: 0, lean: 0, spin: 0 };
     const short = settle(flat, { ...flat, lean: 1 }, 1 / 60);
     const long = settle(flat, { ...flat, lean: 1 }, 1 / 20);
     expect(short.lean).toBeGreaterThan(0);
     expect(long.lean).toBeGreaterThan(short.lean);
     expect(long.lean).toBeLessThan(1);
+  });
+
+  it('swings a touch past the target, as a thing with weight does, and settles on it', () => {
+    const { pose, leans } = run({ ...flat, lean: 1 }, 4);
+    expect(Math.max(...leans)).toBeGreaterThan(1.005);
+    expect(Math.max(...leans)).toBeLessThan(1.1);
+    expect(pose.lean).toBeCloseTo(1, 3);
+    expect(isStill({ angle: 0, speed: 0 }, pose, { ...flat, lean: 1 })).toBe(true);
+  });
+
+  it('cannot run away after a long pause between frames', () => {
+    const pose = settle(flat, { ...flat, lean: 1 }, 5);
+    expect(Math.abs(pose.lean)).toBeLessThanOrEqual(1.1);
   });
 });
 
@@ -76,21 +101,31 @@ describe('isStill', () => {
     expect(isStill({ angle: 0.2, speed: 0 }, rest, rest)).toBe(false);
     expect(isStill({ angle: 0, speed: 0 }, rest, { ...rest, lean: 0.3 })).toBe(false);
   });
+
+  it('is not still while the pose is still moving, even at its target', () => {
+    const moving = { ...rest, speed: { tilt: 0, lean: 0.5, spin: 0 } };
+    expect(isStill({ angle: 0, speed: 0 }, moving, rest)).toBe(false);
+  });
 });
 
 describe('toneAt', () => {
-  it('uses the same two by two pattern as the pixel pictures (scripts/images.mjs)', () => {
-    expect([threshold(0, 0), threshold(1, 0), threshold(0, 1), threshold(1, 1)]).toEqual([
-      0.125, 0.625, 0.875, 0.375,
-    ]);
-    expect(threshold(2, 2)).toBe(threshold(0, 0));
+  it('uses the same four by four pattern as the pixel pictures’ "fine" pattern (scripts/images.mjs)', () => {
+    const table = [
+      [0, 8, 2, 10],
+      [12, 4, 14, 6],
+      [3, 11, 1, 9],
+      [15, 7, 13, 5],
+    ];
+    for (let y = 0; y < 4; y++)
+      for (let x = 0; x < 4; x++) expect(threshold(x, y)).toBe((table[y][x] + 0.5) / 16);
+    expect(threshold(4, 5)).toBe(threshold(0, 1));
   });
 
-  it('gives solid ink below "black", solid paper above "white", a checkerboard between', () => {
-    const ink = (value) =>
-      [0, 1].flatMap((y) => [0, 1].map((x) => toneAt(value, x, y, 0.25, 0.75)));
-    expect(ink(0.1)).toEqual(['ink', 'ink', 'ink', 'ink']);
-    expect(ink(0.9)).toEqual(['paper', 'paper', 'paper', 'paper']);
-    expect(ink(0.5).filter((tone) => tone === 'ink')).toHaveLength(2);
+  it('gives solid ink below "black", solid paper above "white", an even mix between', () => {
+    const tones = (value) =>
+      [0, 1, 2, 3].flatMap((y) => [0, 1, 2, 3].map((x) => toneAt(value, x, y, 0.25, 0.75)));
+    expect(tones(0.1).every((tone) => tone === 'ink')).toBe(true);
+    expect(tones(0.9).every((tone) => tone === 'paper')).toBe(true);
+    expect(tones(0.5).filter((tone) => tone === 'ink')).toHaveLength(8);
   });
 });

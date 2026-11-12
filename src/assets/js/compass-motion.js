@@ -1,6 +1,6 @@
 // How the hero's compass moves, as plain numbers: where it leans for a pointer position and a
-// scroll position, how it eases toward that, how its needle swings back to north, and how a tone
-// becomes ink or paper. No drawing happens here (compass.js draws); the settings are in motion.js.
+// scroll position, how it swings toward that on a spring, how its needle swings back to north,
+// and how a tone becomes ink or paper. No drawing happens here (compass.js draws); the settings are in motion.js.
 import { compass as settings } from './motion.js';
 
 const radians = (degrees) => (degrees * Math.PI) / 180;
@@ -28,12 +28,25 @@ export function poseFor(pointer, scrolled) {
   };
 }
 
-// One frame's step from the current pose toward the target: a share of the way that depends on
-// how long the frame was, so the compass moves at the same pace whatever the screen's refresh rate.
+// One frame's step from the current pose toward the target. Each angle hangs on a spring with a
+// little less damping than would stop it dead, so the compass carries its weight: it swings a
+// touch past where it is going and settles back. The pose remembers how fast each angle moves
+// ("speed"). Long frames are cut into small steps, so it moves the same at any refresh rate and
+// cannot run away after a pause.
+const keys = ['tilt', 'lean', 'spin'];
 export function settle(current, target, seconds) {
-  const share = 1 - Math.exp(-seconds / settings.follow);
-  const step = (key) => current[key] + (target[key] - current[key]) * share;
-  return { tilt: step('tilt'), lean: step('lean'), spin: step('spin') };
+  const { stiffness, damping } = settings.follow;
+  const pose = { tilt: current.tilt, lean: current.lean, spin: current.spin };
+  const speed = { tilt: 0, lean: 0, spin: 0, ...current.speed };
+  const time = clamp(seconds, 0, 4);
+  const steps = Math.min(960, Math.max(1, Math.ceil(time * 240)));
+  for (let step = 0; step < steps; step++)
+    for (const key of keys) {
+      const pull = stiffness * (target[key] - pose[key]) - damping * speed[key];
+      speed[key] += (pull * time) / steps;
+      pose[key] += (speed[key] * time) / steps;
+    }
+  return { ...pose, speed };
 }
 
 // One step of the needle. "angle" is where it points, measured from north (up, toward the ring
@@ -62,20 +75,23 @@ export function isStill(needle, pose, target) {
   return (
     Math.abs(needle.angle) < 1e-3 &&
     Math.abs(needle.speed) < 1e-3 &&
-    ['tilt', 'lean', 'spin'].every((key) => near(pose[key], target[key]))
+    keys.every((key) => near(pose[key], target[key]) && Math.abs(pose.speed?.[key] ?? 0) < 1e-3)
   );
 }
 
-// The two by two pattern of thresholds the pixel pictures use (scripts/images.mjs, "checker"):
-// a pixel becomes paper when its tone is above its threshold. The shader in compass.js repeats it.
+// The four by four pattern of thresholds the pixel pictures call "fine" (scripts/images.mjs): a
+// pixel becomes paper when its tone is above its threshold. Sixteen steps between ink and paper,
+// so the compass's curved metal shades smoothly. The shader in compass.js repeats it.
 const pattern = [
-  [0, 2],
-  [3, 1],
+  [0, 8, 2, 10],
+  [12, 4, 14, 6],
+  [3, 11, 1, 9],
+  [15, 7, 13, 5],
 ];
-export const threshold = (x, y) => (pattern[y % 2][x % 2] + 0.5) / 4;
+export const threshold = (x, y) => (pattern[y % 4][x % 4] + 0.5) / 16;
 
 // A tone (0 dark to 1 light) at a pixel, as ink or paper: darker than "black" is solid ink,
-// lighter than "white" solid paper, and a checkerboard between.
+// lighter than "white" solid paper, and an even mix of the two between.
 export function toneAt(value, x, y, black, white) {
   const stretched = clamp((value - black) / (white - black), 0, 1);
   return stretched <= threshold(x, y) ? 'ink' : 'paper';
