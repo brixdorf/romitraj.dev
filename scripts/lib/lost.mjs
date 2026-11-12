@@ -1,5 +1,5 @@
-// Tests used by the check script, about the page for an address that leads nowhere ("Lost at
-// sea", src/content/404.njk) and the server's answer for such an address (server/index.js).
+// Tests used by the check script, about the page for an address that leads nowhere ("Lost in
+// oblivion", src/content/404.njk) and the server's answer for such an address (server/index.js).
 //
 // "lostAnswers" asks the server directly and confirms that
 //   - a missing page is answered with the status 404 and the page for a missing address, never with 200;
@@ -18,7 +18,7 @@
 import fs from 'node:fs';
 import { letterPlaces, furthest } from './entrance.mjs';
 
-const missing = '/the-kraken-took-it/';
+const missing = '/off-the-map/';
 const name = '[data-part="title"]';
 // The page's giant name, read from the top of its own file, so that renaming the page needs no
 // change here.
@@ -220,21 +220,22 @@ export async function lostPage(browser, address) {
   );
   const answers = [];
   page.on('response', (response) => {
-    if (new URL(response.url()).pathname === '/gone-fishing/') answers.push(response.status());
+    if (new URL(response.url()).pathname === '/nowhere-at-all/') answers.push(response.status());
   });
   await page.goto(address + '/', { waitUntil: 'load' });
   await page.waitForTimeout(800);
   // One of the home page's own links is pointed at an address that does not exist, then clicked.
   await page.evaluate(() => {
-    document.querySelector('.hero__nav a[href="/about/"]').setAttribute('href', '/gone-fishing/');
+    document.querySelector('.hero__nav a[href="/about/"]').setAttribute('href', '/nowhere-at-all/');
   });
-  await page.locator('.hero__nav a[href="/gone-fishing/"]').click();
+  await page.locator('.hero__nav a[href="/nowhere-at-all/"]').click();
   await page
     .waitForFunction(
-      (selector) =>
-        location.pathname === '/gone-fishing/' &&
-        /lost at sea/i.test(document.querySelector(selector)?.textContent || ''),
-      name,
+      ([selector, expected]) =>
+        location.pathname === '/nowhere-at-all/' &&
+        (document.querySelector(selector)?.textContent || '').trim().toLowerCase() ===
+          expected.toLowerCase(),
+      [name, words],
       { timeout: 10000 },
     )
     .catch(() => {});
@@ -245,7 +246,7 @@ export async function lostPage(browser, address) {
     marked: document.documentElement.classList.contains('intro'),
   }));
   const shown = await heading(page);
-  if (landed.path !== '/gone-fishing/')
+  if (landed.path !== '/nowhere-at-all/')
     problems.push(
       `a link to a missing page ended at ${landed.path} instead of staying at the missing address`,
     );
@@ -290,17 +291,18 @@ export async function lostPage(browser, address) {
   await page.goBack();
   await page
     .waitForFunction(
-      (selector) =>
-        location.pathname === '/gone-fishing/' &&
-        /lost at sea/i.test(document.querySelector(selector)?.textContent || ''),
-      name,
+      ([selector, expected]) =>
+        location.pathname === '/nowhere-at-all/' &&
+        (document.querySelector(selector)?.textContent || '').trim().toLowerCase() ===
+          expected.toLowerCase(),
+      [name, words],
       { timeout: 10000 },
     )
     .catch(() => {});
   await page.waitForTimeout(1500);
   const back = await heading(page);
   if (
-    new URL(page.url()).pathname !== '/gone-fishing/' ||
+    new URL(page.url()).pathname !== '/nowhere-at-all/' ||
     !back?.visible ||
     back.words.toLowerCase() !== words.toLowerCase()
   )

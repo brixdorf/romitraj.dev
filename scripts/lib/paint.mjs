@@ -60,24 +60,24 @@ export function paintTexture({
   height,
   seed = 1,
   strokes = 11,
-  tones = { calm: 243.5, darkest: 212, lightest: 251, mostlyAbove: 226, swell: 6 },
+  tones = { calm: 243.5, darkest: 212, lightest: 251, mostlyAbove: 226, bumps: 6 },
 }) {
   const random = randomFrom(seed);
   const between = (least, most) => least + random() * (most - least);
   const heights = new Float32Array(width * height);
-  // The broad swells also show as soft lighter and darker patches, kept apart from the fine shading.
+  // The broad bumps also show as soft lighter and darker patches, kept apart from the fine shading.
   const patches = new Float32Array(width * height);
 
-  // Broad, slow swells in the paint.
-  const swellAcross = smoothNoise(random, 6);
-  const swellDown = smoothNoise(random, 6);
+  // Broad, slow bumps in the paint.
+  const bumpAcross = smoothNoise(random, 6);
+  const bumpDown = smoothNoise(random, 6);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const swell =
-        swellAcross((x / width) * 5 + (y / height) * 1.5) *
-        swellDown((y / height) * 5 + (x / width) * 0.8);
-      heights[y * width + x] = 0.6 * swell;
-      patches[y * width + x] = swell;
+      const bump =
+        bumpAcross((x / width) * 5 + (y / height) * 1.5) *
+        bumpDown((y / height) * 5 + (x / width) * 0.8);
+      heights[y * width + x] = 0.6 * bump;
+      patches[y * width + x] = bump;
     }
   }
 
@@ -161,7 +161,7 @@ export function paintTexture({
     // Shadows keep their full depth; light edges are held back, since the paint is nearly white already.
     const tone =
       tones.calm +
-      patches[index] * tones.swell +
+      patches[index] * tones.bumps +
       (shade[index] < 0 ? shade[index] * strength : shade[index] * strength * 0.45);
     greys[index] = Math.round(Math.max(tones.darkest, Math.min(tones.lightest, tone)));
   }
