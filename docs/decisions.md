@@ -2,6 +2,76 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-12, Part 3 again: better photos, a finer compass, two About cards
+
+Romit found the Part 3 photos and the 3D compass poor and asked for both again, plus his own caption back on the missing page and two new cards on the About page.
+
+### Sources checked
+
+| What                 | Source, read on 2026-11-12                                                                                                                                                  | Used for                                                                                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Each photo's licence | Its own page on unsplash.com: "Free to use under the Unsplash License" (the Smithsonian's camera, tried and dropped, says "Dual License: Public Domain & Unsplash License") | The photos below                                                                                                                                                  |
+| henry.codes          | Its pictures, looked at only (our own screenshots in the private `reference/`)                                                                                              | What a picture here should be: one cut-out object, heavy ink, bright highlights                                                                                   |
+| resend.com           | Its 3D cube, watched in Chromium in the toolbox (pointer moved across it)                                                                                                   | The bar for the compass's finish: bevels catching light, varied surfaces, soft studio light, weight in the motion. Nothing of its code, models or assets was used |
+
+No package was added or updated.
+
+### The photos
+
+Unsplash's search refuses automated browsers ("Access Denied"), which was not worked around: photos were found through its search pages as a web reader sees them, and fetched with each photo's own download link. About a hundred were tried through the site's own conversion before choosing.
+
+**Why the first set was poor:** thin line engravings (the armillary sphere, the heavens), busy close-ups (gears, punched cards, the watch movement) and a light object on a busy ground (the globe) all turn to noise or near-empty paper in two tones. **What works**, as on henry.codes: one bold object, mostly dark with bright highlights, on a plain light ground, or a bright object on plain black (paper on an ink block).
+
+| Picture (`images.json`) | Photo                                                                                                                                                    | Photographer   | Where                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | --------------------------------------------------------- |
+| `sewing`                | [Black and yellow metal sewing machine](https://unsplash.com/photos/black-and-yellow-metal-sewing-machine-hzdgFPz1V24)                                   | Annie Spratt   | Behind the home page's about section                      |
+| `typebars`, `keys`      | [A black and white photo of an old fashioned typewriter](https://unsplash.com/photos/a-black-and-white-photo-of-an-old-fashioned-typewriter-sufuSMO41Jg) | Bonnie Hawkins | Beside "Projects" (the type bars) and "Resume" (the keys) |
+| `telephone`             | [Photo of black rotary phone against white background](https://unsplash.com/photos/photo-of-black-rotary-phone-against-white-background-xhGMQ_nYWqU)     | Quino Al       | Beside "Credits"                                          |
+| `hourglass`             | [An antique hourglass with sand flowing](https://unsplash.com/photos/an-antique-hourglass-with-sand-flowing-ozuQ8EY2CRA)                                 | Callum Mullin  | The About page's small frame                              |
+| `lantern`               | [Silhouette of an old lantern against a pale sky](https://unsplash.com/photos/silhouette-of-an-old-lantern-against-a-pale-sky-sOvV69iL6SA)               | Belov Sergey   | The page for a missing address                            |
+| `binoculars`            | [Black binoculars on white surface](https://unsplash.com/photos/black-binoculars-on-white-surface-bMIUBn07iM0)                                           | Glen Carrie    | Beside Aletheia                                           |
+| `radio`                 | [Vintage radio on a white background](https://unsplash.com/photos/vintage-radio-on-a-white-background-mZSx0BmjOMg)                                       | Ian Talmacs    | Beside My Homelab                                         |
+
+Tried and dropped: an astro compass and a bellows camera from the Smithsonian (black on a dark or grey ground: no clean outline), a row of three folding cameras (blobs in a strip), a big gear (rust turned to noise), a celestial globe and a top-down globe (too light), and an earlier telephone, kept off in favour of the wider one for the Credits strip.
+
+**Two new settings** (`scripts/images.mjs`, tested):
+
+- **`cutout`** removes a photo's plain backdrop, so only the object is drawn on paper (`plainBackdrop`): it spreads from the photo's edges while neighbouring greys stay close, so it follows a slowly darkening wall and stops at the object's edge, and a light spot inside the object stays. It starts only from edge pixels near the ground's grey, measured along the whole photo's edge, because a tight crop runs through the object (the sewing machine at first came out hollow when the search started inside its hand wheel).
+- **`zoom` below 1** shows the whole photo smaller, with room around it in the photo's own ground grey (`paddingFor`), for objects a wide frame would cut (the radio, the telephone).
+
+**Frames are cropped to fill**, and their shapes change a lot with the window (measured: the strips beside page names run from 2.9 to 7.5 times as wide as tall; the My Homelab frame from 2.5 to 3.3; the About page's small frame from 0.4 to 3). Each picture keeps its object in the middle with room to lose. The about section's picture only shows its top half on laptops (the section cuts the rest), so the sewing machine's decorated arm sits high.
+
+**The Credits page keeps its wide frame:** a square frame was tried and left a large empty gap beside the short name.
+
+Formats as before (lossless JPEG XL, AVIF, PNG; the smaller offered first): JPEG XL wins for all the new pictures, AVIF for none.
+
+### The hero: the compass rebuilt
+
+- **Same blocks, 152 by 190 (3px on laptops).** Finer blocks (228 by 285, 2px) were tried first and looked finer, but the brief's measured rule for the hero is about 150 blocks of 3px, like the reference's and every other picture here; 3px blocks also leave more room for the browsers' rounding when they enlarge the picture. The dial's rings and marks were made a little bolder for 3px blocks.
+- **Two steps:** the compass is drawn three times finer into a texture, as smooth greys, then each block's nine samples are averaged and dithered. Edges and small parts come out cleaner than drawing straight into blocks.
+- **Light and materials:** polished metal reflects a soft studio (a large soft light above on the left, a narrow one on the right, a dim room), so highlights slide over the case as it turns; painted parts take the light softly; the bezel and crown are knurled (grooves made in the shader); the dial darkens under the bezel's rim; the needle casts a soft shadow on the dial; the glass adds its reflections and dulls the dial toward its rim (as white on white, its reflections alone would not show).
+- **Model** (`compass-model.js`, tested): a rounded case with smooth normals, a stepped bezel, a crown with a knurled button and a bow, a dial with a track of 5°, 10° and 30° marks, quarter marks and rings, a raised eight-point rose, a blued north half and a brighter south half on the needle with a jewelled cap, and a domed glass.
+- **Dither:** the four by four `fine` pattern (16 steps) instead of two by two (4 steps): curved metal shades smoothly.
+- **Motion:** the pose now hangs on a spring (`follow: { stiffness: 70, damping: 13 }`): it swings about 2% past and settles in about half a second, which gives it weight. Reach: tilt 18°, lean 24° (the test keeps it under 25°). It still comes to rest, so the still picture and the checks hold; there is no idle motion.
+- **Still and share image:** redrawn by `pnpm run share`.
+- **Speed** (`pnpm run speed`): Largest Contentful Paint on a slow phone 1144ms (1168ms before), on a laptop 44ms (104ms before); the headline's entrance costs nothing.
+
+### Firefox and the still picture
+
+The first full check failed once, in Firefox only: at rest the compass differed from the still picture in 5.1% of its blocks (1% allowed). Measured step by step: the two browsers draw the same compass (0.07% apart, raw pixels); Firefox's live canvas shows exactly what it draws (0.09% off the file); but Firefox showed the still _image_ 1.8% off its own file, in one rectangle on the right, even with the compass never started. The cause: every picture has `object-fit: cover`, and the hero frame's inside is 454.67 by 569.33 pixels at 1440px, a hair off four by five, so the image was enlarged by its height (2.9965 times) and trimmed by 0.8px, while the canvas is stretched to the box (2.9912 across). The two drift a pixel apart toward the right; Chromium's rounding hid it, Firefox's did not. **Fix:** the hero's still picture is stretched like the canvas (`object-fit: fill`, `hero.css`). After it: 0.00% in Chromium, 0.11% in Firefox, 0.07% in WebKit. The check itself was not changed.
+
+Three other changes made on the way are kept because they are sound, though none was the cause: the block pass asks for high precision where there is any; the grooves' angle is folded into one turn before its sine (graphics cards differ on the sine of large numbers); and the fine picture is released after each frame before the next draws into it. A plain canvas copy of each frame and a transform-scaled canvas were tried and dropped.
+
+### Checks
+
+The build, `pnpm run lint`, `pnpm test` (112 tests), `pnpm run smoke` and `pnpm run speed` pass. The full check (`pnpm run check`, Chromium, Firefox and WebKit at once) failed once in Firefox (see above) and then **passed** in all three browsers, the compass test included.
+
+### Text
+
+- **The missing page's caption** is Romit's again: "The search party hasn’t found it either." It sits under the lantern.
+- **About page:** two new cards, in the existing card style, between Contact and Toolbox: "Last Movie or Series I watched" ("Finishing MCU for Doomsday") and "Currently Reading" ("The Odyssey"), each with "Suggest me", an email link to hi@romitraj.dev with the subject filled in. The titles' font (Louize Display) has no slash of any kind, so in "Movie/Series" the slash became "or", which also reads right aloud; the subjects keep their slash, since they are not shown. Words in `about.json` (`watching`, `reading`). The link is built by `scripts/lib/mailto.mjs` (tested): the subject is written with `encodeURIComponent`, so spaces are `%20`, never `+`, which some mail apps show as a plus sign.
+- New picture descriptions in Romit's tone, listed in his notes and in `REWRITE.md`.
+
 ## 2026-11-12, Part 3: a new theme, new pictures, a 3D compass
 
 Part 3 of the overhaul. The sea theme is gone. The new one, Romit's, is **the age of exploration meeting old machines**: compasses, armillary spheres, star charts, telescopes, hourglasses, gears and punched cards.

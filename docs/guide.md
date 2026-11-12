@@ -129,6 +129,7 @@ scripts/        python.mjs (runs the two font scripts with the project's own Pyt
                 with Vite+, during every build), lib/venv.mjs (the font scripts' Python
                 environment), lib/projects.mjs (the checks on a project's facts),
                 lib/credits.mjs (the photographers the Credits page thanks),
+                lib/mailto.mjs (email links with a subject filled in),
                 lib/downloads.mjs and lib/pgp.mjs (publish the resume and the OpenPGP key
                 during every build), lib/photo.mjs (turns a photo into grey JPEG XL, AVIF
                 and JPEG files), lib/saying.mjs (the check's test of the About page quote's
@@ -240,7 +241,7 @@ The home page is a stack of sections, listed in order in `src/content/index.njk`
 | --------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | Hero      | Headline, ticker (weather, place, local time, what is playing), page links, the 3D compass in its frame | `headline.json`, `home.json`, `navigation.json`, `images.json` (`hero`)           |
 | Letter    | A short signed note on a dark block                                                                     | `home.json` (`letter`)                                                            |
-| About     | Sliding heading, quote ticker, bio, card of links, a large engraving behind them                        | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`armillary`)     |
+| About     | Sliding heading, quote ticker, bio, card of links, a large sewing machine behind them                   | `home.json` (`about`), `site.json` (`elsewhere`), `images.json` (`sewing`)        |
 | Projects  | One row per project on a dark block                                                                     | The files in `src/content/projects/`, `home.json` (`projects`)                    |
 | Writing   | The latest blog posts as cards, kept up to date by the server                                           | The blog's own feed, `home.json` (`writing`)                                      |
 | Night sky | A band of stippled sky that darkens into the footer, stars and a star chart's arcs (`night-sky.css`)    | `images.json` (`nightsky`)                                                        |
@@ -297,9 +298,9 @@ On phones the giant name shrinks until its longest word fits the screen. This is
 
 ### The page for a missing address
 
-An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost in oblivion", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a framed telescope pointed at nothing in particular.
+An address that leads nowhere (a mistyped address, an old link from another site) gets the site's own page, "Lost in oblivion", in place of a bare error: the giant name with the compass beside it, a card numbered 404 with a few words and three ways back (Home, Projects, About), and a framed oil lantern, captioned “The search party hasn’t found it either.”
 
-- **The page** is `src/content/404.njk`. The build writes it as `404.html`. Its giant name is the `title` at the top of that file; its other words are in `src/_data/pages.json` (`lost`); the picture is `telescope` in `images.json`, and its caption is `caption` in `pages.json` (`lost`). The words beside Projects and About are the ones from `navigation.json`.
+- **The page** is `src/content/404.njk`. The build writes it as `404.html`. Its giant name is the `title` at the top of that file; its other words are in `src/_data/pages.json` (`lost`); the picture is `lantern` in `images.json`, and its caption is `caption` in `pages.json` (`lost`). The words beside Projects and About are the ones from `navigation.json`.
 - **To look at it**, run `pnpm run dev` and open any address that does not exist, such as http://localhost:8080/nothing-here/.
 - **It is sent with the status 404.** A status is the number a server sends before a page: 200 means "here it is", 404 means "there is no such page". The visitor sees the page either way; the number is what tells browsers and search engines not to treat the address as a real one. The live server does this in `server/index.js`, and `pnpm run dev` does the same by itself.
   - A missing picture, stylesheet or other file gets a plain `Not found` with the same status, not the page.
@@ -310,10 +311,11 @@ An address that leads nowhere (a mistyped address, an old link from another site
 
 ### The About page
 
-Its three framed pictures are named in `src/content/about.njk` (`portrait`, `hourglass`, `nightsky`) and described in `images.json`. The portrait is a grey photo, not pixel art (see "Photos" under "Pictures"). All of its text is in `src/_data/about.json`: the quote under the page's name (`quote`), the portrait's caption, four numbered cards (`who`, `tinkering` (titled "Whereabouts"), `contact`, `toolbox`), and the words around the latest blog post and the OpenPGP key. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
+Its three framed pictures are named in `src/content/about.njk` (`portrait`, `hourglass`, `nightsky`) and described in `images.json`. The portrait is a grey photo, not pixel art (see "Photos" under "Pictures"). All of its text is in `src/_data/about.json`: the quote under the page's name (`quote`), the portrait's caption, six numbered cards (`who`, `tinkering` (titled "Whereabouts"), `contact`, `watching`, `reading`, `toolbox`), and the words around the latest blog post and the OpenPGP key. The cards number themselves. The card of links is the same list as on the home page (`site.json`, `elsewhere`). The piece about the latest blog post comes from the blog's feed and is brought up to date while the page is open (see "Blog posts" under "The home page sections"); its words around the post are `latest` in `about.json`. If the feed could not be read during the build, the piece is left out until the page gets the post from the server. The picture frames are empty until the images are built.
 
 `<a href="...">` and `{email}` work as in `home.json`.
 
+- **What you watched last and what you are reading** are two small cards, "Last Movie or Series I watched" and "Currently Reading" (`watching` and `reading` in `about.json`). When either changes, change its `text`. Each ends with "Suggest me", a link that opens an email to you with `subject` already filled in (the subject is never shown on the page, so a slash is fine there; the titles are in the serif font, which has none). The link is made by the `mailto` filter (`scripts/lib/mailto.mjs`).
 - **The toolbox** is a table of two columns, area and skills, matching the skills on the resume. Add a row as `["Area", "Skills"]`. A table of three columns works too: the third is shown as a grey aside.
 - **The quote** (Epictetus) sits right under "About the human", in large serif letters (`--type-saying` in `tokens.css`). Its two halves, `plain` and `italic`, are two lines, the second slanted. It is in the large serif, so no straight apostrophe and no slash. It echoes the "Who" card, which says you keep learning about the things you think you already know.
   - **It has an entrance:** when the page is opened, its two lines slide up into place one after the other, solid, through a window at their top edge, as the page's name does when it arrives (`entrance: saying` at the top of `about.njk`; see "The headline's entrance"). Arriving from another page, the same happens while the name is still sliding in (`pageIn` in `page-changes.js`, `pageChange.pageIn.saying` in `motion.js`). The page's name itself does not move on opening. No entrance for visitors who asked for less motion.
@@ -631,15 +633,18 @@ Every link to another website opens in a new tab. The build does this by itself 
 
 ## The hero's compass
 
-The picture in the hero is an old pocket compass in 3D, drawn in the same chunky two-tone pixels as every other picture. It leans toward the mouse pointer, its case turns as the page scrolls, and its needle swings back to north, wobbles and settles. When nothing moves, it stops drawing.
+The picture in the hero is an old pocket compass in 3D, drawn in the same two-tone pixels and the same 3-pixel blocks as every other picture. It has a polished case with rounded edges, a knurled bezel, a crown and a bow on top, a dial with a track of marks and a raised rose, a blued needle with a jewelled cap, and a domed glass. It leans toward the mouse pointer, its case turns as the page scrolls, and it swings a touch past where it is going and settles, like a thing with weight. Its needle swings back to north, wobbles and settles. When nothing moves, it stops drawing.
 
 How it works:
 
-- **WebGL**, the graphics part of every browser, draws it into a small canvas exactly as many pixels wide as the hero's picture has blocks (152 by 190). The browser enlarges it without smoothing, like the other pictures. The shading is turned into ink or paper with the same two by two pattern the build uses for photos, so it looks like one of them. No library: a few hundred lines of the site's own code.
-  - `src/assets/js/compass-model.js`: the shapes, as triangles: the brass case with its ring, the light face with its marks and its rose, the pivot, and the needle (dark half north). Each corner has a tone from 0 (ink) to 1 (paper).
-  - `src/assets/js/compass-motion.js`: how it leans and turns for a pointer and a scroll position, how quickly it follows, and the needle's spring. Tested by `pnpm test`.
-  - `src/assets/js/compass.js`: the drawing, and starting and stopping it.
-  - `src/assets/js/motion.js` (`compass`): every number: the resting pose, how far it can turn, how quickly it follows, the needle's spring, and the two thresholds that turn shading into ink or paper.
+- **WebGL**, the graphics part of every browser, draws it in two steps. No library: a few hundred lines of the site's own code.
+  1. It draws the compass three times finer than the frame's blocks, into a picture the browser keeps out of sight, in smooth shades of grey. Polished metal reflects a soft studio: a large soft light above on the left, a narrow light on the right, a dim room. That reflection is what makes metal look like metal, and the highlights slide over the case as it turns. Painted parts (the dial, the rose) take the light softly. The bezel and the crown get fine grooves, the dial is a little darker under the bezel's rim, the needle casts a soft shadow on the dial, and the glass adds its reflections and dulls the dial a little toward its rim.
+  2. It averages each block's nine samples and turns the result into ink or paper with the four by four pattern the build calls `fine` (sixteen steps between ink and paper, so curved metal shades smoothly). Where less than half a block is covered, it stays clear, so the painted backdrop shows around the compass.
+  - The canvas is exactly as many pixels as the hero's picture has blocks (152 by 190), enlarged without smoothing like the other pictures. The still picture is stretched to the frame the same way (`object-fit: fill` in `hero.css`), not cut to fit like other pictures: the frame is a fraction of a pixel away from four by five, and cut to fit, Firefox showed the two a pixel apart.
+  - `src/assets/js/compass-model.js`: the shapes, as triangles: the case, the bezel, the crown and the bow, the dial with its marks and rose, the needle, and the glass. Each corner has a tone from 0 (ink) to 1 (paper), what it is made of (painted or polished metal) and, for knurled metal, how many grooves run around it. Tested by `pnpm test`.
+  - `src/assets/js/compass-motion.js`: how it leans and turns for a pointer and a scroll position, the spring it follows on, and the needle's spring. Tested by `pnpm test`.
+  - `src/assets/js/compass.js`: the drawing (the lights, the materials, the two steps), and starting and stopping it.
+  - `src/assets/js/motion.js` (`compass`): every number: the resting pose, how far it can turn, the spring it follows on, the needle's spring, and the two thresholds that turn shading into ink or paper.
 - **The still picture comes first.** Every visitor first gets the still picture, `hero` in `images.json`, made from `src/assets/img/source/hero-compass.png`: the compass at rest, drawn by the same code. Once the page has loaded and the browser has a moment to spare, the canvas is laid over it and takes its place. At rest the two are the same, block for block, so nothing seems to happen until you move. So the compass costs nothing in loading speed.
 - **Where it cannot run, the still picture stays:** without scripts, without WebGL, for visitors who asked their system for less motion (and the moment they ask for it), and if the graphics card ever drops the drawing.
 - **Screen readers** read the still picture's description; it stays in the page, unseen, and the canvas is hidden from them.
@@ -651,6 +656,8 @@ To change it:
 1. Change the shapes in `compass-model.js` or the numbers in `motion.js` (`compass`), and look at it with `pnpm run dev`.
 2. Run `pnpm run share`: it draws the new still picture (and the share image and the README's screenshot) from the same code. Commit the three pictures with the change, or the still and the live compass will no longer match.
 
+The look is the reference's pixel style at the level of finish of a modern product site: it was set against Resend's 3D cube (resend.com), looked at only, never copied. See `docs/decisions.md`.
+
 `pnpm run check` tests it in three browsers: that the canvas takes the still picture's place exactly, without moving the frame; that at rest it shows the same as the still picture (at most 1% of the blocks may differ, since each browser's graphics round the shading slightly differently); that it follows the pointer and the scroll and comes to rest; that it starts again after a page change and leaves no canvas elsewhere; and that with less motion, without scripts and without WebGL only the still picture shows.
 
 ## Pictures
@@ -660,58 +667,62 @@ Every picture on the site is made by the build from a file in `src/assets/img/so
 The list of pictures is `src/_data/images.json`. One entry looks like this:
 
 ```json
-"globe": {
-  "source": "globe.jpg",
-  "alt": "A dark globe on a brass stand, tilted on its axis.",
-  "across": 110,
-  "shape": "17:10",
-  "crop": { "x": 0.5, "y": 0.43, "zoom": 1 },
-  "black": 0.25,
-  "white": 0.75,
-  "sharpen": 1
+"radio": {
+  "source": "radio.jpg",
+  "alt": "An old portable radio with a round speaker, a row of dials and a carry handle on top.",
+  "across": 120,
+  "shape": "5:2",
+  "crop": { "x": 0.5, "y": 0.5, "zoom": 0.8 },
+  "black": 0.3,
+  "white": 0.7,
+  "sharpen": 1,
+  "cutout": 0.03
 }
 ```
 
-| Setting          | What it does                                                                                                                                                                                                                                                        |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source`         | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops                                                                                                                                                                       |
-| `alt`            | The short description screen readers read aloud. Every picture needs either this or `decorative`                                                                                                                                                                    |
-| `decorative`     | `true` for a picture that is only decoration (the footer's compass, the night sky band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both                                                                   |
-| `across`         | How many pixel blocks wide the picture is. Fewer blocks are chunkier. The hero has 152, which is about 3px a block at laptop size                                                                                                                                   |
-| `shape`          | Cuts the source to this shape, written width:height. Without it the source's own shape is kept                                                                                                                                                                      |
-| `crop`           | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it                                                                                                                                |
-| `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker                  |
-| `sharpen`        | Crisper edges before the picture is reduced to two tones. 0 to 2                                                                                                                                                                                                    |
-| `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the night sky band)                                                                                                              |
-| `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                                            |
-| `despeckle`      | `true` removes lone specks of ink: a block with no ink touching it and almost none near it. Used by the portrait, whose cut-out left a faint outline that turned into scattered dots. Even tones, lines and edges are kept (`removeSpecks` in `scripts/images.mjs`) |
-| `kind`           | `"photo"` keeps the picture a photo, in shades of grey, instead of pixel art. See "Photos" below                                                                                                                                                                    |
-| `credit`         | `false` for a picture that needs no entry in `image-credits.json` (the portrait, the hero's compass). Every other photo needs one                                                                                                                                   |
-| `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                                    |
+| Setting          | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `source`         | The file in `src/assets/img/source/`. Two pictures may use the same file with different crops                                                                                                                                                                                                                                                                                                                                                          |
+| `alt`            | The short description screen readers read aloud. Every picture needs either this or `decorative`                                                                                                                                                                                                                                                                                                                                                       |
+| `decorative`     | `true` for a picture that is only decoration (the footer's compass, the night sky band). Screen readers pass over it in silence. The build stops if a picture has neither `alt` nor this, or both                                                                                                                                                                                                                                                      |
+| `across`         | How many pixel blocks wide the picture is. Fewer blocks are chunkier. Most have 74 to 288; the hero has 152, about 3px a block at laptop size                                                                                                                                                                                                                                                                                                          |
+| `shape`          | Cuts the source to this shape, written width:height. Without it the source's own shape is kept                                                                                                                                                                                                                                                                                                                                                         |
+| `crop`           | Which part to keep: `x` and `y` are the middle of the part (0 is the left or top edge, 1 the right or bottom) and `zoom` enlarges it. A `zoom` below 1 shows the whole photo smaller, with room around it in the photo’s own ground colour: for an object that a wide frame would otherwise cut (the radio, the telephone)                                                                                                                             |
+| `black`, `white` | Greys darker than `black` become solid ink and greys lighter than `white` solid paper (0 is black, 1 is white). What lies between becomes a checkerboard. Bring the two closer together for harder contrast; raise both to make the picture darker                                                                                                                                                                                                     |
+| `sharpen`        | Crisper edges before the picture is reduced to two tones. 0 to 2                                                                                                                                                                                                                                                                                                                                                                                       |
+| `cutout`         | Removes a plain backdrop around an object, so only the object is drawn, on paper, as the reference cuts out its subjects. The number is how far apart two neighbouring greys of the backdrop may be (0.03 suits most photos on a plain wall or table). The backdrop is found from the photo’s edges inward, so a light spot inside the object stays (`plainBackdrop` in `scripts/images.mjs`). Used by the sewing machine, the radio and the telephone |
+| `pattern`        | `checker` (the default), `fine` (more steps, for smooth gradients in a drawing) or `grain` (scattered dots like stippling, used by the night sky band)                                                                                                                                                                                                                                                                                                 |
+| `tones`          | `ink` (the default) draws the dark parts in ink. `paper` draws the light parts in the paper colour and leaves the rest clear, for a picture that sits on a dark background (the compass)                                                                                                                                                                                                                                                               |
+| `despeckle`      | `true` removes lone specks of ink: a block with no ink touching it and almost none near it. Used by the portrait, whose cut-out left a faint outline that turned into scattered dots. Even tones, lines and edges are kept (`removeSpecks` in `scripts/images.mjs`)                                                                                                                                                                                    |
+| `kind`           | `"photo"` keeps the picture a photo, in shades of grey, instead of pixel art. See "Photos" below                                                                                                                                                                                                                                                                                                                                                       |
+| `credit`         | `false` for a picture that needs no entry in `image-credits.json` (the portrait, the hero's compass). Every other photo needs one                                                                                                                                                                                                                                                                                                                      |
+| `ground`         | `paper` (the default), `clear` (see-through where the picture is light), or `texture` (the hero only: see below)                                                                                                                                                                                                                                                                                                                                       |
 
 Where each picture is shown:
 
 | Picture                 | Source                                                         | Where                                                                             |
 | ----------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `hero`                  | hero-compass.png (drawn by the site, see "The hero's compass") | The frame in the hero, under the 3D compass                                       |
-| `armillary`             | armillary.jpg (an engraving)                                   | Behind the home page's about section                                              |
+| `sewing`                | sewing-machine.jpg                                             | Behind the home page's about section                                              |
 | `nightsky`              | night-sky.svg                                                  | The band above the footer on the home page, and the wide frame on the About page  |
 | `compass`               | compass.svg                                                    | The footer on every page, and beside the About page's name and the missing page's |
-| `gears`                 | gears.jpg                                                      | Beside the Projects page's name                                                   |
-| `globe`, `movement`     | globe.jpg, watch-movement.jpg                                  | The frames on the Projects page (Aletheia, My Homelab)                            |
+| `typebars`              | typewriter.jpg (its type bars)                                 | Beside the Projects page's name                                                   |
+| `binoculars`, `radio`   | binoculars.jpg, radio.jpg                                      | The frames on the Projects page (Aletheia, My Homelab)                            |
 | `portrait`, `hourglass` | portrait.jpg (a photo), hourglass.jpg                          | The About page                                                                    |
-| `punchcards`            | punch-cards.jpg                                                | Beside the Resume page's name                                                     |
-| `heavens`               | armillary.jpg (the upper half of the engraving)                | Beside the Credits page's name                                                    |
-| `telescope`             | telescope.jpg                                                  | The page for a missing address                                                    |
+| `keys`                  | typewriter.jpg (its keys)                                      | Beside the Resume page's name                                                     |
+| `telephone`             | telephone.jpg                                                  | Beside the Credits page's name                                                    |
+| `lantern`               | lantern.jpg                                                    | The page for a missing address                                                    |
 
-The theme, since 2026-11-12, is **the age of exploration meeting old machines**: compasses, armillary spheres, star charts, telescopes, hourglasses, gears and punched cards. A new picture should fit it.
+The theme, since 2026-11-12, is **the age of exploration meeting old machines**: compasses, lanterns, binoculars, hourglasses, sewing machines, typewriters, telephones and radios. A new picture should fit it.
+
+**What makes a photo work here** (learnt choosing these): one bold object, mostly dark, with bright highlights in it, on a plain light ground (it becomes ink on paper, cut out with `cutout`), or a bright object on a plain black ground (it becomes paper on an ink block, as the hourglass is). Thin line drawings, light grey objects and busy scenes turn to noise. Frames change shape with the window (a strip runs from about 3 to 7.5 times as wide as tall), and the picture is cropped to fill them, so keep the object in the middle with room around it.
 
 ### Changing a picture
 
 - **To swap a photo:** put the new file in `src/assets/img/source/`, change `source` (and `alt`) in `images.json`, and add the photo to `image-credits.json`. Then adjust `crop`, `black` and `white` while `pnpm run dev` is running: the picture is redone each time you save.
 - **A photo that works** has one clear subject with a strong outline against a plain background. Busy photos turn into noise.
 - **To add a picture:** add an entry with a new name (with an `alt`, or `"decorative": true` if it is only ornament), then show it with `{% picture "name" %}` in a template, or name it as a project's `image` or a page's `picture`.
-- **The photos are from Unsplash**, except the portrait, which needs no credit (`"credit": false`). Two of them are engravings from The New York Public Library's collection.
+- **The photos are from Unsplash**, except the portrait, which needs no credit (`"credit": false`).
 
 ### Photos
 
