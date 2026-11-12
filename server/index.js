@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { answerApi } from './api.js';
-import { wkdHeaders } from './wkd.js';
+import { fileHeaders, isUnchanged, typeOf } from './files.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteDir = path.join(root, '_site');
@@ -18,26 +18,6 @@ try {
 }
 const port = Number(process.env.PORT) || 3000;
 
-const types = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.map': 'application/json; charset=utf-8',
-  '.xml': 'application/xml; charset=utf-8',
-  '.txt': 'text/plain; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.webp': 'image/webp',
-  '.avif': 'image/avif',
-  '.ico': 'image/x-icon',
-  '.webmanifest': 'application/manifest+json; charset=utf-8',
-  '.pdf': 'application/pdf',
-  '.asc': 'application/pgp-keys',
-  '.woff2': 'font/woff2',
-};
-
 // Turns a URL path into a file inside baseDir, or null if there is no such file.
 // The second line refuses any path that tries to climb out of baseDir.
 function findFile(baseDir, urlPath) {
@@ -45,11 +25,11 @@ function findFile(baseDir, urlPath) {
   if (filePath !== baseDir && !filePath.startsWith(baseDir + path.sep)) return null;
   const stats = fs.statSync(filePath, { throwIfNoEntry: false });
   if (!stats) return null;
-  if (stats.isFile()) return { filePath, size: stats.size };
+  if (stats.isFile()) return { filePath, size: stats.size, mtimeMs: stats.mtimeMs };
   const indexPath = path.join(filePath, 'index.html');
   const indexStats = fs.statSync(indexPath, { throwIfNoEntry: false });
   return indexStats?.isFile()
-    ? { filePath: indexPath, size: indexStats.size, isIndex: true }
+    ? { filePath: indexPath, size: indexStats.size, mtimeMs: indexStats.mtimeMs, isIndex: true }
     : null;
 }
 
@@ -69,7 +49,7 @@ function sendNotFound(request, response, urlPath) {
   if (!stats?.isFile() || (extension && extension !== '.html'))
     return send(response, 404, 'Not found');
   response.writeHead(404, {
-    'Content-Type': types['.html'],
+    'Content-Type': typeOf(lostPage),
     'Content-Length': stats.size,
     'Cache-Control': 'no-cache',
     'X-Content-Type-Options': 'nosniff',
@@ -103,15 +83,22 @@ const server = http.createServer(async (request, response) => {
     return response.end();
   }
 
-  const extension = path.extname(found.filePath).toLowerCase();
-  response.writeHead(200, {
-    'Content-Type': types[extension] || 'application/octet-stream',
-    'Content-Length': found.size,
-    'Cache-Control': extension === '.html' ? 'no-cache' : 'public, max-age=3600',
-    'X-Content-Type-Options': 'nosniff',
-    // The Web Key Directory's files: raw bytes, readable from any website.
-    ...wkdHeaders(urlPath),
+  // The file's headers (server/files.js). A file the browser already holds in this version is
+  // answered 304 "not modified", with no body.
+  const headers = fileHeaders({
+    urlPath,
+    filePath: found.filePath,
+    search: new URL(request.url, 'http://localhost').search,
+    size: found.size,
+    mtimeMs: found.mtimeMs,
   });
+  if (isUnchanged(request.headers, headers.ETag)) {
+    const unchanged = { ...headers };
+    delete unchanged['Content-Length'];
+    response.writeHead(304, unchanged);
+    return response.end();
+  }
+  response.writeHead(200, headers);
   if (request.method === 'HEAD') return response.end();
   fs.createReadStream(found.filePath).pipe(response);
 });
