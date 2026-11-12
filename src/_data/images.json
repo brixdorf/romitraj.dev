@@ -1,5 +1,5 @@
 {
-  "note": "Every picture on the site. 'source' is a file in src/assets/img/source/ (a photo, or an SVG drawing). Every picture needs one of two things: 'alt', a short description that screen readers read aloud, or 'decorative': true, for a picture that is only decoration and should be passed over in silence. 'across' is how many pixel blocks wide the finished picture is: fewer means chunkier. 'shape' cuts the source to a shape (width:height) and 'crop' chooses which part: x and y from 0 to 1, and zoom. Greys darker than 'black' become solid ink and lighter than 'white' solid paper (both from 0 to 1): move them closer together for harder contrast. The rest is explained in docs/guide.md under Pictures.",
+  "note": "Every picture on the site. 'source' is a file in src/assets/img/source/ (a photo, or an SVG drawing). Every picture needs one of two things: 'alt', a short description that screen readers read aloud, or 'decorative': true, for a picture that is only decoration and should be passed over in silence. 'across' is how many pixel blocks wide the finished picture is: fewer means chunkier. 'shape' cuts the source to a shape (width:height) and 'crop' chooses which part: x and y from 0 to 1, and zoom. Greys darker than 'black' become solid ink and lighter than 'white' solid paper (both from 0 to 1): move them closer together for harder contrast. 'cutout' removes a plain backdrop around an object, so only the object is drawn. The rest is explained in docs/guide.md under Pictures.",
   "pictures": {
     "hero": {
       "source": "hero-compass.png",
@@ -15,19 +15,20 @@
       },
       "credit": false
     },
-    "armillary": {
-      "source": "armillary.jpg",
-      "alt": "An old engraving of an armillary sphere: rings for the tropics and the zodiac around a small Earth, numbered all the way round.",
+    "sewing": {
+      "source": "sewing-machine.jpg",
+      "alt": "An old black sewing machine with gold scrollwork along its arm and a big hand wheel on the side.",
       "across": 234,
       "shape": "26:25",
       "crop": {
-        "x": 0.5,
-        "y": 0.755,
-        "zoom": 1.45
+        "x": 0.47,
+        "y": 0.56,
+        "zoom": 1.75
       },
-      "black": 0.35,
-      "white": 0.75,
-      "sharpen": 1
+      "black": 0.3,
+      "white": 0.65,
+      "sharpen": 1,
+      "cutout": 0.035
     },
     "compass": {
       "source": "compass.svg",
@@ -47,47 +48,45 @@
     },
     "hourglass": {
       "source": "hourglass.jpg",
-      "alt": "An hourglass with most of its sand already at the bottom.",
+      "alt": "An old hourglass on a wooden stand, its sand still running.",
       "across": 74,
       "shape": "3:4",
       "crop": {
         "x": 0.5,
-        "y": 0.5,
-        "zoom": 1
+        "y": 0.45,
+        "zoom": 1.1
       },
-      "black": 0.4,
-      "white": 0.72,
-      "sharpen": 1,
-      "despeckle": true
+      "black": 0.12,
+      "white": 0.55,
+      "sharpen": 1
     },
-    "telescope": {
-      "source": "telescope.jpg",
-      "alt": "An old surveyor’s telescope on a wooden tripod, pointed at nothing in particular.",
+    "lantern": {
+      "source": "lantern.jpg",
+      "alt": "An old oil lantern hanging against a pale sky, the kind a search party carries.",
       "across": 96,
       "shape": "4:5",
       "crop": {
         "x": 0.5,
-        "y": 0.33,
-        "zoom": 1.45
+        "y": 0.55,
+        "zoom": 1.05
       },
-      "black": 0.2,
-      "white": 0.6,
+      "black": 0.25,
+      "white": 0.52,
       "sharpen": 1
     },
-    "punchcards": {
-      "source": "punch-cards.jpg",
-      "alt": "Rows of old punched cards, full of holes.",
+    "keys": {
+      "source": "typewriter.jpg",
+      "alt": "Rows of round keys on an old typewriter.",
       "across": 192,
       "shape": "22:5",
       "crop": {
         "x": 0.5,
-        "y": 0.5,
-        "zoom": 2.6
+        "y": 0.77,
+        "zoom": 1
       },
       "black": 0.3,
-      "white": 0.55,
-      "sharpen": 1,
-      "stretch": true
+      "white": 0.62,
+      "sharpen": 1
     },
     "portrait": {
       "kind": "photo",
@@ -103,61 +102,63 @@
       "widths": [240, 480, 720, 960],
       "target": 0.98
     },
-    "gears": {
-      "source": "gears.jpg",
-      "alt": "A wall of cogs and gears of every size, locked together.",
+    "typebars": {
+      "source": "typewriter.jpg",
+      "alt": "The inside of an old typewriter: dozens of type bars fanned out in a half circle, each waiting for its key.",
       "across": 192,
       "shape": "22:5",
+      "crop": {
+        "x": 0.5,
+        "y": 0.47,
+        "zoom": 1.1
+      },
+      "black": 0.22,
+      "white": 0.6,
+      "sharpen": 1.5
+    },
+    "binoculars": {
+      "source": "binoculars.jpg",
+      "alt": "A pair of black binoculars seen from above, staring right back at you.",
+      "across": 110,
+      "shape": "2:1",
       "crop": {
         "x": 0.5,
         "y": 0.5,
         "zoom": 1
       },
-      "black": 0.15,
-      "white": 0.55,
+      "black": 0.3,
+      "white": 0.7,
       "sharpen": 1
     },
-    "globe": {
-      "source": "globe.jpg",
-      "alt": "A dark globe on a brass stand, tilted on its axis.",
-      "across": 110,
-      "shape": "17:10",
+    "radio": {
+      "source": "radio.jpg",
+      "alt": "An old portable radio with a round speaker, a row of dials and a carry handle on top.",
+      "across": 120,
+      "shape": "5:2",
       "crop": {
         "x": 0.5,
-        "y": 0.43,
-        "zoom": 1
-      },
-      "black": 0.25,
-      "white": 0.75,
-      "sharpen": 1
-    },
-    "movement": {
-      "source": "watch-movement.jpg",
-      "alt": "The inside of an old watch: gears, springs and jewels, all ticking along.",
-      "across": 110,
-      "shape": "17:10",
-      "crop": {
-        "x": 0.5,
-        "y": 0.45,
-        "zoom": 1.6
-      },
-      "black": 0.2,
-      "white": 0.6,
-      "sharpen": 1
-    },
-    "heavens": {
-      "source": "armillary.jpg",
-      "alt": "An old engraving of the heavens: a sky full of stars, with the Sun and the Moon among them.",
-      "across": 192,
-      "shape": "22:5",
-      "crop": {
-        "x": 0.5,
-        "y": 0.26,
-        "zoom": 1.45
+        "y": 0.5,
+        "zoom": 0.8
       },
       "black": 0.3,
-      "white": 0.75,
-      "sharpen": 1
+      "white": 0.7,
+      "sharpen": 1,
+      "cutout": 0.03
+    },
+    "telephone": {
+      "source": "telephone.jpg",
+      "alt": "An old black rotary telephone with its handset off the hook, the cord looping all the way across.",
+      "across": 288,
+      "shape": "5:1",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5,
+        "zoom": 0.42
+      },
+      "black": 0.3,
+      "white": 0.7,
+      "sharpen": 1,
+      "cutout": 0.03
     }
   }
 }

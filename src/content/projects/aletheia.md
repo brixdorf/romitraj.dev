@@ -8,7 +8,7 @@ tags:
 year: 2026
 link: https://aletheia.romitraj.dev
 order: 2
-image: globe
+image: binoculars
 ---
 
 Aletheia goes through a website's checkout or sign-up the way a real customer would, stops before paying, and tells you which tricks it ran into.
