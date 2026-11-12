@@ -182,12 +182,17 @@ export const compass = {
   // The pose at rest, the one the still picture shows: the top turned away from the viewer by
   // "tilt", the right side by "lean".
   rest: { tilt: 22, lean: -18 },
-  // How far it can turn from rest: toward the pointer ("tilt" up and down, "lean" and "turn"
-  // across), and "spin", how far the case turns on its face once the hero has scrolled away.
-  reach: { tilt: 18, lean: 24, turn: 12, spin: 140 },
-  // How it follows: each angle hangs on a spring ("stiffness") slowed by "damping". With these it
-  // takes about a third of a second to get there and swings a few hundredths past before settling.
-  follow: { stiffness: 70, damping: 13 },
+  // How it turns on its own: still for "delay" seconds after it takes the still picture's place,
+  // then easing in over "rampUp" seconds to "speed" degrees a second, about an axis close to
+  // upright that "wanders" (0 never, 1 a lot) so it tumbles.
+  idle: { speed: 30, delay: 1.2, rampUp: 1.5, wander: 0.4 },
+  // A drag with the mouse or a finger: degrees turned per CSS pixel dragged, the fastest it can
+  // be thrown (degrees a second), and how many seconds a throw takes to slow back to its own
+  // pace (about two thirds of the way).
+  drag: { perPixel: 0.6, fastest: 900, coast: 1.1 },
+  // How far from its middle the view reaches across, in the compass's own units (its case has a
+  // radius of 1): room for it to turn every way without leaving the frame.
+  view: 1.4,
   // The needle: the spring pulling it to north, the damping that calms it, and the share of the
   // case's turn the pivot drags it along by.
   needle: { spring: 38, damping: 2.6, drag: 0.85 },

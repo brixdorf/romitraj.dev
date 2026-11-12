@@ -1,11 +1,20 @@
 // The hero's 3D compass. On a page with WebGL, scripts and no wish for less motion, a small canvas
 // takes the place of the still pixel picture in the hero's frame, drawn at the same size in
 // blocks (one canvas pixel is one block, enlarged without smoothing) and in the same two tones,
-// dithered with the pixel pictures' four by four pattern. It leans toward the pointer, its case turns as the page scrolls, and its
-// needle swings back to north. At rest it is the still picture (which `pnpm run share` makes from
-// this same code). Anywhere it cannot run, the still picture simply stays.
+// dithered with the pixel pictures' four by four pattern. It starts as the still picture (which
+// `pnpm run share` makes from this same code), then turns slowly on its own; a drag with the
+// mouse or a finger turns it any way, all the way round, and when let go it coasts back to its
+// own pace. Its needle swings back to north. Anywhere it cannot run, the still picture stays.
 import { buildCompass } from './compass-model.js';
-import { poseFor, rest, settle, stepNeedle, isStill } from './compass-motion.js';
+import {
+  restTurn,
+  turnBy,
+  idleSpin,
+  dragSpin,
+  coast,
+  needleRest,
+  stepNeedle,
+} from './compass-motion.js';
 import { compass as settings } from './motion.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -19,7 +28,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 // glass adds only its reflections. The second pass averages each block's nine samples and turns
 // the result into ink or paper with the pixel pictures' four by four pattern ("fine" in
 // scripts/images.mjs), counted from the top left block. Where less than half a block is covered,
-// it stays clear, so the painted backdrop shows around the compass.
+// it stays clear: around the compass there is only the paper.
 
 const fine = 3;
 
@@ -113,6 +122,9 @@ void main() {
   if (metal > 0.5) {
     float diffuse = max(dot(n, normalize(key)), 0.0);
     value = shade * (0.82 * room(r) + 0.12 * diffuse) + 0.25 * fresnel * room(r);
+    // The back of the case also catches a broad light from behind the viewer, brighter the more
+    // it faces them, so its turned rings and boss show when the compass turns round.
+    if (local.z < -0.28) value += shade * (0.35 * smoothstep(0.15, 0.9, facingEye) + 0.45 * smoothstep(0.6, 0.98, r.z));
   } else {
     float diffuse = max(dot(n, normalize(key)) * 0.6 + 0.4, 0.0);
     float gloss = pow(max(dot(n, normalize(normalize(key) + v)), 0.0), 60.0);
@@ -186,25 +198,19 @@ const multiply = (a, b) => {
       for (let k = 0; k < 4; k++) out[column * 4 + row] += a[k * 4 + row] * b[column * 4 + k];
   return out;
 };
-const turnX = (angle) => {
-  const [c, s] = [Math.cos(angle), Math.sin(angle)];
-  return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]);
-};
-const turnY = (angle) => {
-  const [c, s] = [Math.cos(angle), Math.sin(angle)];
-  return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]);
-};
 const turnZ = (angle) => {
   const [c, s] = [Math.cos(angle), Math.sin(angle)];
   return new Float32Array([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 };
 
 // The camera: a narrow lens some way off, looking at the compass from the front, so it keeps a
-// touch of depth. It looks a little above the case's middle, to leave room for the crown and bow.
-const lift = 0.22;
+// touch of depth. The compass turns about the middle of the case, crown and bow together
+// ("pivot"), which sits in the middle of the view; the view reaches far enough across
+// ("settings.view") for the compass to turn every way without leaving the frame.
+const pivot = [0, 0.33, 0];
 const distance = 9;
 function camera(aspect) {
-  const half = 1.42 / distance;
+  const half = settings.view / aspect / distance;
   const [near, far] = [distance - 3, distance + 3];
   const f = 1 / half;
   const lens = new Float32Array([
@@ -225,9 +231,32 @@ function camera(aspect) {
     (2 * far * near) / (near - far),
     0,
   ]);
-  const place = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -lift, -distance, 1]);
+  const place = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -distance, 1]);
   return multiply(lens, place);
 }
+
+// A turn (compass-motion.js: nine numbers, row by row) about the pivot, as a 4 by 4 matrix.
+const placed = (m) => {
+  const [x, y, z] = pivot;
+  return new Float32Array([
+    m[0],
+    m[3],
+    m[6],
+    0,
+    m[1],
+    m[4],
+    m[7],
+    0,
+    m[2],
+    m[5],
+    m[8],
+    0,
+    -(m[0] * x + m[1] * y + m[2] * z),
+    -(m[3] * x + m[4] * y + m[5] * z),
+    -(m[6] * x + m[7] * y + m[8] * z),
+    1,
+  ]);
+};
 
 // A colour from the styles ("#2a2722") as three numbers from 0 to 1.
 const colour = (name) => {
@@ -254,7 +283,7 @@ function programOf(gl, vertexText, fragmentText) {
   return gl.getProgramParameter(program, gl.LINK_STATUS) ? program : null;
 }
 
-// Sets up WebGL on a canvas. Returns { draw(pose, needleAngle), forget() }, or null where WebGL
+// Sets up WebGL on a canvas. Returns { draw(turn, needleAngle), forget() }, or null where WebGL
 // cannot be had or fails to set up.
 export function compassPainter(canvas, { keep = false } = {}) {
   let gl;
@@ -322,7 +351,7 @@ export function compassPainter(canvas, { keep = false } = {}) {
   );
   gl.useProgram(scene);
   gl.uniformMatrix4fv(sceneUniform('view'), false, camera(canvas.width / canvas.height));
-  gl.uniform3fv(sceneUniform('eye'), [0, lift, distance]);
+  gl.uniform3fv(sceneUniform('eye'), [0, 0, distance]);
   const turn = sceneUniform('turn');
   const needleUniform = sceneUniform('needle');
   const glassUniform = sceneUniform('glass');
@@ -353,7 +382,7 @@ export function compassPainter(canvas, { keep = false } = {}) {
   };
 
   return {
-    draw(pose, needleAngle) {
+    draw(turn, needleAngle) {
       // The fine picture.
       gl.bindFramebuffer(gl.FRAMEBUFFER, target);
       gl.viewport(0, 0, wide, tall);
@@ -363,20 +392,19 @@ export function compassPainter(canvas, { keep = false } = {}) {
       gl.disable(gl.BLEND);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      const tilted = multiply(turnX(-pose.tilt), turnY(-pose.lean));
-      // Where the needle points on the dial, seen from the case: its shadow follows it.
-      const onDial = needleAngle - pose.spin;
-      gl.uniform2f(needleUniform, -Math.sin(onDial), Math.cos(onDial));
+      const whole = placed(turn);
+      // Where the needle points on the dial: its shadow follows it.
+      gl.uniform2f(needleUniform, -Math.sin(needleAngle), Math.cos(needleAngle));
       gl.uniform1f(glassUniform, 0);
-      drawPart('body', multiply(tilted, turnZ(pose.spin)));
-      drawPart('needle', multiply(tilted, turnZ(needleAngle)));
+      drawPart('body', whole);
+      drawPart('needle', multiply(whole, turnZ(needleAngle)));
       // The glass last: what it reflects is added to what is under it, which it dulls a little
       // (its alpha says how much shows through), and it hides nothing.
       gl.uniform1f(glassUniform, 1);
       gl.depthMask(false);
       gl.enable(gl.BLEND);
       gl.blendFuncSeparate(gl.ONE, gl.SRC_ALPHA, gl.ZERO, gl.ONE);
-      drawPart('glass', multiply(tilted, turnZ(pose.spin)));
+      drawPart('glass', whole);
       for (const key of Object.keys(fields)) gl.disableVertexAttribArray(locations[key]);
 
       // The blocks.
@@ -408,7 +436,8 @@ export function compassPainter(canvas, { keep = false } = {}) {
 export function drawStill(canvas) {
   const painter = compassPainter(canvas, { keep: true });
   if (!painter) throw new Error('WebGL is not available here.');
-  painter.draw(rest, 0);
+  const turn = restTurn();
+  painter.draw(turn, needleRest(turn));
   return painter;
 }
 
@@ -461,61 +490,91 @@ function run(frame, still) {
     canvas.remove();
     return () => {};
   }
+  // The round handle laid over the compass that a drag starts from. Only there does a finger
+  // turn the compass instead of scrolling the page (touch-action in hero.css).
+  const grip = document.createElement('div');
+  grip.className = 'hero__grip';
+  grip.setAttribute('aria-hidden', 'true');
+  canvas.after(grip);
 
-  let pose = rest;
-  let target = rest;
-  let needle = { angle: 0, speed: 0, spin: 0 };
-  let pointer = { x: 0, y: 0 };
+  let turn = restTurn();
+  let needle = { angle: needleRest(turn), speed: 0 };
+  // How fast it turns (compass-motion.js), and for how many seconds it has been moving.
+  let spin = [0, 0, 0];
+  let clock = 0;
+  // The drag under way, if any: the pointer, where it last was, and its recent turns (to throw
+  // the compass with the speed it had when let go).
+  let held = null;
   let inView = true;
   let frameId = 0;
   let last = 0;
 
   // The canvas takes the still picture's place once its first drawing is on the screen. The
   // still picture stays in the page, unseen, so screen readers still read its description.
-  painter.draw(pose, needle.angle);
+  painter.draw(turn, needle.angle);
   requestAnimationFrame(() => frame.classList.add('hero__image--live'));
 
-  // How far the hero has scrolled away: 0 at the top of the page, 1 once the frame has left the
-  // top of the window.
-  const scrolled = () => {
-    const box = frame.getBoundingClientRect();
-    return Math.min(1, Math.max(0, window.scrollY / (box.bottom + window.scrollY)));
-  };
-  const aim = () => {
-    target = poseFor(pointer, scrolled());
-    wake();
-  };
-  const tick = (now) => {
+  // Every time is read from performance.now(), for frames and pointer events alike.
+  const tick = () => {
+    const now = performance.now();
     frameId = 0;
     const seconds = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
     last = now;
-    pose = settle(pose, target, seconds);
-    needle = stepNeedle(needle, pose.spin, seconds);
-    painter.draw(pose, needle.angle);
-    if (isStill(needle, pose, target)) last = 0;
-    else wake();
+    clock += seconds;
+    if (held) spin = heldSpin(now);
+    else {
+      spin = coast(spin, idleSpin(clock), seconds);
+      const speed = Math.hypot(...spin);
+      if (speed) turn = turnBy(turn, spin, speed * seconds);
+    }
+    needle = stepNeedle(needle, turn, spin, seconds);
+    painter.draw(turn, needle.angle);
+    wake();
   };
   const wake = () => {
     if (!frameId && inView && !document.hidden) frameId = requestAnimationFrame(tick);
   };
 
-  // The pointer, measured from the middle of the window: right and up count as positive. A
-  // finger is left out: on a touch screen the page's scrolling turns the compass instead.
-  const onPointer = (event) => {
-    if (event.pointerType === 'touch') return;
-    pointer = {
-      x: (event.clientX / window.innerWidth) * 2 - 1,
-      y: 1 - (event.clientY / window.innerHeight) * 2,
-    };
-    aim();
+  // The spin of the last tenth of a second of the drag: its turns added up, over the time.
+  const heldSpin = (now) => {
+    held.turns = held.turns.filter((step) => now - step.time < 100);
+    if (held.turns.length < 2) return [0, 0, 0];
+    const span = Math.max(16, now - held.turns[0].time) / 1000;
+    const sum = [0, 0, 0];
+    for (const step of held.turns.slice(1))
+      for (let axis = 0; axis < 3; axis++) sum[axis] += (step.axis[axis] * step.angle) / span;
+    return sum;
   };
-  const onLeave = () => {
-    pointer = { x: 0, y: 0 };
-    aim();
+  const onDown = (event) => {
+    if (held || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    event.preventDefault();
+    grip.setPointerCapture?.(event.pointerId);
+    held = { id: event.pointerId, x: event.clientX, y: event.clientY, turns: [] };
+    held.turns.push({ time: performance.now(), axis: [0, 1, 0], angle: 0 });
+    grip.classList.add('hero__grip--held');
+    wake();
   };
+  const onMove = (event) => {
+    if (!held || event.pointerId !== held.id) return;
+    const { axis, angle } = dragSpin(event.clientX - held.x, event.clientY - held.y);
+    held.x = event.clientX;
+    held.y = event.clientY;
+    if (!angle) return;
+    turn = turnBy(turn, axis, angle);
+    held.turns.push({ time: performance.now(), axis, angle });
+    wake();
+  };
+  const onUp = (event) => {
+    if (!held || event.pointerId !== held.id) return;
+    spin = heldSpin(performance.now());
+    held = null;
+    grip.classList.remove('hero__grip--held');
+    wake();
+  };
+
   const watcher = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
-    if (inView) aim();
+    if (inView) wake();
   });
   watcher.observe(frame);
   const onVisible = () => {
@@ -527,9 +586,11 @@ function run(frame, still) {
     frame.classList.remove('hero__image--live');
     stop();
   };
-  window.addEventListener('pointermove', onPointer, { passive: true });
-  document.documentElement.addEventListener('pointerleave', onLeave);
-  window.addEventListener('scroll', aim, { passive: true });
+  grip.addEventListener('pointerdown', onDown);
+  grip.addEventListener('pointermove', onMove);
+  grip.addEventListener('pointerup', onUp);
+  grip.addEventListener('pointercancel', onUp);
+  grip.addEventListener('lostpointercapture', onUp);
   document.addEventListener('visibilitychange', onVisible);
   canvas.addEventListener('webglcontextlost', onLost);
 
@@ -537,13 +598,11 @@ function run(frame, still) {
     if (frameId) cancelAnimationFrame(frameId);
     frameId = 0;
     watcher.disconnect();
-    window.removeEventListener('pointermove', onPointer);
-    document.documentElement.removeEventListener('pointerleave', onLeave);
-    window.removeEventListener('scroll', aim);
     document.removeEventListener('visibilitychange', onVisible);
     canvas.removeEventListener('webglcontextlost', onLost);
     frame.classList.remove('hero__image--live');
     painter.forget();
+    grip.remove();
     canvas.remove();
   }
   return stop;

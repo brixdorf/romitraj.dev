@@ -3,12 +3,17 @@
 //   - the compass takes the still picture's place: one canvas, exactly over the still picture,
 //     enlarged without smoothing, the frame not moving, and the still picture kept in the page
 //     (unseen) with its description;
-//   - at rest it shows what the still picture shows, block for block (almost: see "allowed");
-//   - it moves when the pointer moves and when the page scrolls, and comes to rest again, after
-//     which nothing on it changes;
+//   - only the compass shows: no painted backdrop, plain paper all around it, still and live;
+//   - its first drawing is what the still picture shows, block for block (almost: see "allowed");
+//   - the pointer moving over it changes nothing;
+//   - left alone it turns on its own, and keeps turning;
+//   - a drag turns it, and when let go it carries on moving; a finger on it turns it instead of
+//     scrolling the page;
 //   - with "reduce motion", without WebGL and without scripts the still picture stays, alone;
 //   - after a page change away and back there is still exactly one compass, and none elsewhere;
 //   - no script error is raised along the way.
+// The page's clock is stopped (Playwright's clock) while the compass is watched, and moved on by
+// hand, so what it does depends on time alone, never on how busy the computer is.
 import sharp from 'sharp';
 
 // The share of the frame's screen pixels that may differ between the compass at rest and the
@@ -19,8 +24,7 @@ const allowed = 0.01;
 const frame = '.hero__image';
 
 // A photograph of the hero's frame, as raw pixels. Taken of the window, clipped to the frame,
-// without scrolling it into view: scrolling turns the compass. (The window is tall enough to
-// hold the frame.)
+// without scrolling it into view. (The window is tall enough to hold the frame.)
 const photograph = async (page) => {
   const clip = await page.evaluate((selector) => {
     const { left, top, width, height } = document.querySelector(selector).getBoundingClientRect();
@@ -78,6 +82,23 @@ function difference(a, b) {
   return differ / (a.width * a.height);
 }
 
+// Whether the frame's top and bottom rows of blocks are plain paper (#fafafa): the compass
+// turns in the middle and never reaches them, and nothing else may be drawn there. The frame's
+// rounded corners are left out.
+function plainAround({ data, width, height }) {
+  for (const y of [1, 2, 3, height - 4, height - 3, height - 2])
+    for (let x = 6; x < width - 6; x++) {
+      const at = (y * width + x) * 4;
+      if (
+        Math.abs(data[at] - 250) > 3 ||
+        Math.abs(data[at + 1] - 250) > 3 ||
+        Math.abs(data[at + 2] - 250) > 3
+      )
+        return false;
+    }
+  return true;
+}
+
 // Waits for the compass to take over, up to a few seconds. Returns whether it did.
 const goesLive = (page, timeout = 5000) =>
   page
@@ -101,6 +122,7 @@ const contents = (page) =>
       return { left, top, width, height };
     };
     return {
+      painted: Boolean(box.querySelector('.picture--paint')),
       canvases: canvases.length,
       inFrame: box.querySelectorAll('canvas').length,
       stillShown: getComputedStyle(still).opacity !== '0',
@@ -131,6 +153,7 @@ export async function compassInBrowser(browser, address) {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
     const page = await context.newPage();
     errorsOf(page, 'home page');
+    await page.clock.install();
     await page.goto(address + '/', { waitUntil: 'load' });
     // The still picture first, as every visitor gets it.
     await page.waitForTimeout(150);
@@ -140,7 +163,6 @@ export async function compassInBrowser(browser, address) {
       await context.close();
       return problems;
     }
-    await page.waitForTimeout(300);
     const live = await contents(page);
     if (live.inFrame !== 1 || live.canvases !== 1)
       problems.push(
@@ -174,7 +196,26 @@ export async function compassInBrowser(browser, address) {
 
     // Compared block by block, at the middle of each block: the browser enlarges a canvas and a
     // picture with the same hard edges, but may round a block's edge to a different screen pixel.
-    const atRest = await blocksOf(page, live.blocks);
+    // The page's clock is stopped first: the compass holds still for a moment after it takes over
+    // (compass.idle.delay in motion.js), and then turns.
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 20);
+    // The headline's entrance runs on the browser's own animation clock, which Playwright's
+    // clock does not stop, and its letters pass over the top of the frame: it is left to end.
+    await page
+      .waitForFunction(
+        () =>
+          !document
+            .getAnimations()
+            .some(
+              (animation) =>
+                animation.playState === 'running' &&
+                animation.effect?.getTiming().iterations !== Infinity,
+            ),
+        null,
+        { timeout: 8000 },
+      )
+      .catch(() => {});
+    const first = await blocksOf(page, live.blocks);
     await page.evaluate((selector) => {
       document.querySelector(selector).classList.remove('hero__image--live');
     }, frame);
@@ -182,35 +223,68 @@ export async function compassInBrowser(browser, address) {
     await page.evaluate((selector) => {
       document.querySelector(selector).classList.add('hero__image--live');
     }, frame);
-    const restDiffers = difference(atRest, still);
+    const restDiffers = difference(first, still);
     if (restDiffers > allowed)
       problems.push(
-        `at rest the compass differs from the still picture in ${(restDiffers * 100).toFixed(1)}% of its blocks (at most ${allowed * 100}% may)`,
+        `the compass's first drawing differs from the still picture in ${(restDiffers * 100).toFixed(1)}% of its blocks (at most ${allowed * 100}% may)`,
       );
+    for (const [what, picture] of [
+      ['the still picture', still],
+      ['the compass', first],
+    ])
+      if (!plainAround(picture))
+        problems.push(`${what} has something other than plain paper around it in the frame`);
+    if (live.painted) problems.push('the hero frame still holds a painted backdrop');
 
-    // ---- It follows the pointer and the scroll, then rests ----
-    await page.mouse.move(40, 40);
-    await page.mouse.move(1400, 860, { steps: 8 });
-    await page.waitForTimeout(250);
-    const leaning = await blocksOf(page, live.blocks);
-    if (difference(leaning, atRest) < 0.02)
-      problems.push('the compass did not move with the pointer');
-    await page.mouse.move(720, 450);
-    await page.mouse.wheel(0, 500);
-    await page.waitForTimeout(300);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(200);
-    const swinging = await photograph(page);
-    await page.waitForTimeout(250);
-    if (difference(swinging, await photograph(page)) < 0.002)
-      problems.push('the needle did not swing after the page scrolled and came back');
-    await page.waitForTimeout(6000);
-    const settled = await photograph(page);
-    await page.waitForTimeout(400);
-    if (difference(settled, await photograph(page)) > 0)
-      problems.push(
-        'the compass was still moving six seconds after the pointer and the page stopped',
+    // ---- The pointer changes nothing ----
+    const box = live.frame;
+    const [middleX, middleY] = [box.left + box.width / 2, box.top + box.height / 2];
+    await page.mouse.move(middleX - box.width * 0.4, middleY - box.height * 0.4);
+    await page.mouse.move(middleX + box.width * 0.4, middleY + box.height * 0.3, { steps: 8 });
+    await page.mouse.move(40, 40, { steps: 4 });
+    await page.mouse.move(1400, 860, { steps: 4 });
+    await page.clock.runFor(400);
+    if (difference(await blocksOf(page, live.blocks), first) > allowed)
+      problems.push('the compass moved with the pointer (it must not react to it)');
+
+    // ---- Left alone, it turns on its own, and keeps turning ----
+    await page.clock.runFor(4000);
+    const turning = await blocksOf(page, live.blocks);
+    if (difference(turning, first) < 0.02) problems.push('the compass did not turn on its own');
+    await page.clock.runFor(1000);
+    const later = await blocksOf(page, live.blocks);
+    if (difference(later, turning) < 0.02) problems.push('the compass stopped turning on its own');
+    if (!plainAround(later))
+      problems.push('turning, the compass left something other than plain paper around it');
+
+    // ---- A drag turns it, and once let go it carries on ----
+    await page.mouse.move(middleX, middleY);
+    await page.mouse.down();
+    await page.mouse.move(middleX + 150, middleY + 40, { steps: 10 });
+    await page.clock.runFor(50);
+    const dragged = await blocksOf(page, live.blocks);
+    await page.mouse.up();
+    if (difference(dragged, later) < 0.02) problems.push('dragging did not turn the compass');
+    await page.clock.runFor(300);
+    const coasting = await blocksOf(page, live.blocks);
+    await page.clock.runFor(300);
+    if (difference(await blocksOf(page, live.blocks), coasting) < 0.02)
+      problems.push('once let go after a drag, the compass did not carry on moving');
+    const grip = await page.evaluate((selector) => {
+      const handle = document.querySelector(`${selector} .hero__grip`);
+      return (
+        handle && {
+          touch: getComputedStyle(handle).touchAction,
+          cursor: getComputedStyle(handle).cursor,
+        }
       );
+    }, frame);
+    if (!grip) problems.push('the compass has no handle to drag it by');
+    else if (grip.touch !== 'none')
+      problems.push(
+        `a finger on the compass scrolls the page instead of turning it (touch-action ${grip.touch})`,
+      );
+    await page.clock.resume();
 
     // ---- A page change away and back ----
     await page.locator('.hero__nav a[href="/about/"]').click();

@@ -204,12 +204,26 @@ export const dialZ = 0.05;
 export function buildCompass() {
   const body = part();
 
-  // The case: a rounded back, a polished side, and a stepped bezel whose rim is knurled, then
-  // the bezel's inner wall down to the dial. Points given twice make sharp corners.
+  // The case: a rounded back (seen when the compass turns round) with a raised boss in its
+  // middle and two turned grooves, a polished side, and a stepped bezel whose rim is knurled,
+  // then the bezel's inner wall down to the dial. Points given twice make sharp corners.
   lathe(
     body,
     [
-      [0, -0.3],
+      [0, -0.322],
+      [0.12, -0.322],
+      [0.14, -0.3],
+      [0.14, -0.3],
+      [0.3, -0.3],
+      [0.3, -0.3],
+      [0.32, -0.285],
+      [0.34, -0.3],
+      [0.34, -0.3],
+      [0.48, -0.3],
+      [0.48, -0.3],
+      [0.5, -0.285],
+      [0.52, -0.3],
+      [0.52, -0.3],
       [0.62, -0.3],
       [0.82, -0.285],
       [0.93, -0.245],

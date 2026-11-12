@@ -83,8 +83,7 @@
   color: var(--color-muted-on-paper);
 }
 
-/* The picture frame. Two files fill it, one over the other: the painted backdrop, then the pixels.
-   Both are laid over the frame, so its size never depends on them. */
+/* The picture frame. The still pixel picture is laid over it, so its size never depends on it. */
 .hero__image {
   position: relative;
   margin-block-end: 12px;
@@ -123,6 +122,28 @@
 
 .hero__image--live .picture--pixels {
   opacity: 0;
+}
+
+/* The round handle over the compass that a drag starts from (compass.js): a circle in the
+   middle of the frame, about as wide as the compass turns. Only there does a finger turn the
+   compass instead of scrolling the page. */
+.hero__grip {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 84%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero__grip--held {
+  cursor: grabbing;
 }
 
 /* ---- Phone: the headline runs down the left edge, everything else stacks beside it. ---- */
