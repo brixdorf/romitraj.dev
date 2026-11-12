@@ -217,9 +217,22 @@
     grid-row: 4 / span 2;
   }
 
+  /* What Romit is watching and reading: two cards side by side, as tall as each other. */
+  .about-page__watching {
+    grid-column: 1;
+    grid-row: 6;
+    align-self: stretch;
+  }
+
+  .about-page__reading {
+    grid-column: 2;
+    grid-row: 6;
+    align-self: stretch;
+  }
+
   .about-page__toolbox {
     grid-column: 1 / -1;
-    grid-row: 6;
+    grid-row: 7;
   }
 }
 
@@ -280,8 +293,18 @@
     grid-row: 4;
   }
 
+  .about-page__watching {
+    grid-column: 3 / span 5;
+    grid-row: 5;
+  }
+
+  .about-page__reading {
+    grid-column: 8 / span 5;
+    grid-row: 5;
+  }
+
   .about-page__toolbox {
     grid-column: 3 / span 10;
-    grid-row: 5;
+    grid-row: 6;
   }
 }

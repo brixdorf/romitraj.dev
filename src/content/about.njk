@@ -130,6 +130,19 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
     <a class="link panel__action" href="mailto:{{ site.email }}">{{ about.contact.link }}{{ arrow("mailto:") }}</a>
   </section>
 
+  {#- What Romit is watching and reading, each with a link that opens an email to him with the
+      subject filled in (about.json, "watching" and "reading"). #}
+  {%- for key in ["watching", "reading"] %}
+  {%- set item = about[key] %}
+  <section class="panel about-page__{{ key }}" data-part="card">
+    <h2 class="panel__title">{{ item.title }}</h2>
+    <div class="panel__text">
+      <p>{{ item.text | fill | safe }}</p>
+    </div>
+    <a class="link panel__action" href="{{ site.email | mailto(item.subject) }}">{{ item.link }}{{ arrow("mailto:") }}</a>
+  </section>
+  {%- endfor %}
+
   <section class="panel about-page__toolbox" data-part="card">
     <h2 class="panel__title">{{ about.toolbox.title }}</h2>
     {#- The roles keep this a table for screen readers on narrow windows, where the rows are stacked. #}

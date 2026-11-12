@@ -1,8 +1,6 @@
 {
-  "note": "The About page’s words. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes.",
-
+  "note": "The About page’s words. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes. “watching” and “reading” are the two small cards about the last movie or series you watched and the book you are reading: change “text” when it changes. Their “Suggest me” link opens an email to you with “subject” already filled in; the subject is not shown on the page, so a slash is fine there.",
   "portraitNote": "I didn’t have many photos of myself to begin with.",
-
   "who": {
     "title": "Who",
     "paragraphs": [
@@ -10,24 +8,30 @@
       "I currently work in full stack and DevOps. I try to keep my knowledge as deep and as broad as I can, so that I’m the one you reach out to when something breaks."
     ],
     "links": [
-      { "title": "Projects", "url": "/projects/" },
-      { "title": "Blog", "url": "https://blog.romitraj.dev" },
-      { "title": "Resume", "url": "/resume/" }
+      {
+        "title": "Projects",
+        "url": "/projects/"
+      },
+      {
+        "title": "Blog",
+        "url": "https://blog.romitraj.dev"
+      },
+      {
+        "title": "Resume",
+        "url": "/resume/"
+      }
     ]
   },
-
   "tinkering": {
     "title": "Whereabouts",
     "paragraphs": [
       "Right now I’m relearning things I learnt a long time ago, to better understand the code being written. I also keep tinkering with my server and deploying things on it."
     ]
   },
-
   "latest": {
     "label": "Latest post",
     "link": "Read the post"
   },
-
   "contact": {
     "title": "Contact",
     "paragraphs": [
@@ -57,14 +61,24 @@
       "copyLabel": "Copy the command"
     }
   },
-
+  "watching": {
+    "title": "Last Movie or Series I watched",
+    "text": "Finishing MCU for Doomsday",
+    "link": "Suggest me",
+    "subject": "Hey Romit, here is this amazing movie/series you should watch"
+  },
+  "reading": {
+    "title": "Currently Reading",
+    "text": "The Odyssey",
+    "link": "Suggest me",
+    "subject": "Hey Romit, here is this amazing book you should read"
+  },
   "quote": {
     "note": "The large quote at the top of the page, right under its name, set in the large serif: no straight apostrophe, no slash. 'plain' and 'italic' are its two halves, each on a line of its own, the second in italics.",
     "plain": "It is impossible for a man to learn",
     "italic": "what he thinks he already knows.",
     "author": "Epictetus, c. 108 AD"
   },
-
   "toolbox": {
     "title": "Toolbox",
     "columns": ["Area", "Skills"],
