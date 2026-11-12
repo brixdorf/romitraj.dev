@@ -121,7 +121,13 @@ describe('plainBackdrop', () => {
     );
 
   it('finds an even backdrop around a dark subject, and not the subject', () => {
-    const { values, width, height } = greys(['8888888', '8811188', '8810188', '8811188', '8888888']);
+    const { values, width, height } = greys([
+      '8888888',
+      '8811188',
+      '8810188',
+      '8811188',
+      '8888888',
+    ]);
     expect(marks(plainBackdrop(values, width, height, 0.05), width)).toEqual([
       'bbbbbbb',
       'bb...bb',
