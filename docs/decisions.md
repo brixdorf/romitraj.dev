@@ -2,6 +2,20 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-13, a knight's emblem behind the about section
+
+Romit's request, later the same day: run three knight pictures he supplied (in `../inputs`) through the site's picture process as the piece behind "About the human", tuned so each looks its best, and show all three side by side and switchable on the local site. He chose the first: a drawn knight's emblem from Pixabay. No package was added or updated.
+
+| Picture (`images.json`) | Source                                                                | By                                         | Where                                       |
+| ----------------------- | --------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------- |
+| `armour`                | Medieval knight emblem illustration (helmet, plume, spiked pauldrons) | an unnamed artist, Pixabay Content License | Behind the home page's about section, large |
+
+- **Source checked on 2026-11-13:** the image's page on pixabay.com (address from Romit) says "Free for use under the Pixabay Content License". The licence summary: free to use and to change, no credit required; not to be sold on its own, used as a trademark or business name, or used to mislead. A background picture on a personal site is none of those. The page names no uploader, so the Credits page says "by an unnamed artist". The file is Romit's download as he supplied it (`armour.png`, 1920 by 1404, transparent ground, which the process flattens to white). The Met's armour photo (`armour.jpg`) and its credit are gone.
+- **The Pixabay Content License is now accepted** by the build (`scripts/lib/credits.mjs`, test written first), next to public domain, CC0 and the Unsplash License. Pixabay is free to use like those three.
+- **A drawing, not a photo**, against the family of photos of old machines: Romit's choice, the same exception as the armour before it (the subject he asked for in that place, knowingly). Being flat colour with black outlines, it is the crispest of the three in two tones: the outlines stay solid ink, the gold turns to a light dither and the red plume and cape to a dark one.
+- **Settings:** `zoom` 0.63 with `x` 0.475 and `y` 0.746, so the whole emblem shows, its plume near the top, its helmet between the text and the card of links on laptops, and its left spike clear of the text on tablets (at a larger size it ran into the text there). `black` 0.25, `white` 0.8, no `cutout` (the ground is already white). 2169 bytes as PNG, 1215 as JPEG XL.
+- **The other two, tried and not chosen:** a photo of a suit of armour standing in a stone hall, and a gold engraving of a closed helmet. The hall photo needed a new setting to separate the grey steel from the warm wall (lightening each pixel by how colourful the area around it is); it worked, but the steel stayed soft and the helmet had no outline. That setting was not kept, since nothing uses it. The engraving came out as heavy black with bright highlights and was the runner-up.
+
 ## 2026-11-13, a knight's armour behind the about section
 
 Romit's request: replace the picture behind "About the human" on the home page with a medieval knight's armour, from Unsplash or any similar site (not only museums, libraries or public domain), credited and described. No package was added or updated.
