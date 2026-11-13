@@ -22,23 +22,23 @@ pnpm install
 
 These are the only commands you need. Type them in a terminal (Konsole) in the site's folder. The ones marked "browser" open a test browser, so on Fedora they run inside the toolbox (see "Test browsers on Fedora").
 
-| Command                   | What it does                                                                                                                                                                                                                                                                                   |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm run dev`            | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C.                                                                                                                                                                                  |
-| `pnpm run build`          | Builds the finished site into `_site/`.                                                                                                                                                                                                                                                        |
-| `pnpm start`              | Serves `_site/` the way the live server does, at http://localhost:3000. Run `pnpm run build` first.                                                                                                                                                                                            |
-| `pnpm run lint`           | Checks that the code is tidy and has no obvious mistakes (Vite+: Oxfmt and Oxlint). Takes a second. See "Formatting, linting and tests".                                                                                                                                                       |
-| `pnpm run format`         | Tidies the code's layout for you, then does the same check.                                                                                                                                                                                                                                    |
-| `pnpm test`               | Runs the small tests of the helper scripts (Vite+: Vitest). Takes a few seconds.                                                                                                                                                                                                               |
-| `pnpm run smoke`          | Browser. A quick check: builds the site, opens every page in Chromium at three widths, and reports a page that fails to load or any script error. About 20 seconds.                                                                                                                            |
-| `pnpm run links`          | Looks for dead links on every page of the site, inside it and out. Add an address to check another website, such as your blog. See "Dead links".                                                                                                                                               |
-| `pnpm run check`          | Browser. The full check: builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. The three browsers run at the same time. Run it before pushing a visual change. |
-| `pnpm run spotify`        | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below.                                                                                                                                                                |
-| `pnpm run fonts`          | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file.                                                                                                                                                                          |
-| `pnpm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes.                                                                                                                                                                                      |
-| `pnpm run fit`            | Browser. Measures the hero's big lines so each one fills its space. Run it after changing the headline's words.                                                                                                                                                                                |
-| `pnpm run speed`          | Browser. Measures how quickly the home page shows its main content, with and without the headline's entrance. See "The headline's entrance" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed.                                                           |
-| `pnpm run share`          | Browser. Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image".                                                                                                                                       |
+| Command                   | What it does                                                                                                                                                                                                                                                                                                                     |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm run dev`            | Runs the site at http://localhost:8080 and reloads the browser whenever you save a file. Stop it with Ctrl+C.                                                                                                                                                                                                                    |
+| `pnpm run build`          | Builds the finished site into `_site/`.                                                                                                                                                                                                                                                                                          |
+| `pnpm start`              | Serves `_site/` the way the live server does, at http://localhost:3000. Run `pnpm run build` first.                                                                                                                                                                                                                              |
+| `pnpm run lint`           | Checks that the code is tidy and has no obvious mistakes (Vite+: Oxfmt and Oxlint). Takes a second. See "Formatting, linting and tests".                                                                                                                                                                                         |
+| `pnpm run format`         | Tidies the code's layout for you, then does the same check.                                                                                                                                                                                                                                                                      |
+| `pnpm test`               | Runs the small tests of the helper scripts (Vite+: Vitest). Takes a few seconds.                                                                                                                                                                                                                                                 |
+| `pnpm run smoke`          | Browser. A quick check: builds the site, opens every page in Chromium at three widths, and reports a page that fails to load or any script error. About 20 seconds.                                                                                                                                                              |
+| `pnpm run links`          | Looks for dead links on every page of the site, inside it and out. Add an address to check another website, such as your blog. See "Dead links".                                                                                                                                                                                 |
+| `pnpm run check`          | Browser. The full check: builds, looks for broken links, photographs every page in three browsers at three widths, and tests the hero's big lines, the page changes, the headline's entrance and the pictures. The three browsers run at the same time. Run it before pushing a visual change.                                   |
+| `pnpm run spotify`        | Gets a fresh Spotify refresh token and saves it in `.env`. Needed once, and again every 6 months. See "The live widgets" below.                                                                                                                                                                                                  |
+| `pnpm run fonts`          | Converts the licensed fonts into small web fonts. Run it after changing `src/_data/fonts.json` or adding a font file.                                                                                                                                                                                                            |
+| `pnpm run fonts:fallback` | Downloads and prepares the free fallback fonts. Already done; only needed again if the font list changes.                                                                                                                                                                                                                        |
+| `pnpm run fit`            | Browser. Measures the hero's big lines so each one fills its space. Run it after changing the headline's words.                                                                                                                                                                                                                  |
+| `pnpm run speed`          | Browser. Measures how quickly the home page shows its main content, with and without the headline's entrance, and how busy it keeps the browser (blocking time and main-thread work). See "The headline's entrance" and "Loading speed" below. Like the check, it uses stand-ins for the weather, the music and the blog's feed. |
+| `pnpm run share`          | Browser. Makes the share image (the card apps show beside a shared link) and retakes the README's screenshot. See "The site's icon and the share image".                                                                                                                                                                         |
 
 ### Test browsers on Fedora
 
@@ -84,6 +84,7 @@ src/
                 copy.js (the copy button beside the gpg command on the About page),
                 compass.js (the hero's 3D compass, drawn with WebGL), compass-model.js (its
                 shapes), compass-motion.js (how it leans, turns and settles),
+                compass-pace.js (when it draws, and where it keeps the still picture),
                 intro.js (the headline's entrance when the home page opens; built into a small
                 script of its own), shapes.js (shapes shared by the animations),
                 transitions.js (page changes without a reload), scroll-memory.js (remembers
@@ -133,7 +134,8 @@ scripts/        python.mjs (runs the two font scripts with the project's own Pyt
                 lib/downloads.mjs and lib/pgp.mjs (publish the resume and the OpenPGP key
                 during every build), lib/photo.mjs (turns a photo into grey JPEG XL, AVIF
                 and JPEG files), lib/saying.mjs (the check's test of the About page quote's
-                entrance). Files ending in .test.mjs (and .test.js in server/)
+                entrance), lib/font-origin.mjs (the font site the browser connects to early).
+                Files ending in .test.mjs (and .test.js in server/)
                 are the tests (pnpm test).
 docs/           This guide and the decisions log
 package.json    The packages, the commands, and the Node.js and pnpm versions
@@ -462,6 +464,17 @@ It cannot leave the headline hidden:
 
 To measure the cost again, run `pnpm run speed`. It loads the home page nine times with the entrance and nine times without, on a simulated slow phone and on a fast laptop, and prints both figures and the difference. Run it after changing the entrance, the fonts or the top of the home page.
 
+### Loading speed
+
+`pnpm run speed` prints four figures for each kind of load (the middle one of nine, with the lowest and highest):
+
+- **First Contentful Paint**: when anything first appears.
+- **Largest Contentful Paint**: when the biggest piece appears. Search engines use it for "loading speed".
+- **Total Blocking Time**: how long the page was too busy to answer a tap or a key, from the first paint until 3.5 seconds after it loaded. Each task over 50ms counts with the part over 50ms, as PageSpeed counts it.
+- **Main-thread work**: all the time the browser's main thread spent on the page in that span, short tasks included. PageSpeed calls it "Minimize main-thread work".
+
+Its test browser draws WebGL in software, with no graphics card, like the machine PageSpeed tests on. There the hero's compass keeps its still picture (see "The hero's compass"), so the last two figures stay small. If they jump, something started drawing in software again.
+
 To change the entrance's pace, edit `letterTime` and `letterGap` at the top of `src/assets/js/motion.js`. They are shared with the page changes, so both stay in step. To switch the entrance off, remove the script in the head of `layouts/base.njk`.
 
 ## The Credits page
@@ -653,11 +666,14 @@ How it works:
   - `src/assets/js/compass-model.js`: the shapes, as triangles: the case and its back, the bezel, the crown and the bow, the dial with its marks and rose, the needle, and the glass. Each corner has a tone from 0 (ink) to 1 (paper), what it is made of (painted or polished metal) and, for knurled metal, how many grooves run around it. Tested by `pnpm test`.
   - `src/assets/js/compass-motion.js`: the turning, as plain numbers: how it turns on its own, how a drag turns it and how it coasts after, and the needle's swing. Tested by `pnpm test`.
   - `src/assets/js/compass.js`: the drawing (the lights, the materials, the two steps), the drag, and starting and stopping it.
+  - `src/assets/js/compass-pace.js`: when it draws: whether the graphics are software, whether a frame is due, and whether a frame would show anything new. Tested by `pnpm test`.
   - `src/assets/js/motion.js` (`compass`): every number: the resting pose, `idle` (how fast it turns on its own, how long it waits first, how slowly it eases in, how much its axis wanders), `drag` (how far a pixel of dragging turns it, the fastest throw, how long a throw takes to slow down), `view`, the needle's spring, and the two thresholds that turn shading into ink or paper.
 - **The still picture comes first.** Every visitor first gets the still picture, `hero` in `images.json`, made from `src/assets/img/source/hero-compass.png`: the compass at rest, drawn by the same code. Once the page has loaded and the browser has a moment to spare, the canvas is laid over it and takes its place, block for block the same, and a moment later it starts to turn. So the compass costs nothing in loading speed.
-- **Where it cannot run, the still picture stays:** without scripts, without WebGL, for visitors who asked their system for less motion (and the moment they ask for it), and if the graphics card ever drops the drawing.
+- **Where it cannot run, the still picture stays:** without scripts, without WebGL, for visitors who asked their system for less motion (and the moment they ask for it), if the graphics card ever drops the drawing, and **where WebGL would be drawn in software**, by the processor with no graphics card (the browser says WebGL would be slow, or names its software drawer: Chrome's SwiftShader, Linux's llvmpipe, Windows's Basic Render Driver; `compass-pace.js`). There it would keep the page busy all the time: on PageSpeed's test machine it took about 17 seconds of work. Every real graphics card, on phones too, still gets the compass.
 - **Screen readers** read the still picture's description; it stays in the page, unseen, and the canvas and the handle are hidden from them.
 - **It sleeps when it can:** it draws nothing while the hero is out of sight or the tab is in the background. It is stopped and its canvas removed when you leave the home page, and started again when you come back.
+- **It draws at most 60 times a second** (`fps` in `motion.js`), and not at all when nothing moved (the moment it holds still before turning). Its movement is worked out from the time, so a 120 Hz screen sees the same movement, drawn half as often. It keeps its three-times-finer first step: drawn only twice as fine, the thin arms of the rose and the needle break into dots.
+- The check's test browsers draw in software too; it sets `window.drawInSoftware` so the compass runs there anyway, and tests separately that each browser keeps the still picture when told its graphics are software.
 
 To change it:
 
@@ -913,8 +929,8 @@ The address is chosen automatically:
 
 ### How they appear on screen
 
-- The four fonts used at the top of the page are preloaded: the browser starts fetching them straight away. Which ones is set by `"preload": true` in `fonts.json`.
-- While a licensed font is still arriving, its text stays hidden instead of showing in a different font first. With preloading this is normally too short to notice. On a very slow connection the text appears a moment after the lines and boxes around it.
+- The four fonts used at the top of the page are preloaded: the browser starts fetching them straight away. Which ones is set by `"preload": true` in `fonts.json`. The font lines come first in every page's head, and on the live site the first of them tells the browser to connect to fonts.romitraj.dev at once (`preconnect`), before it reads the rest of the page.
+- While a licensed font is still arriving, its text stays hidden instead of showing in a different font first. With preloading this is normally too short to notice. On a very slow connection the text appears a moment after the lines and boxes around it. PageSpeed lists this under "Font display" as time the text could have shown sooner. That is on purpose: shown first in the fallback fonts, the hero would visibly change its letters when the real ones arrive.
 - If a font has not arrived after about 3 seconds, or fails, the fallback font is shown.
 
 ### The fallback fonts
@@ -937,7 +953,7 @@ A character a font lacks is drawn from its fallback font, which looks slightly d
 
 ### The font site
 
-The live site loads the licensed fonts from fonts.romitraj.dev, a small server in the private repository (`font-server.js`). It sends only the `.woff2` files in `fonts/web/`, tells browsers that only https://romitraj.dev may use them, and turns away requests that come from other websites. Setting it up in Dokploy is covered with the rest of deployment.
+The live site loads the licensed fonts from fonts.romitraj.dev, a small server in the private repository (`font-server.js`). It sends only the `.woff2` files in `fonts/web/`, tells browsers that only https://romitraj.dev may use them, and turns away requests that come from other websites. A font asked for with its fingerprint (as the pages ask) may be kept for a year; one asked for without is checked every time. `pnpm test` in the private repository tests it. Setting it up in Dokploy is covered with the rest of deployment.
 
 ### Adding or swapping a font
 
@@ -1045,7 +1061,7 @@ Each is written for Chrome and Edge 115, Firefox 115 and Safari 16.4 or newer: n
 
 `server/files.js` decides, for every file the live server sends, its type and how long it may be kept:
 
-- **A file asked for with a fingerprint** (`main.css?v=1a2b3c4d`: the stylesheet, the scripts, the icons, the pictures) may be kept for an hour by browsers and Cloudflare. A changed file gets a new fingerprint, so a new address.
+- **A file asked for with a fingerprint** (`main.css?v=1a2b3c4d`: the stylesheet, the scripts, the icons, the pictures) may be kept for a year by browsers and Cloudflare, without asking again (`immutable`). The fingerprint is worked out from the file's contents, so a changed file gets a new address.
 - **Everything with a plain address** (every page, `/resume.pdf`, `/romitraj-pgp-public.asc`, the Web Key Directory) is checked with the server on every visit (`no-cache`), so a new version shows at once. The server sends an ETag with each file; when the browser already has that version, the answer is a short "not modified" (304) with no body.
 - **Links a visitor follows or downloads have plain addresses**, with no `?v=` in them.
 - **A PDF opens in the browser** (`Content-Disposition: inline`).

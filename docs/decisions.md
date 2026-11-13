@@ -2,6 +2,30 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-13, loading speed: the compass, the fonts and caching
+
+Romit's request, after PageSpeed scored the live site 91 on phones and 64 on laptops: the laptop test's Total Blocking Time was 1,170ms because the hero's compass ran in software on PageSpeed's machine (no graphics card, about 17 seconds of main-thread work); both tests said the fonts from fonts.romitraj.dev held the text back about 1.4 seconds, and that `?v=` files were kept only 4 hours (pictures 1 hour). Fix all three without changing how the site looks or behaves for visitors. No package was added or updated.
+
+- **Why "4 hours":** the live headers (read on 2026-11-13) showed the site sending an hour, and Cloudflare raising it to its own Browser Cache TTL of 4 hours for the file types it caches (`.png`, `.css`, `.js`), while `.jxl` passed straight through at an hour. The font server already sent a year.
+- **Caching:** a file asked for with `?v=` is now sent with `public, max-age=31536000, immutable` (`server/files.js`, test changed first). Every fingerprint is worked out from the file's contents, so a changed file always gets a new address. Cloudflare keeps an origin's time when it is longer than its own setting, so nothing changes in Cloudflare. The resume, the key and the pages keep `no-cache` and plain addresses. The font server now gives the year only to an address with `?v=` (what the pages ask for) and `no-cache` to one without, so a swapped font is never stuck for a year at its plain address (`font-server.test.js`, Node's own test runner, written first; `pnpm test` there).
+- **Fonts:** the font lines now come first in the head, right after the viewport line, and on the live site begin with `<link rel="preconnect" href="https://fonts.romitraj.dev" crossorigin>` (`scripts/lib/font-origin.mjs`, tested). The four preloads were already there. `font-display: block` stays: with `swap` the hero would first show Anton and Cormorant and then change its letters when the real fonts arrived (the sizes are matched, so nothing would move, but the shapes visibly change), and the brief forbids it.
+- **The compass:** it already started only after the page had loaded, at idle, and already slept while out of sight or in a hidden tab. New: where WebGL would be drawn in software, the still picture stays (`compass-pace.js`, tests first). The browser is asked for a context with `failIfMajorPerformanceCaveat`, and the graphics' name is read (Firefox gives it as the renderer; Chrome and Safari through `WEBGL_debug_renderer_info`, only asked for there, since Firefox warns about it): SwiftShader, llvmpipe, softpipe and Windows's Basic Render Driver count as software. Chromium in the test toolbox names SwiftShader and does not fail the caveat, so the name is what catches it. It also draws at most 60 times a second (`fps` in `motion.js`; the leftover time is carried, so 90 and 144 Hz screens still average 60) and skips a frame identical to the last (the moment it holds still). Its movement is worked out from time, so nothing looks different.
+- **Not done: a lower internal resolution.** The first pass draws three times finer than the blocks. Drawn twice as fine, 294 of the 28,880 blocks of the resting compass changed (1%), and the rose's thin arms and the needle broke into dots. Visibly different, so it stays at three. On a real graphics card that pass is small work.
+- **Tests:** the check's test browsers draw in software, so `pnpm run check`, `pnpm run smoke` and the pictures test set `window.drawInSoftware` to keep testing the compass as visitors see it. The check gained a case that tells each browser its graphics are SwiftShader and expects the still picture alone; with the detection switched off it fails in Firefox, as it should. `pnpm run speed` does not set the switch, so it sees what PageSpeed sees.
+- **`pnpm run speed` now also prints Total Blocking Time and main-thread work.** On this computer the software compass ran in many short tasks (Chromium draws in another process with spare cores), so blocking time hardly showed it; main-thread work did: 3.75 of 5 seconds with the compass against 0.14 with the still picture, in a first probe.
+- **Measured with `pnpm run speed`** (home page, middle of nine loads; the font change does not show here, since this computer loads the fonts from the site itself):
+
+|                                                                  | Before         | After          |
+| ---------------------------------------------------------------- | -------------- | -------------- |
+| Phone, with the entrance: First and Largest Contentful Paint     | 1088ms, 1088ms | 1088ms, 1088ms |
+| Phone, with the entrance: Total Blocking Time, main-thread work  | 127ms, 3296ms  | 62ms, 1136ms   |
+| Phone, without: Total Blocking Time, main-thread work            | 119ms, 3101ms  | 56ms, 799ms    |
+| Laptop, with the entrance: First and Largest Contentful Paint    | 44ms, 112ms    | 40ms, 100ms    |
+| Laptop, with the entrance: Total Blocking Time, main-thread work | 13ms, 2606ms   | 0ms, 460ms     |
+| Laptop, without: Total Blocking Time, main-thread work           | 14ms, 2818ms   | 0ms, 406ms     |
+
+- **Checks:** `pnpm run lint`, `pnpm test` (145 tests), `pnpm run smoke` and the full `pnpm run check` pass. The first full check failed once in Firefox ("dragging did not turn the compass"). That test of the drag fails now and then in Firefox with the old code as well (1 in 4 runs before this change, 2 in 12 after), so it was not changed; the second full check passed.
+
 ## 2026-11-13, the live servers start with node, not pnpm
 
 Both Dokploy applications built fine with Railpack, then crashed on start with `/bin/bash: line 1: pnpm: command not found`. No package was added or updated; nothing in the build changes (still Node.js 26 and pnpm 12.18.0).
