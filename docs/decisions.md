@@ -2,6 +2,21 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-13, a knight's armour behind the about section
+
+Romit's request: replace the picture behind "About the human" on the home page with a medieval knight's armour, from Unsplash or any similar site (not only museums, libraries or public domain), credited and described. No package was added or updated.
+
+| Picture (`images.json`) | Photo                                                                       | By                                               | Where                                       |
+| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------- |
+| `armour` (was `engine`) | A suit of polished steel plate armor on a display stand (Augsburg, c. 1525) | the Metropolitan Museum of Art, Unsplash License | Behind the home page's about section, large |
+
+- **Source checked on 2026-11-13:** the photo's page on unsplash.com says "Free to use under the Unsplash License". The museum's record there: "Armor", helmet, pauldrons and vambraces attributed to Kolman Helmschmid, Augsburg, about 1525 and later, steel and leather, Bashford Dean Memorial Collection. Fetched at 2000 pixels wide from Unsplash's image server and kept as it came (`armour.jpg`). The engine photo and its credit are gone.
+- **Strictly** it is early sixteenth century, the last age of the armoured knight, not the Middle Ages proper; it is the classic "knight in shining armour" look Romit asked for.
+- **Against the earlier rules, by Romit's choice:** the reference has a knight's armour in the same place, and BRIEF.md said never to imitate the subject of one of its pictures, and that every picture comes from the old machines and instruments family. Romit's request overrides both for this one picture. Only the subject is shared: the photo is a different one, licensed and credited, and nothing of the reference's picture was used. The armour is empty, so "no living things" still holds.
+- **Tried, through the site's own conversion:** five suits from the Met on Unsplash (polished, fluted, gilded, dark gilded, red velvet). The polished one won: a clear helmet, tall shoulder guards and bright ridges that survive two tones. The gilded ones turn to a black mass, the red velvet one too, and the fluted one's light helmet melts into the ground. Photos of people in armour, close-ups and suits in rooms were left out.
+- **Placed in the open:** at its natural size the helmet sat behind the card of links on laptops. A `zoom` below 1 could not move a photo sideways, because the room was always split evenly. Now `x` and `y` decide how the room is shared, so the chosen point sits in the middle of the frame as far as the room allows (`paddingFor` in `scripts/images.mjs`, three new tests written first). With `x` and `y` at 0.5 nothing changes: the computer's picture is byte for byte the same. The armour uses `zoom` 0.82 and `x` 0.68: on laptops the helmet and shoulders stand between the text and the card; on tablets and phones the card covers part of the suit, as it covered the engine.
+- **Settings:** `black` 0.45, `white` 0.9, `stretch`, `cutout` 0.03. Lighter thresholds were tried for more of the visor; the difference was small and the heavier one is closer to the reference's heavy black.
+
 ## 2026-11-12, four pictures swapped for ones that grab attention
 
 Romit's request: the desk globe was bland ("we need something that gathers instant attention the moment visitor puts an eye on it"), and the 1881 typewriters, the press camera and the telephone should go too. Same family and the same rule: old machines and instruments, nothing alive. Each photo's page on unsplash.com was read on 2026-11-12 for its licence. No package was added or updated.
