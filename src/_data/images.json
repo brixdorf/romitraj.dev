@@ -40,18 +40,18 @@
       "widths": [240, 480, 720, 960],
       "target": 0.98
     },
-    "engine": {
-      "source": "radial-engine.jpg",
-      "alt": "A 1920s aircraft engine seen from the front: nine cylinders bursting out of a round hub like the points of a star.",
+    "armour": {
+      "source": "armour.jpg",
+      "alt": "An empty suit of knight’s armour from about 1525: a closed helmet with a slotted visor, ridged steel plates down the chest and arms, and a tall guard standing up from each shoulder.",
       "across": 234,
       "shape": "26:25",
       "crop": {
-        "x": 0.45,
-        "y": 0.56,
-        "zoom": 0.68
+        "x": 0.68,
+        "y": 0.4,
+        "zoom": 0.82
       },
-      "black": 0.5,
-      "white": 0.92,
+      "black": 0.45,
+      "white": 0.9,
       "stretch": true,
       "cutout": 0.03
     },
