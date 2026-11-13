@@ -56,6 +56,31 @@ Two things to know. The site's real fonts are licensed, so they are not in this 
 
 Everything else, from changing a sentence to putting it on a server, is in the [guide](docs/guide.md).
 
+## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/wrench-dark.svg"><img src="docs/readme/wrench-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Maintenance
+
+Notes for future me, back after a break with this repository and the font server's open side by side. First, read the [guide](docs/guide.md) and the [decisions](docs/decisions.md): every rule, and the reasons behind it, is in there.
+
+**Each time I come back**
+
+1. `pnpm install`, then `pnpm run lint` and `pnpm test` to make sure nothing broke while I was away.
+2. Update. Look up the newest stable version of each tool on its official site, run `pnpm outdated`, and update one package at a time. Before a big version jump, read its upgrade guide. Each October, Node.js names a new LTS line (the long-term support version meant for real sites): move both repositories to it in `engines` in `package.json`.
+3. Check. `pnpm run check` builds the site and tests every page in Chromium, Firefox and WebKit, and `pnpm run links` finds dead links. Then I open the site with `pnpm run dev` and look at it myself.
+4. Commit, then push `main`. Pushing is the deploy: the server rebuilds the site by itself. I watch it finish in the hosting dashboard and open the live site.
+
+**On a calendar**
+
+- **Every 6 months:** Spotify's token runs out. `pnpm run spotify` gets a new one, then I paste it into the server's settings and deploy again. Next one due around April 2027.
+- **Every year:** renew the domain, check when the Cloudflare certificate expires, and make sure the weather and the song still show up.
+- **Before September 2029:** extend my OpenPGP key and swap in the new file.
+- **When GitHub emails a security alert:** update that package first.
+
+**When something changes**
+
+- New project: copy `src/content/projects/_template.md` and fill it in.
+- New font files: `pnpm run fonts` turns them into web fonts.
+- New headline, fonts, colours or compass: `pnpm run fit` so the big lines fill their space, then `pnpm run share` to redraw the link preview picture and the screenshot above.
+- If the server ever moves to a new address, update the Cloudflare rule that lets it read the blog's feed, or new posts quietly stop showing up.
+
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/heart-dark.svg"><img src="docs/readme/heart-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Credits
 
 - The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code and words here are my own.
