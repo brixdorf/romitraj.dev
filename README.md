@@ -38,7 +38,7 @@ Nothing fancy, on purpose.
 - **[GSAP](https://gsap.com)** and **[Taxi.js](https://github.com/craftedbygc/taxi)** do the movement and the page changes.
 - A little hand-written **WebGL** draws the compass. Without it you get a still picture of the same compass.
 - **[Vite+](https://viteplus.dev)** packs the styles and scripts into two small files, keeps the code tidy and runs the tests.
-- **[sharp](https://sharp.pixelplumbing.com)** and **[jSquash](https://github.com/jamsinclair/jSquash)** make the pixel pictures and the photo, each in whichever format comes out smallest.
+- **[sharp](https://sharp.pixelplumbing.com)** and **[jSquash](https://github.com/jamsinclair/jSquash)** make the pixel pictures, each in whichever format comes out smallest.
 - A tiny **[Node.js](https://nodejs.org)** server hands out the pages and fetches the weather and the song.
 - **[Playwright](https://playwright.dev)** is the one that opens three browsers and complains.
 
@@ -77,6 +77,7 @@ Notes for future me, back after a break with this repository and the font server
 **When something changes**
 
 - New project: copy `src/content/projects/_template.md` and fill it in.
+- New words on a page, or a new page: `pnpm run dates`, so the sitemap that search engines read knows the day it changed. `pnpm test` reminds me if I forget.
 - New font files: `pnpm run fonts` turns them into web fonts.
 - New headline, fonts, colours or compass: `pnpm run fit` so the big lines fill their space, then `pnpm run share` to redraw the link preview picture and the screenshot above.
 - If the server ever moves to a new address, update the Cloudflare rule that lets it read the blog's feed, or new posts quietly stop showing up.
