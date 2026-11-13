@@ -12,6 +12,7 @@ import { publishKey } from './scripts/lib/pgp.mjs';
 import { picturesToThank } from './scripts/lib/credits.mjs';
 import { mailto } from './scripts/lib/mailto.mjs';
 import { fontOrigin } from './scripts/lib/font-origin.mjs';
+import { robotsTxt, sitemapXml } from './scripts/lib/sitemap.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -168,6 +169,14 @@ export default function (eleventyConfig) {
     };
     return `${part(place.latitude, 'N', 'S')} ${part(place.longitude, 'E', 'W')}`;
   });
+
+  // The sitemap (content/sitemap.njk) and robots.txt (content/robots.njk), from
+  // scripts/lib/sitemap.mjs. Every page in the collections is listed, with the day it last changed
+  // from _data/pageDates.json; the build stops for a page with no date there (pnpm run dates).
+  eleventyConfig.addFilter('sitemap', (pages, dates) =>
+    sitemapXml(site.url, pages.map((page) => page.url).filter(Boolean), dates.pages),
+  );
+  eleventyConfig.addFilter('robots', (url) => robotsTxt(url));
 
   // Every link that leaves this site opens in a new tab. This runs over each finished page, so it
   // covers links written in templates, in the data files and in Markdown alike. Such a link gets

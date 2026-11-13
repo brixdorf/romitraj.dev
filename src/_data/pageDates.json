@@ -1,0 +1,41 @@
+{
+  "note": "The day each page of the sitemap (/sitemap.xml) last changed, and a fingerprint of what it is made from. Written by pnpm run dates (scripts/dates.mjs): run it after changing a page's words, as pnpm test asks, and commit this file with the change. Never edit it by hand.",
+  "pages": {
+    "/": {
+      "lastmod": "2026-11-12",
+      "hash": "64938455625fde8d"
+    },
+    "/about/": {
+      "lastmod": "2026-11-12",
+      "hash": "ba162cca9aa875be"
+    },
+    "/credits/": {
+      "lastmod": "2026-11-13",
+      "hash": "0d661cf727b691af"
+    },
+    "/projects/": {
+      "lastmod": "2026-11-12",
+      "hash": "0649c228df6eca89"
+    },
+    "/projects/aletheia/": {
+      "lastmod": "2026-11-12",
+      "hash": "f62a6b5abaa7bb59"
+    },
+    "/projects/devops-labs/": {
+      "lastmod": "2026-11-12",
+      "hash": "752c15a8a1a8ebc2"
+    },
+    "/projects/my-homelab/": {
+      "lastmod": "2026-11-12",
+      "hash": "9b9b712d691ed6c4"
+    },
+    "/projects/watchsheet/": {
+      "lastmod": "2026-11-12",
+      "hash": "d6b5aa6887d766bb"
+    },
+    "/resume/": {
+      "lastmod": "2026-11-12",
+      "hash": "9ee2e0d44af179f4"
+    }
+  }
+}

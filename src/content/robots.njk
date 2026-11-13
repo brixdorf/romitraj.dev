@@ -1,0 +1,7 @@
+---
+permalink: robots.txt
+layout: false
+eleventyExcludeFromCollections: true
+---
+{#- /robots.txt: every crawler may read everything, and it points to the sitemap. It blocks nothing (scripts/lib/sitemap.mjs explains why). -#}
+{{ site.url | robots | safe -}}

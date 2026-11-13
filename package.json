@@ -17,6 +17,7 @@
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs",
     "links": "node scripts/links.mjs",
+    "dates": "node scripts/dates.mjs",
     "lint": "vp check",
     "format": "vp check --fix",
     "test": "vp test",

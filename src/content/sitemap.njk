@@ -1,0 +1,7 @@
+---
+permalink: sitemap.xml
+layout: false
+eleventyExcludeFromCollections: true
+---
+{#- The sitemap at /sitemap.xml: every page of the site and the day it last changed, for search engines. Made by the "sitemap" filter (eleventy.config.js, scripts/lib/sitemap.mjs). -#}
+{{ collections.all | sitemap(pageDates) | safe -}}

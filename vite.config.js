@@ -11,6 +11,7 @@ export default defineConfig({
       'src/_data/fontVersions.json',
       'src/_data/fallbackFonts.json',
       'src/_data/textWidths.json',
+      'src/_data/pageDates.json',
       'pnpm-lock.yaml',
     ],
   },

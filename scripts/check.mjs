@@ -1,5 +1,5 @@
 // Checks the site before a commit: builds it, looks for broken links between its own pages and
-// files, photographs every page in Chromium, Firefox and WebKit (all three at the same time) at
+// files, confirms that the sitemap lists every page with a date and robots.txt blocks nothing, photographs every page in Chromium, Firefox and WebKit (all three at the same time) at
 // laptop, tablet and phone widths,
 // confirms the hero's big lines still fit their space, clicks from page to page in each browser
 // to confirm the page changes work, that nothing moves once a page change has finished, and that
@@ -148,6 +148,44 @@ if (broken.length) {
   process.exitCode = 1;
 } else {
   console.log(`Links: ${linkCount} internal links on ${pages.length} page(s), none broken.`);
+}
+
+// ---- The sitemap and robots.txt: every page listed with a date, nothing blocked ----
+{
+  const siteUrl = JSON.parse(
+    fs.readFileSync(path.join(root, 'src', '_data', 'site.json'), 'utf8'),
+  ).url.replace(/\/+$/, '');
+  const read = (name) => fs.readFileSync(path.join(siteDir, name), 'utf8');
+  const mapProblems = [];
+  const sitemap = fs.existsSync(path.join(siteDir, 'sitemap.xml')) ? read('sitemap.xml') : '';
+  const robots = fs.existsSync(path.join(siteDir, 'robots.txt')) ? read('robots.txt') : '';
+  if (!sitemap) mapProblems.push('there is no sitemap.xml');
+  if (!robots) mapProblems.push('there is no robots.txt');
+  const entries = [
+    ...sitemap.matchAll(/<url><loc>([^<]*)<\/loc><lastmod>([^<]*)<\/lastmod><\/url>/g),
+  ];
+  const listed = entries.map(([, loc]) => loc.replace(siteUrl, ''));
+  // Every page but the one for a missing address, which answers 404 and is never listed.
+  const expected = pages.filter((page) => !page.endsWith('.html'));
+  for (const page of expected)
+    if (!listed.includes(page)) mapProblems.push(`the sitemap leaves out ${page}`);
+  for (const page of listed)
+    if (!expected.includes(page))
+      mapProblems.push(`the sitemap lists ${page}, which is not a page`);
+  for (const [, loc, lastmod] of entries)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(lastmod) || Number.isNaN(Date.parse(lastmod)))
+      mapProblems.push(`the sitemap dates ${loc} "${lastmod}", which is not a day`);
+  if (robots && !robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`))
+    mapProblems.push('robots.txt does not point to the sitemap');
+  if (/^Disallow:\s*\S/im.test(robots)) mapProblems.push('robots.txt blocks something');
+  if (mapProblems.length) {
+    console.log('\nSITEMAP AND ROBOTS.TXT PROBLEMS:\n  ' + mapProblems.join('\n  '));
+    process.exitCode = 1;
+  } else {
+    console.log(
+      `Sitemap: ${listed.length} pages, each with the day it last changed; robots.txt points to it and blocks nothing.`,
+    );
+  }
 }
 
 // ---- 3. Picture files: how heavy are they? ----
