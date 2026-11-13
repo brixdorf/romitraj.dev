@@ -152,14 +152,18 @@ export function removeSpecks(dark, width, height, reach = 3, most = 2) {
   return kept;
 }
 
-// How much room to add around a photo shown at a zoom below 1: enough on each side that the photo
-// takes up "zoom" of the result's width and height. None at a zoom of 1 or more.
-export function paddingFor(width, height, zoom) {
+// How much room to add around a photo shown at a zoom below 1: enough that the photo takes up
+// "zoom" of the result's width and height. None at a zoom of 1 or more. The room is shared out so
+// that the photo's point at "x" and "y" (0 to 1, the middle by default) sits in the middle of the
+// result, as far as the room allows: the photo is moved, never cut.
+export function paddingFor(width, height, zoom, { x = 0.5, y = 0.5 } = {}) {
   if (!(zoom < 1)) return null;
   const across = Math.round(width / zoom) - width;
   const down = Math.round(height / zoom) - height;
-  const left = Math.floor(across / 2);
-  const top = Math.floor(down / 2);
+  const share = (room, size, point) =>
+    Math.min(room, Math.max(0, Math.floor((size + room) / 2 - point * size)));
+  const left = share(across, width, x);
+  const top = share(down, height, y);
   return { left, right: across - left, top, bottom: down - top };
 }
 
@@ -299,7 +303,7 @@ async function convertOne(name, settings, colours) {
   // A zoom below 1 shows the whole photo smaller, with room around it in the grey of the photo's
   // own ground (so it blends in and turns to paper with it), for a subject that would otherwise be
   // cut by a wide frame.
-  const padding = paddingFor(meta.width, meta.height, crop?.zoom);
+  const padding = paddingFor(meta.width, meta.height, crop?.zoom, crop);
   if (padding) {
     const grey = Math.round((await usualEdgeGrey(opened())) * 255);
     const padded = await opened()
@@ -309,7 +313,8 @@ async function convertOne(name, settings, colours) {
       .toBuffer();
     opened = () => sharp(padded);
     meta = await opened().metadata();
-    crop = { ...crop, zoom: 1 };
+    // The room already puts the chosen point in the middle, so the frame is cut from the middle.
+    crop = { ...crop, zoom: 1, x: 0.5, y: 0.5 };
   }
   const shape = settings.shape ? shapeOf(settings.shape) : meta.width / meta.height;
   const across = settings.across;

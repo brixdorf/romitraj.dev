@@ -195,6 +195,37 @@ describe('paddingFor', () => {
   it('splits an odd amount of room with the extra pixel on the right and at the bottom', () => {
     expect(paddingFor(101, 51, 0.5)).toEqual({ left: 50, right: 51, top: 25, bottom: 26 });
   });
+
+  it('moves the photo so that the point at x and y sits in the middle of the frame', () => {
+    // 1000 wide at a zoom of one half: 1000 of room. With x at 0.6, the photo's point 600 must
+    // be at the middle of the 2000 wide result, 1000, so 400 of the room goes on the left.
+    expect(paddingFor(1000, 800, 0.5, { x: 0.6, y: 0.25 })).toEqual({
+      left: 400,
+      right: 600,
+      top: 600,
+      bottom: 200,
+    });
+  });
+
+  it('never moves the photo past the edge of the frame', () => {
+    expect(paddingFor(1000, 800, 0.5, { x: 1, y: 0 })).toEqual({
+      left: 0,
+      right: 1000,
+      top: 800,
+      bottom: 0,
+    });
+    expect(paddingFor(1000, 800, 0.5, { x: -1, y: 2 })).toEqual({
+      left: 1000,
+      right: 0,
+      top: 0,
+      bottom: 800,
+    });
+  });
+
+  it('keeps the photo in the middle when x and y are 0.5 or left out', () => {
+    expect(paddingFor(101, 51, 0.5, { x: 0.5, y: 0.5 })).toEqual(paddingFor(101, 51, 0.5));
+    expect(paddingFor(101, 51, 0.5, {})).toEqual(paddingFor(101, 51, 0.5));
+  });
 });
 
 describe('fadeKeeps', () => {
