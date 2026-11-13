@@ -54,11 +54,11 @@ pnpm run check    # build it and test it in three browsers
 
 Two things to know. The site's real fonts are licensed, so they are not in this repository; without them it uses free look-alikes and still works. And the weather shows up on its own, but the song needs Spotify keys of your own.
 
-Everything else, from changing a sentence to putting it on a server, is in the [guide](docs/guide.md).
+Every word on the site lives in `src/_data/` and `src/content/`, and every file starts with a short note on what it does.
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/wrench-dark.svg"><img src="docs/readme/wrench-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Maintenance
 
-Notes for future me, back after a break with this repository and the font server's open side by side. First, read the [guide](docs/guide.md) and the [decisions](docs/decisions.md): every rule, and the reasons behind it, is in there.
+Notes for future me, back after a break with this repository and the font server's open side by side. First, read `INSTRUCTIONS.md` in the font server's repository: every rule, every chore and the steps for the server are in there.
 
 **Each time I come back**
 
