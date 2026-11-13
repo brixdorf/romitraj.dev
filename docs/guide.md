@@ -1067,18 +1067,19 @@ Both are built by Railpack, Dokploy's builder that reads `package.json` and work
 
 ### What the server will do
 
-Checked on 2026-11-11 by reading Railpack's code (versions 0.15.4, Dokploy's default, and 0.43.0, the newest) and by installing, building and starting a clean copy of the site the way Railpack does, with no `.env` file and no private folder beside it. (First checked on 2026-10-11 with Railpack 0.40.1 and npm.)
+Checked on 2026-11-11 (and again on 2026-11-13 for the start command) by reading Railpack's code (versions 0.15.4, Dokploy's default, and 0.43.0, the newest) and by installing, building and starting a clean copy of the site the way Railpack does, with no `.env` file and no private folder beside it. (First checked on 2026-10-11 with Railpack 0.40.1 and npm.)
 
-|                           | The site                                                                       | The fonts                     |
-| ------------------------- | ------------------------------------------------------------------------------ | ----------------------------- |
-| Node.js                   | 26, from `"engines": { "node": "26.x" }` in `package.json`                     | the same                      |
-| Package manager           | pnpm 12.18.0, from `"packageManager"` in `package.json`, installed by Corepack | the same                      |
-| Install                   | `pnpm install --frozen-lockfile --prefer-offline`                              | the same (nothing to install) |
-| Build                     | `pnpm run build` (about 3 seconds)                                             | none                          |
-| Start                     | `pnpm run start`                                                               | `pnpm run start`              |
-| Port inside the container | 3000                                                                           | 3000                          |
-| Settings to enter         | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`          | none                          |
+|                           | The site                                                                                | The fonts                                   |
+| ------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Node.js                   | 26, from `"engines": { "node": "26.x" }` in `package.json`                              | the same                                    |
+| Package manager           | pnpm 12.18.0, from `"packageManager"` in `package.json`, for the install and build only | the same                                    |
+| Install                   | `pnpm install --frozen-lockfile --prefer-offline`                                       | the same (nothing to install)               |
+| Build                     | `pnpm run build` (about 3 seconds)                                                      | none                                        |
+| Start                     | `node server/index.js`, from `railpack.json`                                            | `node font-server.js`, from `railpack.json` |
+| Port inside the container | 3000                                                                                    | 3000                                        |
+| Settings to enter         | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`                   | none                                        |
 
+- **The finished server has Node.js but no pnpm** (found 2026-11-13, when both applications crashed on start with "pnpm: command not found"). Railpack uses pnpm to install and build, then copies only Node.js, the packages and the built files into what runs. So each repository has a small `railpack.json` that starts the server with `node` itself: the same file `pnpm start` runs on your computer. Keep the two in step: a test (`server/start.test.js`) fails if the site's ever differ or name pnpm. The server needs nothing else: only Node.js's own modules, the built `_site/` and `src/_data/`.
 - **Nothing changes in Dokploy for pnpm, Node.js 26 or Vite+** (the switch of 2026-11-11). Railpack reads the Node.js line and pnpm's version from `package.json` and picks the install command from `pnpm-lock.yaml` by itself. The first deployment after the switch takes a little longer, as it fetches Node.js 26, pnpm and the new packages once.
 - **No `PORT` setting is needed.** Both servers listen on 3000 unless told otherwise, and 3000 is what you enter as the container port.
 - **The site works with none of the three settings.** Without them, or with a wrong one, the now-playing piece of the ticker stays hidden and everything else is as usual. The weather needs no setting.
@@ -1144,7 +1145,7 @@ If Dokploy can already see both repositories, skip this step.
 5. Check that **Auto Deploy** on the **General** tab is on. It starts switched on for a new application.
 6. The **Environment** tab stays empty for this application.
 7. Click **Deploy**.
-8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 26, pnpm (`pnpm install`) and `pnpm run start`, and end without an error. This takes a minute or two.
+8. Open the **Deployments** tab and open the newest entry to watch the build. It should mention Node 26, pnpm (`pnpm install`) and the start command `node font-server.js`, and end without an error. This takes a minute or two.
 9. Open the **Logs** tab. The last line should read `Font server running at http://localhost:3000`.
 10. Open the **Domains** tab and click **Create Domain**:
     - **Host:** `fonts.romitraj.dev`
@@ -1186,7 +1187,7 @@ If Dokploy can already see both repositories, skip this step.
    Save the settings with the save button on that tab. Close the editor without saving.
 
 6. Go back to **General** and click **Deploy**.
-7. On the **Deployments** tab, watch the newest entry. It should mention Node 26, `pnpm install`, `pnpm run build` (with lines beginning `[11ty]`) and `pnpm run start`.
+7. On the **Deployments** tab, watch the newest entry. It should mention Node 26, `pnpm install`, `pnpm run build` (with lines beginning `[11ty]`) and the start command `node server/index.js`.
 8. On the **Logs** tab the last line should read `Site running at http://localhost:3000`.
 9. On the **Domains** tab click **Create Domain**:
    - **Host:** `romitraj.dev` (never `www.romitraj.dev`: Cloudflare already sends `www` to the plain name)
@@ -1215,19 +1216,20 @@ If Dokploy can already see both repositories, skip this step.
 
 ### If something is wrong
 
-| What you see                                                    | What it means                                           | Where to look                                                                                                                                                                                           |
-| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The newest entry on **Deployments** ends in an error            | The build failed                                        | Read the last lines of that entry. A wrong Node version there (not 26), or npm where pnpm should be, means an old Railpack: type `0.43.0` into **Railpack Version** on **General**, save, deploy again. |
-| `404 page not found`                                            | The server has no application for that address          | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://`                                                                                                                 |
-| Cloudflare's page "Bad gateway" (502)                           | The application is not running, or the port is not 3000 | **Logs**, and **Container Port** on **Domains**                                                                                                                                                         |
-| Cloudflare's page "Invalid SSL certificate" (526)               | The server is not presenting the origin certificate     | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.)       |
-| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all               | The DNS record's address in Cloudflare, and that the server is running                                                                                                                                  |
-| The site shows but the ticker has no track                      | The Spotify settings                                    | **Environment**, then deploy again. See "If a widget is missing".                                                                                                                                       |
+| What you see                                                    | What it means                                                            | Where to look                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The newest entry on **Deployments** ends in an error            | The build failed                                                         | Read the last lines of that entry. A wrong Node version there (not 26), or npm where pnpm should be, means an old Railpack: type `0.43.0` into **Railpack Version** on **General**, save, deploy again. |
+| **Logs** shows `pnpm: command not found`                        | The start command asks for pnpm, which the finished server does not have | `railpack.json` in that repository must exist and start with `node` (see "What the server will do"); then deploy again.                                                                                 |
+| `404 page not found`                                            | The server has no application for that address                           | The domain on the **Domains** tab: the host must be spelled exactly, with no `https://`                                                                                                                 |
+| Cloudflare's page "Bad gateway" (502)                           | The application is not running, or the port is not 3000                  | **Logs**, and **Container Port** on **Domains**                                                                                                                                                         |
+| Cloudflare's page "Invalid SSL certificate" (526)               | The server is not presenting the origin certificate                      | Step 2; that **Certificate** is **None** and **HTTPS** is on; and that the certificate covers the name. (A newly added certificate was used at once on the first deployment, with no extra step.)       |
+| Cloudflare's page "Web server is down" (521) or a timeout (522) | Cloudflare cannot reach the server at all                                | The DNS record's address in Cloudflare, and that the server is running                                                                                                                                  |
+| The site shows but the ticker has no track                      | The Spotify settings                                                     | **Environment**, then deploy again. See "If a widget is missing".                                                                                                                                       |
 
 ### After the first deployment
 
 - **Every `git push` to `main` deploys.** Push the site's repository and the site is rebuilt and restarted, usually within two minutes. Push the private repository and the fonts application restarts too, even when only the brief changed. That is harmless: browsers and Cloudflare keep the fonts for a year.
-  - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json` and `package-lock.json`. It is not set (your choice, 2026-11-06), and where the field is has not been checked.
+  - If you would rather the fonts application restart only when a font changes, Dokploy has a setting called **Watch Paths** for that. The paths would be `fonts/web/**`, `font-server.js`, `package.json`, `pnpm-lock.yaml` and `railpack.json`. It is not set (your choice, 2026-11-06), and where the field is has not been checked.
 - **A changed setting does nothing until the next deploy.** After saving anything on the **Environment** tab, click **Deploy** on **General**.
 - **Visitors get new files at once.** Pages are never kept by browsers or by Cloudflare. The stylesheet, the script, the pictures and the fonts may be kept, and each carries a fingerprint in its address (`main.css?v=...`) that changes when the file changes.
 - **Push only what you have checked.** There is no test on the server: the checks on your PC (see "Checking before a commit") are the test.
