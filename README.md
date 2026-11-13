@@ -26,7 +26,7 @@ The headline says _"What we know is a drop, what we don't know is an ocean."_ Th
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/weather-dark.svg"><img src="docs/readme/weather-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Live weather and music.** A thin moving strip on the home page shows the weather in Bangalore, my local time, and the song I'm playing on Spotify right now. If one of those services is having a bad day, that bit just hides. No error messages, no drama.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** Photos of old things made of metal and glass: a knight's suit of armour from about 1525, a surveyor's theodolite, an old Kodak, a magnifying glass, an early Apple computer and a row of skeleton keys. Not one living thing in any of them. They are turned into two colours, ink and paper, each time the site is built. The compass on the home page is 3D, polished case, glass and all. It slowly tumbles on its own; grab it and spin it any way you like, and its needle wobbles back to north. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/pictures-dark.svg"><img src="docs/readme/pictures-light.svg" width="18" height="18" align="absmiddle" alt=""></picture> **Pictures made of chunky pixels.** A knight's emblem, and photos of old things made of metal and glass: a surveyor's theodolite, an old Kodak, a magnifying glass, an early Apple computer and a row of skeleton keys. Not one living thing in any of them. They are turned into two colours, ink and paper, each time the site is built. The compass on the home page is 3D, polished case, glass and all. It slowly tumbles on its own; grab it and spin it any way you like, and its needle wobbles back to north. Even the page you get for a wrong address is in on it: it tells you the page is lost in oblivion.
 
 And it looks the same in Chrome, Edge, Firefox and Safari, on a laptop or a phone. One command opens every page in three browsers and complains loudly if anything is off.
 
@@ -59,9 +59,9 @@ Everything else, from changing a sentence to putting it on a server, is in the [
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/heart-dark.svg"><img src="docs/readme/heart-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> Credits
 
 - The design is based on [henry.codes](https://henry.codes) by Henry Desroches. The code and words here are my own.
-- The pictures are made from photos on [Unsplash](https://unsplash.com), some of them shared there by museums, and each photographer is named on the site's [Credits page](https://romitraj.dev/credits/).
+- The pictures are made from photos on [Unsplash](https://unsplash.com), some of them shared there by museums, and one drawing from [Pixabay](https://pixabay.com). Each one is credited on the site's [Credits page](https://romitraj.dev/credits/).
 - Weather data by [Open-Meteo.com](https://open-meteo.com). Icons by [Phosphor Icons](https://phosphoricons.com).
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/scales-dark.svg"><img src="docs/readme/scales-light.svg" width="22" height="22" align="absmiddle" alt=""></picture> License
 
-The code is [MIT](LICENSE) licensed, so take what is useful. The site's content (the words, my bio, the project write-ups) is all rights reserved, the photos stay under the Unsplash License, and the fallback fonts under the SIL Open Font License.
+The code is [MIT](LICENSE) licensed, so take what is useful. The site's content (the words, my bio, the project write-ups) is all rights reserved, the pictures stay under their own licences (Unsplash and Pixabay), and the fallback fonts under the SIL Open Font License.

@@ -30,6 +30,7 @@ The MIT license applies to the code in this repository only.
   by Romit Raj Sahu is all rights reserved and is not covered by the MIT
   license.
 - Pictures. The photos the pictures are made from stay under the Unsplash
-  License. Credits are listed in src/_data/image-credits.json.
+  License, and the knight's emblem under the Pixabay Content License.
+  Credits are listed in src/_data/image-credits.json.
 - Fallback fonts. The fallback fonts stay under the SIL Open Font License.
   Their license files are kept next to them in src/assets/fonts/.
