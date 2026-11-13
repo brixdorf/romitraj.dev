@@ -2,8 +2,8 @@
   "note": "The day each page of the sitemap (/sitemap.xml) last changed, and a fingerprint of what it is made from. Written by pnpm run dates (scripts/dates.mjs): run it after changing a page's words, as pnpm test asks, and commit this file with the change. Never edit it by hand.",
   "pages": {
     "/": {
-      "lastmod": "2026-11-12",
-      "hash": "64938455625fde8d"
+      "lastmod": "2026-11-13",
+      "hash": "ec0fe0ce6f00f4f9"
     },
     "/about/": {
       "lastmod": "2026-11-13",
