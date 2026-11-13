@@ -2,6 +2,14 @@
 
 A dated log of what was chosen and why. Newest entries at the top. Add an entry whenever something important is chosen or changed, and whenever a version is verified.
 
+## 2026-11-13, a maintenance section in the README and GitHub's preview picture
+
+Romit's request. No package was added or updated.
+
+- **The README gained "Maintenance"**: what to do on coming back after a break (install, update, check, commit and push to deploy), what is due on a calendar (the Spotify token, the domain and certificate, the OpenPGP key, security alerts) and what to run when something changes. It names no address, value or setting that is not already public. Its icon is Phosphor's wrench (2.1.1, the newest, checked with `pnpm view @phosphor-icons/core version`), ink and paper like the others.
+- **The share image was checked and kept**: it was drawn after the last change to the compass, the headline and the colors (2026-11-12), and shows what the site shows now. Only its description in the guide (a painted backdrop, removed on 2026-11-12) and a note in `share.mjs` (the old diver drawing) were out of date.
+- **GitHub's preview picture**: 1280 by 640, the same card as the share image with more room at the sides and "The code behind romitraj.dev" in the corner, drawn the same way in a real browser with the licensed fonts (32 KB). It is uploaded by hand in the repository's settings, so it is kept outside the repository.
+
 ## 2026-11-13, loading speed: the compass, the fonts and caching
 
 Romit's request, after PageSpeed scored the live site 91 on phones and 64 on laptops: the laptop test's Total Blocking Time was 1,170ms because the hero's compass ran in software on PageSpeed's machine (no graphics card, about 17 seconds of main-thread work); both tests said the fonts from fonts.romitraj.dev held the text back about 1.4 seconds, and that `?v=` files were kept only 4 hours (pictures 1 hour). Fix all three without changing how the site looks or behaves for visitors. No package was added or updated.
