@@ -618,7 +618,7 @@ The small picture in a browser tab, in bookmarks and on a phone's home screen is
 
 When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, the app shows a preview card: a picture, the page's title and its description.
 
-- **The picture** is `src/assets/img/share.png`, 1200 by 630 pixels: the headline in the site's own type beside the hero's compass at rest, on its painted backdrop, with the gradient bar's colors along the top. Every page uses the same picture.
+- **The picture** is `src/assets/img/share.png`, 1200 by 630 pixels: the headline in the site's own type, your name and the site's address, beside the hero's compass at rest in its framed box on plain paper, with the gradient bar's colors along the top. Every page uses the same picture.
 - **The title and description are each page's own**: the same `title` and `description` that sit at the top of the page's file (for a project, its title and description).
 - **The tags** that the apps read are written into every page's head by `src/_includes/layouts/base.njk`: the Open Graph tags (`og:title`, `og:description`, `og:url`, `og:image` and a few more), which nearly every app reads, and X's own (`twitter:card` and the rest). Addresses in them are full addresses, starting with `https://romitraj.dev`, because the apps do not know which site a tag came from.
 - **To make the picture again**, run:
@@ -631,6 +631,7 @@ When a link to the site is pasted into WhatsApp, LinkedIn, X or a similar app, t
 
 - **Why it is a command and not part of the build:** the card needs the licensed fonts, which are on your computer and not on the live server.
 - **The words describing the picture** for people who cannot see it are `shareImageAlt` in `src/_data/site.json`.
+- **GitHub's preview picture** (the card shown when the repository's link is shared) is a separate 1280 by 640 version of the same card, with "The code behind romitraj.dev" in the corner. It is not part of the site: upload it on GitHub under the repository's Settings, General, "Social preview". The current one is `github-social-preview.png` in the `inputs` folder next to the site's (made 2026-11-13). When the share image changes, make this one again to match and upload it.
 - **To preview the card once the site is live:** paste the page's address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/, free, needs a LinkedIn login). It shows the card and the tags it read, and asks LinkedIn to fetch the page afresh. For WhatsApp, send the link to yourself. Apps keep a card for days, so an old one may linger after a change.
 
 `pnpm run check` confirms on every built page that the icon files are named and exist, that the tags carry the page's own title, description and full address, and that the share image is 1200 by 630 pixels and light enough; and in each browser that the page names the ink compass while the browser is light and the paper compass while it is dark, that it swaps them as soon as the browser changes (with no reload), that the right one stays after a page change and the ink one without scripts, and that each drawing is what it should be.
