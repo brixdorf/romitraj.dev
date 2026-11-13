@@ -58,6 +58,17 @@ describe('picturesToThank', () => {
       expect(() => picturesToThank({ 'a.jpg': photo('the globe', { licence }) })).not.toThrow();
   });
 
+  it('accepts a drawing from Pixabay under the Pixabay Content License', () => {
+    expect(() =>
+      picturesToThank({
+        'a.png': photo('the emblem', {
+          collection: 'Pixabay',
+          licence: 'Pixabay Content License',
+        }),
+      }),
+    ).not.toThrow();
+  });
+
   it('stops the build for an address that is not a web page', () => {
     expect(() => picturesToThank({ 'a.jpg': photo('the globe', { url: 'globe.jpg' }) })).toThrow(
       'a.jpg',
