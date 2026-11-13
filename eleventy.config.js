@@ -283,8 +283,8 @@ export default function (eleventyConfig) {
   // Each of the two files then gets a fingerprint: a few characters worked out from its contents.
   // A template writes a file's address with {% asset "/assets/css/main.css" %}, which adds the
   // fingerprint ("?v=..."). Browsers, and Cloudflare in front of the live site, may keep these
-  // files for an hour; with the fingerprint in the address a changed file is a new address, so
-  // nobody is shown a new page with an old stylesheet after a deploy.
+  // files for a year without asking again; with the fingerprint in the address a changed file is
+  // a new address, so nobody is shown a new page with an old stylesheet after a deploy.
   const assetVersions = {};
   eleventyConfig.on('eleventy.before', async ({ directories, runMode }) => {
     await bundleAssets(directories.output, { sourcemap: runMode !== 'build' });

@@ -29,8 +29,9 @@ export const typeOf = (filePath) =>
 
 // The headers for the file "filePath" (by default the address itself), asked for at "urlPath"
 // with "search" (the part of the address from "?"), "size" bytes long, last changed at "mtimeMs".
-// - A file asked for with a fingerprint ("?v=...", the stylesheet, the scripts, the pictures)
-//   may be kept for an hour: a changed file gets a new fingerprint, so a new address.
+// - A file asked for with a fingerprint ("?v=...", the stylesheet, the scripts, the pictures, the
+//   icons, the fonts on this computer) may be kept for a year without asking again ("immutable"):
+//   the fingerprint is worked out from the file's contents, so a changed file gets a new address.
 // - Anything else (the pages, the resume, the key) has a plain address that never changes, so
 //   browsers and Cloudflare must check with the server each time ("no-cache"). The ETag lets them
 //   do that cheaply: an unchanged file is answered "not modified", with no body.
@@ -40,7 +41,7 @@ export function fileHeaders({ urlPath, filePath = urlPath, search = '', size, mt
   const headers = {
     'Content-Type': typeOf(filePath),
     'Content-Length': size,
-    'Cache-Control': fingerprinted ? 'public, max-age=3600' : 'no-cache',
+    'Cache-Control': fingerprinted ? 'public, max-age=31536000, immutable' : 'no-cache',
     ETag: `"${size.toString(16)}-${Math.floor(mtimeMs).toString(16)}"`,
     'X-Content-Type-Options': 'nosniff',
   };
