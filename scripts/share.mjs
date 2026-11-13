@@ -18,7 +18,7 @@
 // The card is made from the site's own parts: its stylesheet (so the colors, fonts and the raised
 // apostrophe are the site's), the headline's words from _data/headline.json, the sizes that make
 // each big line fill its space from _data/textWidths.json, the gradient bar's colors, and the
-// close-up of the diver drawing ("searcher" in _data/images.json).
+// hero's compass at rest ("hero" in _data/images.json).
 // The screenshot is taken from the site as "pnpm start" serves it on this computer, so it shows
 // the real weather and track if the keys in .env are there, and simply no track if they are not.
 import fs from 'node:fs';
