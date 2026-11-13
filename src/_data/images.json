@@ -41,19 +41,17 @@
       "target": 0.98
     },
     "armour": {
-      "source": "armour.jpg",
-      "alt": "An empty suit of knight’s armour from about 1525: a closed helmet with a slotted visor, ridged steel plates down the chest and arms, and a tall guard standing up from each shoulder.",
+      "source": "armour.png",
+      "alt": "A knight’s emblem drawn in bold outlines: a closed helmet with a slotted visor and a flowing plume, between two spiked shoulder guards.",
       "across": 234,
       "shape": "26:25",
       "crop": {
-        "x": 0.68,
-        "y": 0.4,
-        "zoom": 0.82
+        "x": 0.475,
+        "y": 0.746,
+        "zoom": 0.63
       },
-      "black": 0.45,
-      "white": 0.9,
-      "stretch": true,
-      "cutout": 0.03
+      "black": 0.25,
+      "white": 0.8
     },
     "theodolites": {
       "source": "theodolite.jpg",

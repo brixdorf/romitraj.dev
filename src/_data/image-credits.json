@@ -1,13 +1,13 @@
 {
-  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. 'subject' is how the Credits page names it ('the globe'), 'title' is the photo's title on its page (with the object's date where the museum gives one), 'photographer' is who took it, 'collection' is where it is shared (Unsplash, or the Smithsonian museum that keeps the object), 'licence' is Unsplash License, Public domain or CC0, and 'url' is the photo's own page. The build stops if a photo is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry. The Credits page is set in a serif font with no straight apostrophe and no slash: use the curly apostrophe (’).",
+  "note": "Where each photo in src/assets/img/source/ came from, and what the Credits page says about it. 'subject' is how the Credits page names it ('the globe'), 'title' is the photo's title on its page (with the object's date where the museum gives one), 'photographer' is who took or drew it, 'collection' is where it is shared (Unsplash, Pixabay, or the Smithsonian museum that keeps the object), 'licence' is Unsplash License, Pixabay Content License, Public domain or CC0, and 'url' is the photo's own page. The build stops if a photo is used without an entry here, or if an entry lacks one of these. A picture marked \"credit\": false in images.json needs no entry here. The drawings (the .svg files) are the site's own and need no entry. The Credits page is set in a serif font with no straight apostrophe and no slash: use the curly apostrophe (’).",
   "pictures": {
-    "armour.jpg": {
-      "subject": "the armour",
-      "title": "A suit of polished steel plate armor on a display stand (made in Augsburg, about 1525)",
-      "photographer": "the Metropolitan Museum of Art",
-      "collection": "Unsplash",
-      "licence": "Unsplash License",
-      "url": "https://unsplash.com/photos/steel-plate-armor-suit-display-Whg0D7tOOBM"
+    "armour.png": {
+      "subject": "the knight",
+      "title": "Medieval knight emblem illustration",
+      "photographer": "an unnamed artist",
+      "collection": "Pixabay",
+      "licence": "Pixabay Content License",
+      "url": "https://pixabay.com/vectors/paladin-warrior-soldier-cutout-6539115/"
     },
     "theodolite.jpg": {
       "subject": "the theodolites",
