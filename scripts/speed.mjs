@@ -1,7 +1,12 @@
 // Measures how quickly a page shows its main content, in Chromium: First Contentful Paint (when
-// anything first appears) and Largest Contentful Paint (when the biggest piece of content
-// appears, the figure search engines use for "loading speed"). It builds the site, serves it, and
-// loads the page several times on a simulated phone connection and on a fast one.
+// anything first appears), Largest Contentful Paint (when the biggest piece of content appears,
+// the figure search engines use for "loading speed") and Total Blocking Time (how long the page
+// was too busy to answer a tap or a key, from the first paint until it has settled: every task
+// longer than 50ms counts with the part over 50ms, as PageSpeed counts it), and the main thread's
+// work (all the time it spent on tasks, short ones included, from opening the page until it has
+// settled: PageSpeed's "main-thread work"). It builds the site,
+// serves it, and loads the page several times on a simulated phone connection and on a fast one.
+// Like PageSpeed's test machine, the test browser draws WebGL in software, with no graphics card.
 // It measures twice, with and without the page's entrance (the home page's headline, the About
 // page's quote), and prints the difference, so the cost of an entrance is always known. On a page
 // without one, the two agree.
@@ -34,12 +39,14 @@ const settings = {
 };
 const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
 
-// Loads the page once in a fresh browser profile and returns its two paint times.
+// Loads the page once in a fresh browser profile and returns its two paint times, its blocking
+// time and the main thread's work.
 async function load(browser, address, setting, entrance) {
   const context = await browser.newContext({ viewport: setting.viewport });
   const page = await context.newPage();
   const session = await context.newCDPSession(page);
   await session.send('Network.enable');
+  await session.send('Performance.enable');
   await session.send('Network.setCacheDisabled', { cacheDisabled: true });
   if (setting.network)
     await session.send('Network.emulateNetworkConditions', { offline: false, ...setting.network });
@@ -50,7 +57,11 @@ async function load(browser, address, setting, entrance) {
       window.steadyMotion = true;
     });
   await page.addInitScript(() => {
-    window.paints = { largest: null, first: null };
+    window.paints = { largest: null, first: null, tasks: [] };
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries())
+        window.paints.tasks.push({ start: entry.startTime, duration: entry.duration });
+    }).observe({ type: 'longtask', buffered: true });
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         const element = entry.element;
@@ -69,7 +80,15 @@ async function load(browser, address, setting, entrance) {
   });
   await page.goto(address + pagePath, { waitUntil: 'load' });
   await page.waitForTimeout(3500);
-  const paints = await page.evaluate(() => window.paints);
+  const paints = await page.evaluate(() => {
+    const { tasks, ...rest } = window.paints;
+    const blocking = tasks
+      .filter((task) => task.start + task.duration > (rest.first ?? 0))
+      .reduce((sum, task) => sum + Math.max(0, task.duration - 50), 0);
+    return { ...rest, blocking };
+  });
+  const { metrics } = await session.send('Performance.getMetrics');
+  paints.work = metrics.find((metric) => metric.name === 'TaskDuration').value * 1000;
   await context.close();
   return paints;
 }
@@ -94,6 +113,8 @@ try {
       if (!list.length) continue;
       const first = list.map((result) => result.first ?? NaN);
       const largest = list.map((result) => result.largest?.time ?? NaN);
+      const blocking = list.map((result) => result.blocking);
+      const work = list.map((result) => result.work);
       summary[kind] = { first: median(first), largest: median(largest) };
       const what = list
         .map((result) => result.largest?.what)
@@ -107,8 +128,13 @@ try {
           ? 'With the entrance:   '
           : 'Without the entrance:'
         : 'Measured:';
+      const range = (values) =>
+        `${Math.round(median(values))}ms (${Math.round(Math.min(...values))} to ${Math.round(Math.max(...values))})`;
       console.log(
-        `  ${label} First Contentful Paint ${Math.round(median(first))}ms (${Math.round(Math.min(...first))} to ${Math.round(Math.max(...first))}), Largest Contentful Paint ${Math.round(median(largest))}ms (${Math.round(Math.min(...largest))} to ${Math.round(Math.max(...largest))}), largest piece: ${what}`,
+        `  ${label} First Contentful Paint ${range(first)}, Largest Contentful Paint ${range(largest)}, largest piece: ${what}`,
+      );
+      console.log(
+        `                        Total Blocking Time ${range(blocking)}, main-thread work ${range(work)}`,
       );
     }
     if (compare)
