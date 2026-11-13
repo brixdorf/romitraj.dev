@@ -9,9 +9,9 @@ const send = (urlPath, search = '') =>
 describe('fileHeaders', () => {
   it('names the type of every kind of file the site has', () => {
     expect(send('/index.html')['Content-Type']).toBe('text/html; charset=utf-8');
-    expect(send('/assets/img/portrait-480.jxl', '?v=1')['Content-Type']).toBe('image/jxl');
-    expect(send('/assets/img/portrait-480.avif', '?v=1')['Content-Type']).toBe('image/avif');
-    expect(send('/assets/img/portrait-480.jpg', '?v=1')['Content-Type']).toBe('image/jpeg');
+    expect(send('/assets/img/clock-480.jxl', '?v=1')['Content-Type']).toBe('image/jxl');
+    expect(send('/assets/img/clock-480.avif', '?v=1')['Content-Type']).toBe('image/avif');
+    expect(send('/assets/img/clock-480.jpg', '?v=1')['Content-Type']).toBe('image/jpeg');
     expect(send('/resume.pdf')['Content-Type']).toBe('application/pdf');
     expect(send('/romitraj-pgp-public.asc')['Content-Type']).toBe('application/pgp-keys');
     expect(send('/something')['Content-Type']).toBe('application/octet-stream');

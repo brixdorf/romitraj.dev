@@ -93,7 +93,7 @@ describe('needsCredit', () => {
   });
 
   it('asks for none for a photo marked "credit": false', () => {
-    expect(needsCredit({ source: 'portrait.jpg', kind: 'photo', credit: false })).toBe(false);
+    expect(needsCredit({ source: 'clock.jpg', kind: 'photo', credit: false })).toBe(false);
   });
 });
 

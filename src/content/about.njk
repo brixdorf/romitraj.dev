@@ -53,13 +53,6 @@ description: Who Romit Raj Sahu is, what he is experimenting with, and how to re
     </p>
   </section>
 
-  <figure class="about-page__portrait" data-part="card">
-    {#- The photo's shown width, for the browser to pick a file: a square of at most 224px below
-        1000px, two of the twelve columns from there (about-page.css). #}
-    <div class="frame about-page__portrait-frame">{% picture "portrait", { sizes: "(min-width: 1000px) calc((100vw - 208px) / 6 + 16px), 224px" } %}</div>
-    <figcaption class="about-page__caption">{{ about.portraitNote }}</figcaption>
-  </figure>
-
   <div class="frame about-page__square" data-part="card">{% picture "camera" %}</div>
   <div class="frame about-page__strip" data-part="card">{% picture "nightsky" %}</div>
 

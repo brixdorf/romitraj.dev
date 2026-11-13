@@ -26,20 +26,6 @@
       "white": 0.96,
       "pattern": "grain"
     },
-    "portrait": {
-      "kind": "photo",
-      "source": "portrait.jpg",
-      "credit": false,
-      "alt": "Romit Raj Sahu in a white T-shirt, arms crossed, looking off to one side.",
-      "shape": "11:21",
-      "crop": {
-        "x": 0.45,
-        "y": 0.42,
-        "zoom": 1.15
-      },
-      "widths": [240, 480, 720, 960],
-      "target": 0.98
-    },
     "armour": {
       "source": "armour.png",
       "alt": "A knight’s emblem drawn in bold outlines: a closed helmet with a slotted visor and a flowing plume, between two spiked shoulder guards.",

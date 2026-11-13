@@ -17,7 +17,7 @@ import { root } from './site.mjs';
 const heaviestAllowed = 24 * 1024;
 // A photo (JPEG XL, AVIF or JPEG, from scripts/lib/photo.mjs) is shades of grey, not two tones,
 // and comes in several widths of which a browser fetches one: each file has a limit of its own.
-// Its files are named by width ("portrait-480.avif"); a pixel picture's other formats are not
+// Its files are named by width ("clock-480.avif"); a pixel picture's other formats are not
 // ("armillary.jxl"), and keep the pixel pictures' limit.
 const heaviestPhotoAllowed = 160 * 1024;
 const isPhoto = (name) => /-\d+\.(jxl|avif|jpg)$/.test(name);
@@ -189,7 +189,7 @@ export async function picturesHoldStill(browser, address, pagePaths) {
       const written = await page.evaluate(() =>
         [...document.querySelectorAll('img')].map((image) => ({
           // The picture's name from images.json: its mark, or else its file's name (a photo's
-          // files are named by width, such as "portrait-480.jpg").
+          // files are named by width, such as "clock-480.jpg").
           name:
             image.dataset.picture ||
             (image.getAttribute('src') || '').split('/').pop().split('?')[0],

@@ -1,26 +1,5 @@
 /* The About page: where each card and picture frame sits in the page grid at each window width,
-   plus the quote under the page's name, the portrait's caption and the short piece about the latest blog post. */
-.about-page__portrait {
-  margin: 0 0 32px;
-}
-
-.about-page__portrait-frame {
-  max-inline-size: 224px;
-  aspect-ratio: 1;
-}
-
-/* The square frame on phones and tablets shows the top of the tall portrait: the face. */
-.about-page__portrait-frame .picture {
-  object-position: 50% 10%;
-}
-
-.about-page__caption {
-  margin-block-start: 8px;
-  font-size: var(--type-micro);
-  font-style: italic;
-  line-height: 1.17;
-  color: var(--color-muted-on-paper);
-}
+   plus the quote under the page's name and the short piece about the latest blog post. */
 
 /* The square frame only appears when there is a second column to put it in. */
 .about-page__square {
@@ -167,15 +146,15 @@
 
 /* Two columns: cards on the left, frames and links on the right. */
 @media (width >= 600px) {
-  /* The first row is exactly as tall as a frame, so the two frames stay together at the top
-     however tall the card beside them grows. */
+  /* The first two rows are exactly as tall as a frame, so the two frames stay together at the top,
+     with the card of links right under them, however tall the card beside them grows. */
   .about-page {
-    grid-template-rows: var(--frame-strip);
+    grid-template-rows: var(--frame-strip) var(--frame-strip);
   }
 
   .about-page__who {
     grid-column: 1;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
   }
 
   .about-page__square {
@@ -188,11 +167,6 @@
   .about-page__strip {
     grid-column: 2;
     grid-row: 2;
-  }
-
-  .about-page__portrait {
-    grid-column: 1;
-    grid-row: 3;
   }
 
   .about-page__elsewhere {
@@ -236,31 +210,22 @@
   }
 }
 
-/* Twelve columns: the tall portrait on the left edge, everything else to its right. */
+/* Twelve columns: the Who card and the frames side by side at the top, then the cards in rows. */
 @media (width >= 1000px) {
   /* The second row is exactly as tall as the wide frame, so any spare height goes to the first. */
   .about-page {
     grid-template-rows: auto var(--frame-strip);
   }
 
-  .about-page__portrait {
-    grid-column: 1 / span 2;
-    grid-row: 1 / span 2;
-  }
-
-  .about-page__portrait-frame {
-    aspect-ratio: 225 / 429;
-  }
-
   .about-page__who {
-    grid-column: 3 / span 5;
+    grid-column: 1 / span 6;
     grid-row: 1 / span 2;
     align-self: stretch;
   }
 
   /* As tall as the card of links beside it. */
   .about-page__square {
-    grid-column: 8 / span 2;
+    grid-column: 7 / span 3;
     grid-row: 1;
     align-self: stretch;
     block-size: auto;
@@ -273,38 +238,38 @@
   }
 
   .about-page__strip {
-    grid-column: 8 / span 5;
+    grid-column: 7 / span 6;
     grid-row: 2;
   }
 
   .about-page__tinkering {
-    grid-column: 3 / span 6;
+    grid-column: 1 / span 7;
     grid-row: 3;
   }
 
   .about-page__latest {
-    grid-column: 9 / span 4;
+    grid-column: 8 / span 5;
     grid-row: 3 / span 2;
     margin-block: 0 16px;
   }
 
   .about-page__contact {
-    grid-column: 3 / span 6;
+    grid-column: 1 / span 7;
     grid-row: 4;
   }
 
   .about-page__watching {
-    grid-column: 3 / span 5;
+    grid-column: 1 / span 6;
     grid-row: 5;
   }
 
   .about-page__reading {
-    grid-column: 8 / span 5;
+    grid-column: 7 / span 6;
     grid-row: 5;
   }
 
   .about-page__toolbox {
-    grid-column: 3 / span 10;
+    grid-column: 1 / -1;
     grid-row: 6;
   }
 }

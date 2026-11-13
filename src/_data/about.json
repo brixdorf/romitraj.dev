@@ -1,6 +1,5 @@
 {
   "note": "The About page’s words. The cards are set in a serif font that has no straight apostrophe and no slash: use the curly apostrophe (’) and write around slashes. “watching” and “reading” are the two small cards about the last movie or series you watched and the book you are reading: change “text” when it changes. Their “Suggest me” link opens an email to you with “subject” already filled in; the subject is not shown on the page, so a slash is fine there.",
-  "portraitNote": "I didn’t have many photos of myself to begin with.",
   "who": {
     "title": "Who",
     "paragraphs": [
