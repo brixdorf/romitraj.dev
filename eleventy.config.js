@@ -11,6 +11,7 @@ import { publishFile } from './scripts/lib/downloads.mjs';
 import { publishKey } from './scripts/lib/pgp.mjs';
 import { picturesToThank } from './scripts/lib/credits.mjs';
 import { mailto } from './scripts/lib/mailto.mjs';
+import { fontOrigin } from './scripts/lib/font-origin.mjs';
 import { answerApi } from './server/api.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -39,6 +40,7 @@ const sectionHeading = /<h2>(.*?)<\/h2>/g;
 
 export default function (eleventyConfig) {
   eleventyConfig.addGlobalData('fontBase', fontBase);
+  eleventyConfig.addGlobalData('fontOrigin', fontOrigin(fontBase));
 
   // The site's own address without "https://", such as "romitraj.dev". The page compares it with
   // the address it is being viewed at, to count visitors on the live site only (layouts/base.njk).

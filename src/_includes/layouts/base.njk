@@ -11,12 +11,15 @@
   content slot says which page it holds ("data-path").
   The script after the icon lines picks the ink or the paper compass for the tab, to match the
   browser's light or dark look.
+  The fonts come first after the two lines every page needs, so the browser starts on them at once
+  (partials/fonts.njk).
 -#}
 <!doctype html>
 <html lang="{{ site.language }}"{% if entrance and entrance != true %} data-entrance="{{ entrance }}"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {%- include "partials/fonts.njk" %}
   <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
   <meta name="description" content="{{ description or site.description }}">
   {#- The preview card that WhatsApp, LinkedIn, X and similar apps draw when a link to this page
@@ -73,7 +76,6 @@
       else if (dark.addListener) dark.addListener(pick);
     })();
   </script>
-  {%- include "partials/fonts.njk" %}
   {%- if site.analytics %}
   <script>
     /* Visitor counting (Rybbit), on the live site only. This adds Rybbit's own tag to the head, exactly as its install page gives it:

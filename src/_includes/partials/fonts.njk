@@ -1,10 +1,15 @@
 {#-
-  Loads the web fonts.
-  The licensed fonts (_data/fonts.json) come from the font base URL. The ones used at the top of the
+  Loads the web fonts. It comes first in the head, so the browser starts on the fonts at once.
+  The licensed fonts (_data/fonts.json) come from the font base URL. When that is another site (the
+  live pages load them from fonts.romitraj.dev), the browser is told to connect to it straight away
+  ("preconnect", "crossorigin" because fonts are fetched that way). The ones used at the top of the
   page are preloaded, and text stays hidden for a moment instead of flashing in a different font.
   The free fallback fonts (_data/fallbackFonts.json) are only fetched if a licensed font fails or
   lacks a character. Each is scaled to take up the same space as the font it stands in for.
 -#}
+{%- if fontOrigin %}
+  <link rel="preconnect" href="{{ fontOrigin }}" crossorigin>
+{%- endif %}
 {%- for font in fonts %}
   {%- if font.preload %}
   <link rel="preload" href="{{ fontBase }}{{ font.file }}{% if fontVersions[font.file] %}?v={{ fontVersions[font.file] }}{% endif %}" as="font" type="font/woff2" crossorigin>
