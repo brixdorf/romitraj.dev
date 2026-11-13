@@ -9,7 +9,7 @@
 // When to run it: once to begin with, and again every 6 months. Spotify's refresh tokens stop
 // working 6 months after the approval, and using them does not extend that. After running it,
 // copy the new SPOTIFY_REFRESH_TOKEN value from .env into the live site's settings as well
-// (docs/guide.md, "Spotify").
+// (Dokploy, the Environment tab, then deploy again).
 //
 // It needs SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET in .env first, and the address below
 // listed under "Redirect URIs" in the app's settings on developer.spotify.com/dashboard.

@@ -2,7 +2,7 @@
 // (src/assets/js/compass.js), and saves it as src/assets/img/source/hero-compass.png: the still pixel
 // picture the hero shows before the 3D compass starts, and wherever it cannot run. The build turns
 // it into the hero's picture like any other source (scripts/images.mjs), and the share image
-// uses it. Run by `pnpm run share`; see "The hero's compass" in docs/guide.md.
+// uses it. Run by `pnpm run share`.
 import fs from 'node:fs';
 import path from 'node:path';
 import { root } from './site.mjs';
