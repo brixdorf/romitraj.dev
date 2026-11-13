@@ -200,4 +200,7 @@ export const compass = {
   // paper, a checkerboard between (as "black" and "white" in images.json).
   black: 0.3,
   white: 0.72,
+  // The most drawings a second. Its movement is worked out from the time, so a faster screen
+  // would only draw the same movement more often.
+  fps: 60,
 };

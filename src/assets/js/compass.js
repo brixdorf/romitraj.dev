@@ -4,7 +4,8 @@
 // dithered with the pixel pictures' four by four pattern. It starts as the still picture (which
 // `pnpm run share` makes from this same code), then turns slowly on its own; a drag with the
 // mouse or a finger turns it any way, all the way round, and when let go it coasts back to its
-// own pace. Its needle swings back to north. Anywhere it cannot run, the still picture stays.
+// own pace. Its needle swings back to north. Anywhere it cannot run, the still picture stays,
+// and that includes graphics drawn by the processor with no graphics card (compass-pace.js).
 import { buildCompass } from './compass-model.js';
 import {
   restTurn,
@@ -15,6 +16,7 @@ import {
   needleRest,
   stepNeedle,
 } from './compass-motion.js';
+import { inSoftware, frameDue, sameView } from './compass-pace.js';
 import { compass as settings } from './motion.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -283,9 +285,21 @@ function programOf(gl, vertexText, fragmentText) {
   return gl.getProgramParameter(program, gl.LINK_STATUS) ? program : null;
 }
 
+// The name of the graphics that draw for WebGL. Firefox gives it as the renderer; Chrome and
+// Safari give "WebKit WebGL" there and the real name through an extension. (Asking Firefox for
+// that extension would print a warning, so it is only asked for when needed.)
+function rendererOf(gl) {
+  const named = gl.getParameter(gl.RENDERER);
+  if (!/^webkit webgl$/i.test(named)) return named;
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  return info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : named;
+}
+
 // Sets up WebGL on a canvas. Returns { draw(turn, needleAngle), forget() }, or null where WebGL
-// cannot be had or fails to set up.
-export function compassPainter(canvas, { keep = false } = {}) {
+// cannot be had or fails to set up. With "hardwareOnly", also null where the browser says WebGL
+// would be slow, or where the graphics are drawn in software: there the compass would keep the
+// page busy (PageSpeed's test machine has no graphics card), and the still picture stays.
+export function compassPainter(canvas, { keep = false, hardwareOnly = false } = {}) {
   let gl;
   try {
     gl = canvas.getContext('webgl', {
@@ -294,11 +308,16 @@ export function compassPainter(canvas, { keep = false } = {}) {
       depth: false,
       premultipliedAlpha: true,
       preserveDrawingBuffer: keep,
+      failIfMajorPerformanceCaveat: hardwareOnly,
     });
   } catch {
     gl = null;
   }
   if (!gl) return null;
+  if (hardwareOnly && inSoftware(rendererOf(gl))) {
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return null;
+  }
 
   const scene = programOf(gl, sceneVertex, sceneFragment);
   const blocks = programOf(gl, blockVertex, blockFragment);
@@ -485,7 +504,9 @@ function run(frame, still) {
   canvas.className = 'hero__compass';
   canvas.setAttribute('aria-hidden', 'true');
   (still.closest('picture') || still).after(canvas);
-  const painter = compassPainter(canvas);
+  // "drawInSoftware" is the check's switch: its test browsers draw in software, and it tests the
+  // compass there anyway.
+  const painter = compassPainter(canvas, { hardwareOnly: !window.drawInSoftware });
   if (!painter) {
     canvas.remove();
     return () => {};
@@ -507,17 +528,26 @@ function run(frame, still) {
   let held = null;
   let inView = true;
   let frameId = 0;
+  // When the last frame was worked out, and when it was due (compass-pace.js, frameDue).
   let last = 0;
+  let due = 0;
 
   // The canvas takes the still picture's place once its first drawing is on the screen. The
   // still picture stays in the page, unseen, so screen readers still read its description.
   painter.draw(turn, needle.angle);
+  let drawn = { turn, needle: needle.angle };
   requestAnimationFrame(() => frame.classList.add('hero__image--live'));
 
-  // Every time is read from performance.now(), for frames and pointer events alike.
+  // Every time is read from performance.now(), for frames and pointer events alike. A frame
+  // comes at most "fps" times a second (motion.js), and is only drawn if something moved.
   const tick = () => {
     const now = performance.now();
     frameId = 0;
+    if (due) {
+      const next = frameDue(due, now);
+      if (next === null) return wake();
+      due = next;
+    } else due = now;
     const seconds = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
     last = now;
     clock += seconds;
@@ -528,7 +558,11 @@ function run(frame, still) {
       if (speed) turn = turnBy(turn, spin, speed * seconds);
     }
     needle = stepNeedle(needle, turn, spin, seconds);
-    painter.draw(turn, needle.angle);
+    const view = { turn, needle: needle.angle };
+    if (!sameView(drawn, view)) {
+      painter.draw(turn, needle.angle);
+      drawn = view;
+    }
     wake();
   };
   const wake = () => {
@@ -579,6 +613,7 @@ function run(frame, still) {
   watcher.observe(frame);
   const onVisible = () => {
     last = 0;
+    due = 0;
     wake();
   };
   // If the graphics card drops the drawing, the still picture comes back.

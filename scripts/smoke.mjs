@@ -44,6 +44,11 @@ try {
     { width: 390, height: 844 },
   ]) {
     const page = await browser.newPage({ viewport });
+    // The test browser draws WebGL in software, where the hero keeps its still picture; this lets
+    // the compass run anyway, so its script is checked too.
+    await page.addInitScript(() => {
+      window.drawInSoftware = true;
+    });
     const at = () => `${new URL(page.url()).pathname} at ${viewport.width}px`;
     page.on('console', (message) => {
       if (message.type() === 'error' && !/Failed to load resource/.test(message.text()))

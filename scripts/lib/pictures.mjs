@@ -152,9 +152,11 @@ export async function picturesHoldStill(browser, address, pagePaths) {
     { width: 390, height: 844 },
   ]) {
     const context = await browser.newContext({ viewport: size });
-    // A still page: no headline entrance, fixed starting places.
+    // A still page: no headline entrance, fixed starting places. The hero's compass runs, as for
+    // a visitor, although the test browsers draw it in software.
     await context.addInitScript(() => {
       window.steadyMotion = true;
+      window.drawInSoftware = true;
     });
     const page = await context.newPage();
     // Picture files wait here until they are let through.

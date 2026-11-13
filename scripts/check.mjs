@@ -294,9 +294,12 @@ try {
           Object.assign(options, { isMobile: true, hasTouch: true });
         const context = await browser.newContext(options);
         // Tells the site's scripts to use fixed starting points for anything they would otherwise place
-        // at random, so the same page gives the same picture on every run.
+        // at random, so the same page gives the same picture on every run. The test browsers draw
+        // WebGL in software, where the hero keeps its still picture; "drawInSoftware" lets the
+        // compass run anyway, so every page is photographed and tested as a visitor sees it.
         await context.addInitScript(() => {
           window.steadyMotion = true;
+          window.drawInSoftware = true;
         });
         // Hover fades are switched off for the photographs. Chromium briefly squeezes the page while it
         // photographs it, which would otherwise catch labels that only show on phones in the middle of fading out.

@@ -9,11 +9,14 @@
 //   - left alone it turns on its own, and keeps turning;
 //   - a drag turns it, and when let go it carries on moving; a finger on it turns it instead of
 //     scrolling the page;
-//   - with "reduce motion", without WebGL and without scripts the still picture stays, alone;
+//   - with "reduce motion", without WebGL, without scripts and with graphics drawn in software
+//     (no graphics card) the still picture stays, alone;
 //   - after a page change away and back there is still exactly one compass, and none elsewhere;
 //   - no script error is raised along the way.
 // The page's clock is stopped (Playwright's clock) while the compass is watched, and moved on by
 // hand, so what it does depends on time alone, never on how busy the computer is.
+// The test browsers draw WebGL in software, where the site keeps the still picture; the tests
+// that watch the compass move set the site's switch for that ("drawInSoftware").
 import sharp from 'sharp';
 
 // The share of the frame's screen pixels that may differ between the compass at rest and the
@@ -165,6 +168,9 @@ export async function compassInBrowser(browser, address) {
   // ---- It takes the still picture's place, and at rest shows the same ----
   {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
+    await context.addInitScript(() => {
+      window.drawInSoftware = true;
+    });
     const page = await context.newPage();
     errorsOf(page, 'home page');
     await page.clock.install();
@@ -346,6 +352,24 @@ export async function compassInBrowser(browser, address) {
       const getContext = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function (kind, ...rest) {
         return /webgl/.test(kind) ? null : getContext.call(this, kind, ...rest);
+      };
+    }),
+  );
+  // Each browser is told its graphics are Chrome's software ones (SwiftShader), the way
+  // PageSpeed's test machine draws, whatever it really draws with.
+  await stays('with graphics drawn in software', {}, (context) =>
+    context.addInitScript(() => {
+      const [renderer, unmasked] = [0x1f01, 0x9246];
+      const { getParameter, getExtension } = WebGLRenderingContext.prototype;
+      WebGLRenderingContext.prototype.getParameter = function (name) {
+        if (name === renderer) return 'WebKit WebGL';
+        if (name === unmasked) return 'ANGLE (Google, SwiftShader Device, SwiftShader driver)';
+        return getParameter.call(this, name);
+      };
+      WebGLRenderingContext.prototype.getExtension = function (name) {
+        if (name === 'WEBGL_debug_renderer_info')
+          return { UNMASKED_VENDOR_WEBGL: 0x9245, UNMASKED_RENDERER_WEBGL: unmasked };
+        return getExtension.call(this, name);
       };
     }),
   );
